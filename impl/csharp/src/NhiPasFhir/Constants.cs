@@ -51,6 +51,11 @@ public static class Sys
     public const string V3InterpObs = "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation";
     public const string OrderableDrugForm = "http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm";
 
+    // --- ClaimResponse (核定回應) ---
+    public const string Adjudication = "http://terminology.hl7.org/CodeSystem/adjudication";
+    public const string CsApproveComment = PasBase + "/CodeSystem/nhi-approve-comment";
+    public const string ExtClaimResponseRequestor = Sd + "/extension-claimResponse-requestor";
+
     public const string ExtClaimEncounter = Sd + "/extension-claim-encounter";
     public const string ExtRequestedService = Sd + "/extension-requestedService";
     public const string ExtDxRecordedDate = "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-diagnosisRecordedDate";

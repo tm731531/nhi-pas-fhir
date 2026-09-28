@@ -380,10 +380,10 @@ public sealed class ImmunologicAssembler : AbstractCaseAssembler
             Id = "cla-imm", Meta = Profile("Claim-immunologic-agent-twpas"),
             Status = FinancialResourceStatusCodes.Active,
             Type = Cc(Sys.ClaimType, "institutional"),
-            SubType = Cc(Sys.CsApplyType, "1", "送核"),
+            SubType = SubTypeOf(c),
             Use = ClaimUseCode.Preauthorization,
             Patient = Ref(patient), Created = c.Created, Enterer = Ref(doctor), Provider = Ref(hospital),
-            Priority = Cc(Sys.CsTmhbType, "1", "一般事前審查申請"),
+            Priority = PriorityOf(c),
             Insurance = { new Claim.InsuranceComponent { Sequence = 1, Focal = true, Coverage = Ref(cov) } },
         };
         claim.Extension.Add(new Extension(Sys.ExtClaimEncounter, Ref(encMin)));

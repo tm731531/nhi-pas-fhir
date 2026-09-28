@@ -43,4 +43,29 @@ public static class Samples
             ["drug_code"] = "BC27730100", ["drug_qty"] = 52, ["program_text"] = "ALK陽性的晚期非小細胞肺癌第一線治療",
             ["drug_code_2"] = "KC011162B5", ["drug_qty_2"] = 70, ["apply_reason"] = "C50P1",
         });
+
+    /// <summary>申復 (appeal) — same as a 送核 case but subType=3. Any case type accepts subtype_code/priority_code.</summary>
+    public static PACase AppealCase()
+    {
+        var c = CancerDrugCase();
+        return c with { Data = new Dictionary<string, object>(c.Data)
+        {
+            ["subtype_code"] = "3",                                          // 3 = 申復
+            ["filing_ref"] = "FHR3501200000_2016101000000001.JSON",          // 送核檔名
+            ["old_acpt_no"] = "202405301000002",                            // 原送核受理編號 (invariant applType)
+        } };
+    }
+
+    /// <summary>自主審查 (self-assessment) — 送核 but priority=3.</summary>
+    public static PACase SelfAssessmentCase()
+    {
+        var c = CancerDrugCase();
+        return c with { Data = new Dictionary<string, object>(c.Data) { ["priority_code"] = "3" } };  // 3 = 自主審查
+    }
+
+    /// <summary>NHI decision (核定回應) — fabricated. Item 1 = 同意 (approve-comment "1").</summary>
+    public static ResponseCase ResponseCase() => new(
+        ResponseId: "202505301000002", PatientRef: "Patient/pat-1", HospitalRef: "Organization/org-hosp",
+        ClaimRef: "Claim/cla-1", Created: "2026-09-28", Disposition: "審畢結果",
+        Items: new[] { new ResponseItem(ItemSequence: 1, ApproveCode: "1", ApprovedValue: 2) });
 }

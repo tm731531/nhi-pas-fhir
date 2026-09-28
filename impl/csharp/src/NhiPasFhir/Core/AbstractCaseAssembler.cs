@@ -87,6 +87,23 @@ public abstract class AbstractCaseAssembler : ICaseAssembler
         Value = new Quantity(value, unit, Sys.Ucum),
     };
 
+    // 申報別 (subType) × 案件別 (priority) — every case type reads these from PACase.Data; default = 送核 / 一般.
+    private static readonly Dictionary<string, string> ApplyType = new()
+    { ["1"] = "送核", ["2"] = "送核補件", ["3"] = "申復", ["4"] = "爭議審議", ["5"] = "申復補件" };
+    private static readonly Dictionary<string, string> TmhbType = new()
+    { ["1"] = "一般事前審查申請", ["3"] = "自主審查", ["4"] = "緊急報備" };
+
+    protected static CodeableConcept SubTypeOf(PACase c)
+    {
+        var code = c.Data.TryGetValue("subtype_code", out var v) ? (string)v : "1";
+        return new CodeableConcept(Sys.CsApplyType, code, ApplyType.GetValueOrDefault(code));
+    }
+    protected static CodeableConcept PriorityOf(PACase c)
+    {
+        var code = c.Data.TryGetValue("priority_code", out var v) ? (string)v : "1";
+        return new CodeableConcept(Sys.CsTmhbType, code, TmhbType.GetValueOrDefault(code));
+    }
+
     protected Bundle WrapBundle(string profile, IEnumerable<Resource> ordered)
     {
         var bundle = new Bundle { Id = "bun-demo", Meta = Profile(profile), Type = Bundle.BundleType.Collection };
@@ -133,20 +150,54 @@ public abstract class AbstractCaseAssembler : ICaseAssembler
             Status = FinancialResourceStatusCodes.Active,
             Type = new CodeableConcept(Sys.ClaimType, "institutional"),
             Use = ClaimUseCode.Preauthorization,
-            SubType = new CodeableConcept(Sys.CsApplyType, "1", "送核"),
-            Priority = new CodeableConcept(Sys.CsTmhbType, "1", "一般事前審查申請"),
+            SubType = SubTypeOf(c),
+            Priority = PriorityOf(c),
             Patient = Ref(patient), Created = c.Created, Enterer = Ref(doctor), Provider = Ref(hospital),
             Insurance = { new Claim.InsuranceComponent { Sequence = 1, Focal = true, Coverage = Ref(cov) } },
             Item = parts.Items, Diagnosis = parts.Diagnoses, SupportingInfo = supportingInfo,
         };
         claim.Extension.Add(new Extension(Sys.ExtClaimEncounter, Ref(enc)));
+        // 補件/申復/爭議 (subType 2/3/4/5) require the original acceptance number (invariant applType).
+        if (c.Data.TryGetValue("old_acpt_no", out var acpt))
+        {
+            if (c.Data.TryGetValue("filing_ref", out var fref))
+                claim.Identifier.Add(new Identifier { Use = Identifier.IdentifierUse.Usual, Value = (string)fref });
+            claim.Identifier.Add(new Identifier { Use = Identifier.IdentifierUse.Secondary, Value = (string)acpt });
+        }
 
         var ordered = new List<Resource> { claim, enc, patient, doctor, hospital };
         ordered.AddRange(parts.Extras);
         ordered.Add(cov);
         ordered.Add(nhi);
         ordered.AddRange(parts.Reports.Select(r => r.Report));
+        // 自主審查 (priority 3): the applicant includes its own self-assessment ClaimResponse (invariant claimResponse-1).
+        if (c.Data.TryGetValue("priority_code", out var pc) && (string)pc == "3")
+            ordered.Add(BuildSelfAssessment(c, patient, nhi, claim));
 
         return WrapBundle("Bundle-twpas", ordered);
+    }
+
+    protected ClaimResponse BuildSelfAssessment(PACase c, Patient patient, Organization nhi, Claim claim)
+    {
+        var cr = new ClaimResponse
+        {
+            Id = "cla-self", Meta = Profile("ClaimResponse-self-assessment-twpas"),
+            Status = FinancialResourceStatusCodes.Active,
+            Type = new CodeableConcept(Sys.ClaimType, "institutional"),
+            Use = ClaimUseCode.Preauthorization,
+            Patient = Ref(patient), Created = c.Created, Insurer = Ref(nhi), Request = Ref(claim),
+            Outcome = ClaimProcessingCodes.Complete,
+        };
+        foreach (var id in new[] { c.Provider["doctor_id_card"], c.Patient["id_card"] })  // 對查委員身分 (requestor)
+            cr.Extension.Add(new Extension(Sys.ExtClaimResponseRequestor, new Identifier(Sys.IdCard, id)));
+        foreach (var item in claim.Item)                                                    // 個別醫令核定結果
+            cr.Item.Add(new ClaimResponse.ItemComponent
+            {
+                ItemSequence = item.Sequence,
+                Adjudication = { new ClaimResponse.AdjudicationComponent
+                    { Category = new CodeableConcept(Sys.Adjudication, "submitted"),
+                      Reason = new CodeableConcept(Sys.CsApproveComment, "1"), Value = item.Quantity?.Value } },
+            });
+        return cr;
     }
 }
