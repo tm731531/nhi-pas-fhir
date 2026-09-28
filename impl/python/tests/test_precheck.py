@@ -1,6 +1,6 @@
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "src"))
-from nhi_pas.precheck import precheck_pairs, has_blocking_errors, RuleSet
+from nhi_pas.core.precheck import precheck_pairs, has_blocking_errors, RuleSet
 
 
 def test_valid_pair_passes():
