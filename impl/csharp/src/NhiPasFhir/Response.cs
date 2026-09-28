@@ -2,6 +2,8 @@ using Hl7.Fhir.Model;
 
 namespace NhiPasFhir;
 
+// IG 對照 (spec/docs/IG-TRACEABILITY.md): 規範文件邏輯模型 ResponseModel → 範例 Bundle-bun-response / ClaimResponse-twpas
+
 /// <summary>One adjudicated item of an NHI response. ApproveCode ∈ nhi-approve-comment:
 /// 0 審核中 · 1 同意 · 2 不予同意 · 3 部份同意 · 4 補件 · 5 退件 · 6 不予同意(對應手術亦不支付) · 7 改核.</summary>
 public sealed record ResponseItem(int ItemSequence, string ApproveCode, int ApprovedValue = 0);

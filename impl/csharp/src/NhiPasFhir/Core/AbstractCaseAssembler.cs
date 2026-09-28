@@ -2,6 +2,8 @@ using Hl7.Fhir.Model;
 
 namespace NhiPasFhir.Core;
 
+// IG 對照 (spec/docs/IG-TRACEABILITY.md): 共用臨床層 Profiles(Patient/Practitioner/Organization/Coverage/Encounter-twpas)+ ClaimResponse-self-assessment-twpas(自主審查)
+
 /// <summary>Shared assembly behaviour (TW Core clinical layer + Bundle). Case types override BuildCase.</summary>
 public abstract class AbstractCaseAssembler : ICaseAssembler
 {

@@ -2,6 +2,8 @@ using Hl7.Fhir.Model;
 
 namespace NhiPasFhir;
 
+// IG 對照 (spec/docs/IG-TRACEABILITY.md): Profile Operationoutcome-twpas → 範例 OperationOutcome-error-example
+
 /// <summary>One processing issue in an OperationOutcome-twpas. DetailsCode ∈ operation-outcome CodeSystem
 /// (e.g. "MSG_PARAM_INVALID").</summary>
 public sealed record OutcomeIssue(string Severity, string Code, string DetailsCode);

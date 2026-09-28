@@ -4,6 +4,8 @@ using NhiPasFhir.Core;
 
 namespace NhiPasFhir.Plugins;
 
+// IG 對照 (spec/docs/IG-TRACEABILITY.md): 視覺化邏輯模型「癌藥事前審查」→ ApplyModel → 範例 Bundle-bun-1 / Claim-twpas
+
 /// <summary>癌藥/一般送核 case type — reproduces the official full example Bundle-bun-1 (28 resources):
 /// imaging chain + cancer-stage + gene/diagnostic (+ Specimen + genetic-testing Org) + exam/lab evidence +
 /// procedure/substance + assessments + two applied drugs. Values transcribed from the official example

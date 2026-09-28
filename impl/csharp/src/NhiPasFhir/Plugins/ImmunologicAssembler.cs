@@ -4,6 +4,8 @@ using NhiPasFhir.Core;
 
 namespace NhiPasFhir.Plugins;
 
+// IG 對照 (spec/docs/IG-TRACEABILITY.md): 視覺化邏輯模型「免疫製劑事前審查」→ ApplyImmModel → 範例 Bundle-bun-imm / Claim-immunologic-agent-twpas
+
 /// <summary>免疫製劑事前審查 case type. Builds the full Bundle-immunologic-agent-twpas (36 resources:
 /// SOAP note via Composition-opd + blood group + allergy + imaging/exam/lab/procedure/phototherapy
 /// evidence + two applied drugs). All values transcribed from the official IG example (fabricated, no PHI);

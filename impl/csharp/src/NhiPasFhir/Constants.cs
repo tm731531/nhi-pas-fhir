@@ -1,5 +1,7 @@
 namespace NhiPasFhir;
 
+// IG 對照 (spec/docs/IG-TRACEABILITY.md): 規範文件「專門術語」:所有 CodeSystem / ValueSet 的 canonical system URL
+
 /// <summary>Verified systems/CodeSystems/extension URLs (from the official IG package + examples).</summary>
 public static class Sys
 {

@@ -76,6 +76,7 @@ per-case manual: [impl/csharp/MANUAL.md](impl/csharp/MANUAL.md).
 - [ARCHITECTURE](spec/docs/ARCHITECTURE.md) — interface → abstract → implementation + factory
 - [CASE-CATALOG](spec/docs/CASE-CATALOG.md) — every case type, lifecycle, class hierarchy
 - [COVERAGE](spec/docs/COVERAGE.md) — coverage vs the official IG
+- [IG-TRACEABILITY](spec/docs/IG-TRACEABILITY.md) — every official IG artifact ↔ where we cover it (change detector)
 - [CONTRACTS-and-TESTS](spec/docs/CONTRACTS-and-TESTS.md) — the contracts and test plan
 
 ## Principles

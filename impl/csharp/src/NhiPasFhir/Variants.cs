@@ -2,6 +2,8 @@ using Hl7.Fhir.Model;
 
 namespace NhiPasFhir;
 
+// IG 對照 (spec/docs/IG-TRACEABILITY.md): 範例值變體:obs-cancer-cns/tnm · obs-pat-ctcae/pdai · diaRep-ima-loinc · doc-phototherapy-min · pat-resident
+
 /// <summary>Individual resource variants from the official examples — same profile, different clinical data.
 /// Producing each and validating it to 0 errors proves the library stays in sync with the official IG for
 /// every documented value shape (cancer-stage integer/string/coded, patient-assessment quantity/component,
