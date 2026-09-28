@@ -2,7 +2,7 @@
 
 **Feature Branch**: `001-cancer-drug-pa-bundle`
 **Created**: 2026-09-28
-**Status**: Draft (for review)
+**Status**: Ready — clarifications resolved 2026-09-28 (FR-013 = full terminology; FR-014 = structured input + two-layer TW Core/pas architecture)
 **Input**: Produce a 癌藥事前審查 (cancer-drug prior-authorization) request `Bundle` that **passes the
 official HL7 FHIR validator with 0 errors** against the pinned NHI pas IG, and pre-checks the
 drug↔indication constraint before submission. Governed by `.specify/memory/constitution.md`.
@@ -104,12 +104,18 @@ every pre-check output carries the advisory disclaimer.
 - **FR-012**: The drug↔indication rule set MUST load from an authoritative artifact (預檢規則 CQL IG /
   ValueSets); the seeded subset is explicitly labelled as such until the full set is ingested.
 
-*Unclear (to resolve in /speckit-clarify):*
-- **FR-013**: Terminology binding conformance — is v1 "done" at structural `0 errors` (`-tx n/a`), or
-  MUST it also pass full terminology validation (kg/cm/ICD codes via a tx server)?
-  [NEEDS CLARIFICATION: which terminology gate for v1?]
-- **FR-014**: Source of the structured case data (manual input vs EMR extraction) —
-  [NEEDS CLARIFICATION: assumed provided/out of scope for this feature?]
+*Resolved (2026-09-28, Tom):*
+- **FR-013**: v1 "done" = the generated Bundle passes **full terminology validation** (UCUM/ICD/SNOMED
+  codes checked against a terminology server), not merely structural `0 errors`. Medical correctness
+  demands the codes themselves are valid, not just the shape. (Chosen: option B.)
+- **FR-014**: This feature takes the case as a **structured PA Case input**; data capture (form / HIS
+  adapter / FHIR-EMR pull) is a **separate feature**. Internally the system MUST be **two-layered**:
+  a **TW Core clinical layer** (Patient/Practitioner/Organization/Encounter/Condition/Observation/
+  DiagnosticReport/Procedure/Specimen — the entities pas inherits from TW Core) and a **pas assembler**
+  that applies pas-specific constraints and packaging on top. This mirrors the Da Vinci PAS pattern pas
+  inherits, and lets a future FHIR-EMR source reuse the assembler unchanged.
+- **FR-015**: The two layers MUST be separable: the pas assembler consumes TW Core-shaped clinical data
+  regardless of how it was produced (form today, FHIR EMR later) — build-once-on-TW-Core.
 
 ### Key Entities
 - **PA Case (input)**: the structured facts of one cancer-drug PA application (patient, physician,
@@ -122,8 +128,10 @@ every pre-check output carries the advisory disclaimer.
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
-- **SC-001**: A generated cancer-drug Bundle from a complete fabricated case validates with **0 errors**
-  against `tw.gov.mohw.nhi.pas#1.2.6` (baseline today: 45 errors → target 0).
+- **SC-001**: A generated cancer-drug Bundle from a complete fabricated case validates with **0 errors,
+  including full terminology validation** (with a tx server, not `-tx n/a`), against
+  `tw.gov.mohw.nhi.pas#1.2.6` (baseline today: 45 errors → target 0). Terminology warnings are triaged;
+  code-validity errors are not acceptable.
 - **SC-002**: Pre-check correctly BLOCKS every known-bad drug↔indication pair in the seeded rule set and
   CLEARS every known-good pair (100% on the seeded test set).
 - **SC-003**: 0 hand-guessed URLs/codes remain in emitted output — every value traces to the pinned IG.
@@ -134,7 +142,8 @@ every pre-check output carries the advisory disclaimer.
 - Pinned IG version is **`tw.gov.mohw.nhi.pas#1.2.6`**; upgrades are explicit, re-validated events (VI).
 - Scope of this feature is **cancer-drug** PA only; 免疫製劑 (immunologic agents) is a later feature.
 - The structured PA Case is provided to the system (data capture/EMR integration is out of scope here).
-- Terminology-server checks (UCUM/ICD/SNOMED) are handled as a separate, explicit gate; this feature's
-  primary DoD is structural `0 errors` unless FR-013 resolves otherwise.
+- DoD is **full** validation (structural + terminology) at 0 errors (FR-013 = B).
+- Internal architecture is two-layered (TW Core clinical layer + pas assembler) per FR-014/FR-015;
+  data capture is out of scope for this feature.
 - All data is fabricated; no PHI (Constitution V).
 - Official validator + IG package are fetched via `tools/fetch_validation_assets.sh` (not committed).
