@@ -2,6 +2,7 @@
 
 SoT: https://nhicore.nhi.gov.tw/pas/ · IG v1.2.6 · FHIR R4. No real patient data.
 """
+from . import twcore, pas  # noqa: F401  (two-layer architecture, spec 001)
 from .interface import (
     Adjudication, ApplyCategory, Disposition, FilingCategory,
     SubmitResult, TWPASClient, TWPASServer, SEARCH_PARAMETERS,
