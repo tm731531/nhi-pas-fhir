@@ -53,3 +53,18 @@ Phase 1 (this repo now): **docs + interface design**. App comes later.
 ## License / data
 
 Study material. Uses **no real patient data**. All identifiers in examples are fabricated.
+
+## Governance & strategy (this is a serious project)
+
+- `CLAUDE.md` — working rules (never fabricate FHIR fields; English code; dev-branch; verify).
+- `AGENTS.md` — agent-team staffing map (spin up on demand).
+- `docs/strategy/BUSINESS.md` — the money side: goal, market, ICP, product, monetisation, competitor.
+- Strategy memory: `~/.claude/projects/-home-tom/memory/project-nhi-pas-fhir.md`.
+
+## Quickstart
+
+```bash
+make venv          # create .venv + install deps
+. .venv/bin/activate
+make test          # pytest (should pass)
+```
