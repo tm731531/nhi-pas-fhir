@@ -1,0 +1,95 @@
+FHIR Validation tool Version 6.10.4 (Git# 1b90fb13f77b). Built 2026-09-04T05:45:41.468Z (24 days old)
+  Java:   17.0.20.1 from /usr/lib/jvm/java-17-openjdk-amd64 on amd64 (64bit). 7972MB available
+  Paths:  Current = /home/tom/Desktop/nhi-pas-fhir, Package Cache = /home/tom/.fhir/packages
+  Params: .fhir/generated/pa-bundle.json -ig .fhir/pas-package.tgz -version 4.0.1
+  Locale: 台灣/TW
+  Jurisdiction: Taiwan, Republic of China
+Loading
+  Loading FHIR v4.0.1 from hl7.fhir.r4.core#4.0.1
+  Load hl7.terminology.r4#6.2.0 - 4288 resources (00:13.135)
+  Load hl7.fhir.uv.extensions.r4#5.2.0 - 759 resources (00:02.501)
+  Loaded FHIR - 8265 resources (00:00.000)
+  Terminology server https://tx.fhir.org - Version Connected to Terminology Server at https://tx.fhir.org (00:02.512)
+  Load hl7.terminology#7.4.0 - 4181 resources (00:03.948)
+  Load hl7.fhir.uv.extensions.r5#5.2.0 - 759 resources (00:00.363)
+  Load hl7.terminology.r5#7.1.0 - 4072 resources (00:04.146)
+  Load hl7.fhir.uv.extensions#5.3.0 - 856 resources (00:00.022)
+  Load hl7.terminology.r4#7.1.0 - 4072 resources (00:06.631)
+  Load hl7.fhir.uv.extensions.r4#5.3.0 - 885 resources (00:01.030)
+  Load hl7.terminology.r4#7.3.0 - 4146 resources (00:08.827)
+  Load hl7.terminology.r4#6.1.0 - 4279 resources (00:11.701)
+  Load hl7.fhir.uv.extensions.r4#5.1.0 - 1397 resources (00:01.668)
+  Load hl7.terminology.r4#5.0.0 - 4175 resources (00:13.113)
+  Load fhir.dicom#2022.4.20221006 - 1319 resources (00:00.037)
+  Load hl7.fhir.uv.ips#1.1.0 - 104 resources (00:00.002)
+  Load hl7.fhir.r4.examples#4.0.1 - 4581 resources (00:03.774)
+  Load hl7.fhir.uv.sdc#3.0.0 - 138 resources (00:00.014)
+  Load tw.gov.mohw.twcore#0.3.2 - 320 resources (00:00.133)
+  Load hl7.fhir.us.core#3.1.1 - 146 resources (00:00.012)
+  Load hl7.fhir.us.core.v311#3.1.1 - 0 resources (00:00.000)
+  Load hl7.fhir.uv.extensions.r4#1.0.0 - 1329 resources (00:01.621)
+  Load hl7.fhir.uv.bulkdata#2.0.0 - 7 resources (00:00.002)
+  Load hl7.fhir.uv.smart-app-launch#2.1.0 - 8 resources (00:00.002)
+  Load us.nlm.vsac#0.11.0 - 14323 resources (00:00.689)
+  Load us.cdc.phinvads#0.12.0 - 1967 resources (00:00.086)
+  Load ihe.formatcode.fhir#1.1.0 - 3 resources (00:00.002)
+  Load hl7.fhir.us.core#6.1.0 - 213 resources (00:00.004)
+  Load hl7.fhir.us.core.v610#6.1.0 - 0 resources (00:00.000)
+  Load hl7.terminology.r4#5.5.0 - 4225 resources (00:23.249)
+  Load hl7.fhir.uv.smart-app-launch#2.0.0 - 1 resources (00:00.001)
+  Load us.nlm.vsac#0.18.0 - 30140 resources (00:02.552)
+  Load hl7.terminology.r5#5.3.0 - 4202 resources (00:36.178)
+  Load hl7.fhir.uv.extensions#5.1.0-snapshot1 - 1379 resources (00:00.078)
+  Load hl7.fhir.us.core#7.0.0 - 217 resources (00:00.005)
+  Load hl7.fhir.uv.xver-r5.r4#0.1.0 - 4707 resources (00:00.161)
+  Load hl7.fhir.uv.tools.r4#1.1.2 - 118 resources (00:00.021)
+  Load hl7.terminology.r4#6.5.0 - 4357 resources (00:44.452)
+  Load hl7.fhir.uv.extensions.r4#5.3.0-ballot-tc1 - 855 resources (00:00.810)
+  Load hl7.fhir.uv.sdc#4.0.0 - 181 resources (00:00.012)
+  Load us.nlm.vsac#0.19.0 - 15332 resources (00:01.350)
+  Load hl7.fhir.us.davinci-hrex#1.2.0 - 31 resources (00:00.003)
+  Load hl7.terminology.r4#7.0.1 - 4066 resources (00:54.137)
+  Load hl7.fhir.uv.cds-hooks#3.0.0-ballot - 5 resources (00:00.000)
+  Load hl7.fhir.uv.cds-hooks-library#1.0.1 - 1 resources (00:00.001)
+  Load hl7.fhir.us.davinci-crd#2.2.1 - 87 resources (00:00.022)
+  Load hl7.fhir.us.davinci-hrex#1.1.0 - 29 resources (00:00.006)
+  Load hl7.terminology.r4#5.3.0 - 4202 resources (00:55.271)
+  Load hl7.fhir.us.udap-security#0.1.0 - 2 resources (00:00.004)
+  Load hl7.fhir.us.davinci-hrex#1.0.0 - 26 resources (00:00.001)
+  Load hl7.fhir.us.davinci-crd#2.0.0 - 42 resources (00:00.018)
+  Load hl7.fhir.uv.subscriptions-backport.r4#1.1.0 - 24 resources (00:00.002)
+  Load us.nlm.vsac#0.7.0 - 12403 resources (00:01.267)
+  Load hl7.fhir.us.carin-bb#2.0.0 - 91 resources (00:00.002)
+  Load hl7.fhir.us.davinci-pas#2.1.0 - 102 resources (00:00.016)
+  Load hl7.fhir.us.davinci-crd#2.1.0 - 52 resources (00:00.024)
+  Load hl7.fhir.us.davinci-dtr#2.1.0 - 40 resources (00:00.022)
+  Load hl7.fhir.us.davinci-cdex#2.1.0 - 25 resources (00:00.001)
+  Load hl7.fhir.us.davinci-pas#2.2.1 - 111 resources (00:00.018)
+  Load .fhir/pas-package.tgz#1.2.6 - 127 resources (00:03.280)
+  Package Summary: [hl7.fhir.r4.core#4.0.1, hl7.fhir.xver-extensions#0.1.0, hl7.terminology.r4#6.2.0, hl7.fhir.uv.extensions.r4#5.2.0, hl7.terminology#7.4.0, hl7.fhir.uv.extensions.r5#5.2.0, hl7.terminology.r5#7.1.0, hl7.fhir.uv.extensions#5.3.0, hl7.terminology.r4#7.1.0, hl7.fhir.uv.extensions.r4#5.3.0, hl7.terminology.r4#7.3.0, hl7.terminology.r4#6.1.0, hl7.fhir.uv.extensions.r4#5.1.0, hl7.terminology.r4#5.0.0, fhir.dicom#2022.4.20221006, hl7.fhir.uv.ips#1.1.0, hl7.fhir.r4.examples#4.0.1, hl7.fhir.uv.sdc#3.0.0, tw.gov.mohw.twcore#0.3.2, hl7.fhir.us.core#3.1.1, hl7.fhir.us.core.v311#3.1.1, hl7.fhir.uv.extensions.r4#1.0.0, hl7.fhir.uv.bulkdata#2.0.0, hl7.fhir.uv.smart-app-launch#2.1.0, us.nlm.vsac#0.11.0, us.cdc.phinvads#0.12.0, ihe.formatcode.fhir#1.1.0, hl7.fhir.us.core#6.1.0, hl7.fhir.us.core.v610#6.1.0, hl7.terminology.r4#5.5.0, hl7.fhir.uv.smart-app-launch#2.0.0, us.nlm.vsac#0.18.0, hl7.terminology.r5#5.3.0, hl7.fhir.uv.extensions#5.1.0-snapshot1, hl7.fhir.us.core#7.0.0, hl7.fhir.uv.xver-r5.r4#0.1.0, hl7.fhir.uv.tools.r4#1.1.2, hl7.terminology.r4#6.5.0, hl7.fhir.uv.extensions.r4#5.3.0-ballot-tc1, hl7.fhir.uv.sdc#4.0.0, us.nlm.vsac#0.19.0, hl7.fhir.us.davinci-hrex#1.2.0, hl7.terminology.r4#7.0.1, hl7.fhir.uv.cds-hooks#3.0.0-ballot, hl7.fhir.uv.cds-hooks-library#1.0.1, hl7.fhir.us.davinci-crd#2.2.1, hl7.fhir.us.davinci-hrex#1.1.0, hl7.terminology.r4#5.3.0, hl7.fhir.us.udap-security#0.1.0, hl7.fhir.us.davinci-hrex#1.0.0, hl7.fhir.us.davinci-crd#2.0.0, hl7.fhir.uv.subscriptions-backport.r4#1.1.0, us.nlm.vsac#0.7.0, hl7.fhir.us.carin-bb#2.0.0, hl7.fhir.us.davinci-pas#2.1.0, hl7.fhir.us.davinci-crd#2.1.0, hl7.fhir.us.davinci-dtr#2.1.0, hl7.fhir.us.davinci-cdex#2.1.0, hl7.fhir.us.davinci-pas#2.2.1, tw.gov.mohw.nhi.pas#1.2.6]
+  Terminology Cache at /tmp/default-tx-cache
+  Get set... 
+  ...go! (00:19.300)
+Cached new session. Cache size = 1
+Sources to validate: .fhir/generated/pa-bundle.json
+Validating
+  Validate .fhir/generated/pa-bundle.json
+ 00:10.763
+Done. Times: Loading: 05:18.433, validation: 00:10.763. Memory = 2Gb
+
+Success: 0 errors, 12 warnings, 2 notes
+  Warning @ Bundle.entry[0].resource/*Claim/cla-1*/.diagnosis[0].diagnosis.ofType(CodeableConcept).coding[0].system (line 123, col14): A definition for CodeSystem 'https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-cm-2023-tw' could not be found, so the code cannot be validated, validating against ￨ﾇﾺ￧ﾁﾣ￥ﾁﾥ￤﾿ﾝ￤ﾺﾋ￥ﾉﾍ￥ﾯﾩ￦ﾟﾥ￥ﾯﾦ￤ﾽﾜ￦ﾌﾇ￥ﾼﾕ v1.2.6
+  Information @ Bundle.entry[0].resource/*Claim/cla-1*/.diagnosis[0].diagnosis.ofType(CodeableConcept).coding[0].system (line 126, col96): A definition could not be found for Canonical URL 'https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-cm-2023-tw' but a definition can be found for 'http://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-cm-2023-tw' - change from https: to http:, validating against ￨ﾇﾺ￧ﾁﾣ￥ﾁﾥ￤﾿ﾝ￤ﾺﾋ￥ﾉﾍ￥ﾯﾩ￦ﾟﾥ￥ﾯﾦ￤ﾽﾜ￦ﾌﾇ￥ﾼﾕ v1.2.6
+  Warning @ Bundle.entry[0].resource/*Claim/cla-1*/.item[0].quantity (line 105, col14): UCUM Codes that contain human readable annotations like {tbl} can be misleading (e.g. they are ignored when comparing units). Best Practice is not to depend on annotations in the UCUM code, so this usage should be checked, and the Quantity.unit SHOULD contain the annotation, validating against ￨ﾇﾺ￧ﾁﾣ￥ﾁﾥ￤﾿ﾝ￤ﾺﾋ￥ﾉﾍ￥ﾯﾩ￦ﾟﾥ￥ﾯﾦ￤ﾽﾜ￦ﾌﾇ￥ﾼﾕ v1.2.6
+  Warning @ Bundle.entry[0].resource/*Claim/cla-1*/ (line 13, col8): Constraint failed: dom-6: 'A resource should have narrative for robust management' (defined in http://hl7.org/fhir/StructureDefinition/DomainResource) (Best Practice Recommendation), validating against ￨ﾇﾺ￧ﾁﾣ￥ﾁﾥ￤﾿ﾝ￤ﾺﾋ￥ﾉﾍ￥ﾯﾩ￦ﾟﾥ￥ﾯﾦ￤ﾽﾜ￦ﾌﾇ￥ﾼﾕ v1.2.6
+  Warning @ Bundle.entry[0].resource/*Claim/cla-1*/.diagnosis[0].diagnosis.ofType(CodeableConcept).coding[0] (line 125, col18): The code provided (https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-cm-2023-tw#C90.00) is not in the value set '￨ﾇﾺ￧ﾁﾣ￥ﾁﾥ￤﾿ﾝ￧ﾽﾲ2023￥ﾹﾴ￤ﾸﾭ￦ﾖﾇ￧ﾉﾈICD-10-CM￥ﾀﾼ￩ﾛﾆ' (https://twcore.mohw.gov.tw/ig/twcore/ValueSet/icd-10-cm-2023-tw|2024-11-18), and a code should come from this value set unless it has no suitable code (the validator cannot judge what is suitable), validating against ￨ﾇﾺ￧ﾁﾣ￥ﾁﾥ￤﾿ﾝ￤ﾺﾋ￥ﾉﾍ￥ﾯﾩ￦ﾟﾥ￥ﾯﾦ￤ﾽﾜ￦ﾌﾇ￥ﾼﾕ v1.2.6
+  Warning @ Bundle.entry[1].resource/*Encounter/enc-1*/ (line 206, col8): Constraint failed: dom-6: 'A resource should have narrative for robust management' (defined in http://hl7.org/fhir/StructureDefinition/DomainResource) (Best Practice Recommendation), validating against ￨ﾇﾺ￧ﾁﾣ￥ﾁﾥ￤﾿ﾝ￤ﾺﾋ￥ﾉﾍ￥ﾯﾩ￦ﾟﾥ￥ﾯﾦ￤ﾽﾜ￦ﾌﾇ￥ﾼﾕ v1.2.6
+  Information @ Bundle.entry[1].resource/*Encounter/enc-1*/.serviceType (line 219, col10): None of the codings provided are in the value set '￥ﾰﾍ￦ﾇﾉ￨ﾇﾳ SNOMED CT￤ﾹﾋ￥ﾰﾱ￩ﾆﾫ￧ﾧﾑ￥ﾈﾥ + ￨ﾨﾺ￧ﾙﾂ￧ﾧﾑ￥ﾈﾥ￥ﾀﾼ￩ﾛﾆ' (https://twcore.mohw.gov.tw/ig/twcore/ValueSet/medical-department-sct-tw|0.3.0), and a coding is recommended to come from this value set (codes = https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/medical-consultation-department-nhi-tw#AJ), validating against ￨ﾇﾺ￧ﾁﾣ￥ﾁﾥ￤﾿ﾝ￤ﾺﾋ￥ﾉﾍ￥ﾯﾩ￦ﾟﾥ￥ﾯﾦ￤ﾽﾜ￦ﾌﾇ￥ﾼﾕ v1.2.6
+  Warning @ Bundle.entry[2].resource/*Patient/pat-1*/ (line 234, col8): Constraint failed: dom-6: 'A resource should have narrative for robust management' (defined in http://hl7.org/fhir/StructureDefinition/DomainResource) (Best Practice Recommendation), validating against ￨ﾇﾺ￧ﾁﾣ￥ﾁﾥ￤﾿ﾝ￤ﾺﾋ￥ﾉﾍ￥ﾯﾩ￦ﾟﾥ￥ﾯﾦ￤ﾽﾜ￦ﾌﾇ￥ﾼﾕ v1.2.6
+  Warning @ Bundle.entry[3].resource/*Practitioner/pra-1*/ (line 269, col8): Constraint failed: dom-6: 'A resource should have narrative for robust management' (defined in http://hl7.org/fhir/StructureDefinition/DomainResource) (Best Practice Recommendation), validating against Base FHIR Standard
+  Warning @ Bundle.entry[4].resource/*Organization/org-hosp*/ (line 301, col8): Constraint failed: dom-6: 'A resource should have narrative for robust management' (defined in http://hl7.org/fhir/StructureDefinition/DomainResource) (Best Practice Recommendation), validating against Base FHIR Standard
+  Warning @ Bundle.entry[5].resource/*MedicationRequest/medReq-apply*/ (line 339, col8): Constraint failed: dom-6: 'A resource should have narrative for robust management' (defined in http://hl7.org/fhir/StructureDefinition/DomainResource) (Best Practice Recommendation), validating against ￨ﾇﾺ￧ﾁﾣ￥ﾁﾥ￤﾿ﾝ￤ﾺﾋ￥ﾉﾍ￥ﾯﾩ￦ﾟﾥ￥ﾯﾦ￤ﾽﾜ￦ﾌﾇ￥ﾼﾕ v1.2.6
+  Warning @ Bundle.entry[6].resource/*Coverage/cov-1*/ (line 463, col8): Constraint failed: dom-6: 'A resource should have narrative for robust management' (defined in http://hl7.org/fhir/StructureDefinition/DomainResource) (Best Practice Recommendation), validating against ￨ﾇﾺ￧ﾁﾣ￦ﾠﾸ￥﾿ﾃ￥ﾯﾦ￤ﾽﾜ￦ﾌﾇ￥ﾼﾕ(TW Core IG) v0.3.2
+  Warning @ Bundle.entry[7].resource/*Organization/org-nhi*/ (line 484, col8): Constraint failed: dom-6: 'A resource should have narrative for robust management' (defined in http://hl7.org/fhir/StructureDefinition/DomainResource) (Best Practice Recommendation), validating against Base FHIR Standard
+  Warning @ Bundle.entry[8].resource/*Observation/obs-lab*/ (line 522, col8): Constraint failed: dom-6: 'A resource should have narrative for robust management' (defined in http://hl7.org/fhir/StructureDefinition/DomainResource) (Best Practice Recommendation), validating against ￨ﾇﾺ￧ﾁﾣ￥ﾁﾥ￤﾿ﾝ￤ﾺﾋ￥ﾉﾍ￥ﾯﾩ￦ﾟﾥ￥ﾯﾦ￤ﾽﾜ￦ﾌﾇ￥ﾼﾕ v1.2.6
+Done. Times: Loading: 05:18.433, validation: 00:10.763. Max Memory = 7Gb
