@@ -24,6 +24,14 @@ public class CaseVariantsTests
         Assert.NotEmpty(cr.Extension.Where(x => x.Url.EndsWith("extension-claimResponse-requestor")));
     }
 
+    [Fact] public void Department_is_selectable_from_all_50_NHI_departments()
+    {
+        var c = Samples.CancerDrugCase();
+        var cardio = c with { Data = new Dictionary<string, object>(c.Data) { ["department_code"] = "AB" } };  // 心臟血管內科
+        var enc = NhiPas.Build(cardio).Entry.Select(e => e.Resource).OfType<Encounter>().Single();
+        Assert.Equal("AB", enc.ServiceType.Coding[0].Code);
+    }
+
     [Fact] public void Response_builds_searchset_bundle_with_decision()
     {
         var b = NhiPas.BuildResponse(Samples.ResponseCase());

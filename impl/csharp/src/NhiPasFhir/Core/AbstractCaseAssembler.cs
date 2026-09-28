@@ -104,6 +104,10 @@ public abstract class AbstractCaseAssembler : ICaseAssembler
         return new CodeableConcept(Sys.CsTmhbType, code, TmhbType.GetValueOrDefault(code));
     }
 
+    /// <summary>就醫科別 (Encounter.serviceType). Any of the 50 NHI departments via Data["department_code"]; default AJ.</summary>
+    protected static CodeableConcept ServiceDeptOf(PACase c)
+        => new(Sys.ServiceDept, c.Data.TryGetValue("department_code", out var v) ? (string)v : "AJ");
+
     protected Bundle WrapBundle(string profile, IEnumerable<Resource> ordered)
     {
         var bundle = new Bundle { Id = "bun-demo", Meta = Profile(profile), Type = Bundle.BundleType.Collection };
@@ -125,7 +129,7 @@ public abstract class AbstractCaseAssembler : ICaseAssembler
             Id = "enc-1", Meta = Profile("Encounter-twpas"),
             Status = Encounter.EncounterStatus.Planned,
             Class = new Coding(Sys.V3ActCode, "AMB"),
-            ServiceType = new CodeableConcept(Sys.ServiceDept, "AJ"),
+            ServiceType = ServiceDeptOf(c),
             Subject = Ref(patient),
         };
         var cov = BuildCoverage(patient, nhi);

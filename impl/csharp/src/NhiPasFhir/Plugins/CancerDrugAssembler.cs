@@ -40,7 +40,7 @@ public sealed class CancerDrugAssembler : AbstractCaseAssembler
             Id = "enc-min", Meta = Profile("Encounter-twpas"),
             Status = Encounter.EncounterStatus.Planned,
             Class = new Coding(Sys.V3ActCode, "AMB"),
-            ServiceType = Cc(Sys.ServiceDept, "AJ"),
+            ServiceType = ServiceDeptOf(c),
         };
 
         // --- imaging chain ---
