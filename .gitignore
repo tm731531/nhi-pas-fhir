@@ -9,3 +9,7 @@ dist/
 .fhir/
 impl/python/.venv/
 impl/python/build/
+# dotnet
+impl/csharp/**/bin/
+impl/csharp/**/obj/
+impl/csharp/build/
