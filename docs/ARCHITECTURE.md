@@ -103,9 +103,20 @@ class CancerDrugAssembler:  # ← today's logic, moved behind the interface
 | Factory | not yet | ⏭ add once there is a 2nd case type |
 | CaseSource | not yet (capture is a separate feature) | ⏭ later |
 
-## Design rules (so it stays clean)
-- **YAGNI-guarded factory**: introduce the Factory only when the **2nd** assembler appears — one strategy
-  needs no factory. (Don't build the abstraction before the second case exists.)
+## Platform decision (2026-09-28, owner)
+This is **not** a single-case tool — it is a **framework/platform** intended to cover the whole Taiwan
+FHIR IG family (pas 癌藥/免疫製劑, 重大傷病, 理賠, EMR, 長照…) and to be **open-sourced**. Multiplicity
+is *certain* (the IG family is a fact, not a guess) and a framework *is* its abstraction — so the
+Interface + Factory + core/plugin split is built **from the start**, not deferred. (This overrides the
+usual YAGNI "wait for the 2nd case" rule, because the 2nd..Nth cases are known to be coming.)
+
+## Design rules (so it stays clean & open-source-ready)
+- **core / plugin separation**: `core` (interfaces, factory, TW Core layer, validator wrapper) depends on
+  no specific IG; each IG/case-type lives in a `plugin` that depends only on `core`.
+- **every plugin must pass the official validator at 0 errors** — enforced in CI. This is the framework's
+  quality contract.
+- **no PHI, no secrets** — a precondition for open-sourcing (already held).
+- Adding a new IG/case = implement the interface + register + validate. Core is untouched.
 - **Assemblers depend on the TW Core layer, never the reverse** — clinical layer knows nothing about pas.
 - **Caller depends only on interfaces** (`PACase`, `BundleAssembler`, `Validator`) — never on concrete
   assemblers. That is what makes 免疫製劑 / 長照 pluggable later.
