@@ -25,6 +25,11 @@
 - TWPAS **Client**(送審 + 查詢流程)⬜
 - TWPAS **Server**(收件 + 驗證 + 回應;17 SearchParameter)⬜
 
+## Profile (schema) 覆蓋:43 / 43 可實例化 profile ✅
+兩個 bundle(癌藥28 + 免疫36)+ 回應 + OperationOutcome 已實例化**全部可實例化的 profile**
+(logic model / CapabilityStatement / SearchParameter 不可實例化,不計)。61 個 example 檔多為 bundle 子資源
+或同 profile 的值變體(用 `PACase.Data` 換值即可產出)。
+
 ## 已建立的地基(跨情境共用)
 - 框架:Interface → Abstract(共用 TW Core 臨床層 builder)→ Implementation + Factory ✅
 - Pre-check(drug↔適應症)+ Pipeline gate ✅(規則僅 seed 2 條,待接預檢規則 CQL IG)

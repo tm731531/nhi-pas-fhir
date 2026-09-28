@@ -12,5 +12,8 @@ public static class NhiPas
     /// <summary>Build the NHI decision Bundle (核定回應) for a submitted claim. 維度 2.</summary>
     public static Bundle BuildResponse(ResponseCase response) => ResponseBuilder.Build(response);
 
+    /// <summary>Build an OperationOutcome-twpas (錯誤回報) for a submission that cannot be processed.</summary>
+    public static OperationOutcome BuildOutcome(params OutcomeIssue[] issues) => OutcomeBuilder.Build(issues);
+
     public static string ToJson(Resource r) => r.ToJson();
 }

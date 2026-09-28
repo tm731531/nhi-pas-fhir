@@ -1,0 +1,1 @@
+{"resourceType":"OperationOutcome","id":"error","meta":{"profile":["https://nhicore.nhi.gov.tw/pas/StructureDefinition/Operationoutcome-twpas"]},"issue":[{"severity":"error","code":"processing","details":{"coding":[{"system":"http://terminology.hl7.org/CodeSystem/operation-outcome","code":"MSG_PARAM_INVALID"}]}}]}

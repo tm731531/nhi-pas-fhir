@@ -68,4 +68,7 @@ public static class Samples
         ResponseId: "202505301000002", PatientRef: "Patient/pat-1", HospitalRef: "Organization/org-hosp",
         ClaimRef: "Claim/cla-1", Created: "2026-09-28", Disposition: "審畢結果",
         Items: new[] { new ResponseItem(ItemSequence: 1, ApproveCode: "1", ApprovedValue: 2) });
+
+    /// <summary>錯誤回報範例(fabricated).</summary>
+    public static OutcomeIssue[] ErrorOutcome() => new[] { new OutcomeIssue("error", "processing", "MSG_PARAM_INVALID") };
 }

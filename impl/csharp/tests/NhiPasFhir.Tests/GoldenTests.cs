@@ -36,4 +36,11 @@ public class GoldenTests
         var actual = NhiPas.ToJson(NhiPas.BuildResponse(Samples.ResponseCase()));
         Assert.Equal(expected, actual);
     }
+
+    [Fact] public void Outcome_reproduces_golden()
+    {
+        var expected = File.ReadAllText(GoldenPath("outcome.golden.json"));
+        var actual = NhiPas.ToJson(NhiPas.BuildOutcome(Samples.ErrorOutcome()));
+        Assert.Equal(expected, actual);
+    }
 }
