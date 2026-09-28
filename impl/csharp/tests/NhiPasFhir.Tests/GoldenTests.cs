@@ -43,4 +43,17 @@ public class GoldenTests
         var actual = NhiPas.ToJson(NhiPas.BuildOutcome(Samples.ErrorOutcome()));
         Assert.Equal(expected, actual);
     }
+
+    public static IEnumerable<object[]> VariantCases()
+    {
+        foreach (var (file, _) in NhiPasFhir.Variants.All()) yield return new object[] { file };
+    }
+
+    [Theory] [MemberData(nameof(VariantCases))]
+    public void Variant_reproduces_golden(string file)
+    {
+        var resource = NhiPasFhir.Variants.All().First(v => v.File == file).Resource;
+        var expected = File.ReadAllText(GoldenPath($"variant-{file}.golden.json"));
+        Assert.Equal(expected, NhiPas.ToJson(resource));
+    }
 }

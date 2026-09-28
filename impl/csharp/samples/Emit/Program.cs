@@ -26,3 +26,7 @@ void EmitResource(string file, Resource r)
 }
 EmitResource("pa-bundle-response.cs.json", NhiPas.BuildResponse(Samples.ResponseCase()));
 EmitResource("pa-outcome.cs.json", NhiPas.BuildOutcome(Samples.ErrorOutcome()));
+
+// value-variants — prove per-profile sync with the official examples
+foreach (var (file, resource) in Variants.All())
+    EmitResource($"variant-{file}.cs.json", resource);
