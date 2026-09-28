@@ -1,0 +1,16 @@
+[project]
+name = "nhi-pas-fhir"
+version = "0.0.1"
+description = "Study/reference implementation of Taiwan NHI Prior Authorization (事前審查) FHIR IG"
+requires-python = ">=3.11"
+dependencies = []            # keep zero-dep for the interface/docs phase
+
+[project.optional-dependencies]
+models = ["pydantic>=2"]     # for resources.py once we model StructureDefinitions
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
