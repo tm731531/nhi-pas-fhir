@@ -1,5 +1,5 @@
 # nhi-pas-fhir — dev tasks. Run inside the venv (make venv first).
-.PHONY: help venv test example lint clean
+.PHONY: help venv test example validate fetch-validator lint clean
 PY := .venv/bin/python
 
 help:
@@ -17,6 +17,12 @@ test:
 
 example:
 	$(PY) -m examples.build_sample_bundle
+
+fetch-validator:  ## download IG package + HL7 validator (large; gitignored)
+	bash tools/fetch_validation_assets.sh
+
+validate:  ## validate a file against the pinned IG: make validate FILE=path.json
+	bash tools/validate.sh $(FILE)
 
 clean:
 	find . -type d -name __pycache__ -prune -exec rm -rf {} + ; rm -rf .pytest_cache
