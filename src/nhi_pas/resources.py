@@ -203,9 +203,10 @@ class CoverageTWPAS(_Res):
 # extension:encounter (1..1) -> Encounter-twpas
 # supportingInfo: weight(1..1) + height(1..1) as Quantity; pregnancy(0..1); + referenced evidence.
 
-VS_APPLY_TYPE = "https://nhicore.nhi.gov.tw/pas/ValueSet/nhi-apply-type"
-VS_TMHB_TYPE = "https://nhicore.nhi.gov.tw/pas/ValueSet/nhi-tmhb-type"
-CS_SUPPORTINGINFO_CATEGORY = "https://nhicore.nhi.gov.tw/pas/CodeSystem/supportinginfo-category"  # TODO verify id
+# Verified against official example Claim-cla-1.json (IG package tw.gov.mohw.nhi.pas 1.2.6):
+CS_APPLY_TYPE = "https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-apply-type"   # 申報類別 (coding.system)
+CS_TMHB_TYPE = "https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-tmhb-type"    # 申請案件類別
+CS_SUPPORTINGINFO_CATEGORY = "https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-supporting-info-type"
 
 
 class ClaimSupportingInfo(BaseModel):
@@ -252,8 +253,8 @@ class ClaimTWPAS(_Res):
     ) -> "ClaimTWPAS":
         return cls(
             meta=Meta(profile=[P.CLAIM]),
-            subType=CodeableConcept.of(VS_APPLY_TYPE, subtype_code),
-            priority=CodeableConcept.of(VS_TMHB_TYPE, priority_code),
+            subType=CodeableConcept.of(CS_APPLY_TYPE, subtype_code),
+            priority=CodeableConcept.of(CS_TMHB_TYPE, priority_code),
             patient=Reference(reference=patient_ref),
             provider=Reference(reference=provider_ref),
             enterer=Reference(reference=enterer_ref),

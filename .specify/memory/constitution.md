@@ -61,4 +61,9 @@ This constitution supersedes other practices in this repo. Amendments require: a
 Tom's approval, and a migration/re-validation note. Every plan and review must check compliance with
 these principles; violations block "done." Complexity must be justified against Principle I.
 
-**Version**: 0.1.0 (draft — under discussion) | **Ratified**: TODO | **Last Amended**: 2026-09-28
+**Version**: 1.0.0 (ratified) | **Ratified**: 2026-09-28 | **Last Amended**: 2026-09-28
+
+<!-- Ratification note (2026-09-28): Tom approved all 6 principles as-is; Principle III
+     (advisory-not-authority) explicitly affirmed ("醫療不能開玩笑"). Official/authoritative
+     sources take priority (Principle II). No additional principles requested. -->
+
