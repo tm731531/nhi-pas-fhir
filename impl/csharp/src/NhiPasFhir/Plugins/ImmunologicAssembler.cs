@@ -25,6 +25,9 @@ public sealed class ImmunologicAssembler : AbstractCaseAssembler
 
     private static CodeableConcept Cc(string sys, string code, string? display = null) => new(sys, code, display);
     private static CodeableConcept Text(string text) => new() { Text = text };
+    // Case-payload readers: a caller may override via PACase.Data; absent → the example default (keeps the golden stable).
+    private static string S(PACase c, string k, string dflt) => c.Data.TryGetValue(k, out var v) ? (string)v : dflt;
+    private static int I(PACase c, string k, int dflt) => c.Data.TryGetValue(k, out var v) ? Convert.ToInt32(v) : dflt;
     private static Attachment Pdf(string url, string title) =>
         new() { ContentType = "application/pdf", Url = url, Title = title };
 
@@ -352,7 +355,7 @@ public sealed class ImmunologicAssembler : AbstractCaseAssembler
             Id = "medReq-apply", Meta = Profile("MedicationRequest-apply-twpas"),
             Status = MedicationRequest.MedicationrequestStatus.OnHold,
             Intent = MedicationRequest.MedicationRequestIntent.Plan,
-            Medication = new CodeableConcept(Sys.CsMedication, "BC27730100"),
+            Medication = new CodeableConcept(Sys.CsMedication, S(c, "drug_code", "BC27730100")),
             Subject = Ref(patient),
             DosageInstruction =
             {
@@ -365,7 +368,7 @@ public sealed class ImmunologicAssembler : AbstractCaseAssembler
             Id = "medReq-apply-2", Meta = Profile("MedicationRequest-apply-twpas"),
             Status = MedicationRequest.MedicationrequestStatus.OnHold,
             Intent = MedicationRequest.MedicationRequestIntent.Plan,
-            Medication = new CodeableConcept(Sys.CsMedication, "KC011162B5"),
+            Medication = new CodeableConcept(Sys.CsMedication, S(c, "drug_code_2", "KC011162B5")),
             Subject = Ref(patient),
             DosageInstruction = { ApplyDose("2024-03-11", "2024-07-28", 1, 200, new[] { (Sys.MedFreqNhi, "Q4WD1"), (Sys.MedFreqNhi, "Q4WD2"), (Sys.MedFreqNhi, "Q4WD3"), (Sys.MedFreqNhi, "Q4WD4"), (Sys.MedFreqNhi, "Q4WD5"), (Sys.MedFreqNhi, "AC1H") }) },
             DispenseRequest = new MedicationRequest.DispenseRequestComponent { Quantity = new Quantity { System = Sys.OrderableDrugForm } },
@@ -397,19 +400,19 @@ public sealed class ImmunologicAssembler : AbstractCaseAssembler
             claim.SupportingInfo.Add(new Claim.SupportingInformationComponent
             { Sequence = s++, Category = Cc(Sys.CsSupportingInfo, cat), Value = Ref(report) });
 
-        var dx = new Claim.DiagnosisComponent { Sequence = 1, Diagnosis = Cc(Sys.Icd10cmTw, "I50.812") };
-        dx.Type.Add(Text("Adenocarcinoma, descending colon, cT3N2M1a, cStage IVA, KRAS G12V, with multiple liver metastases, status post FOLFIRI"));
-        dx.Extension.Add(new Extension(Sys.ExtDxRecordedDate, new Date("2024-01-01")));
+        var dx = new Claim.DiagnosisComponent { Sequence = 1, Diagnosis = Cc(Sys.Icd10cmTw, S(c, "diagnosis_icd", "I50.812")) };
+        dx.Type.Add(Text(S(c, "diagnosis_text", "Adenocarcinoma, descending colon, cT3N2M1a, cStage IVA, KRAS G12V, with multiple liver metastases, status post FOLFIRI")));
+        dx.Extension.Add(new Extension(Sys.ExtDxRecordedDate, new Date(S(c, "diagnosis_date", "2024-01-01"))));
         claim.Diagnosis.Add(dx);
-        claim.Procedure.Add(new Claim.ProcedureComponent { Sequence = 1, Date = "2024-01-01", Procedure = Cc(Sys.Icd10pcsTw, "3E0Y704") });
+        claim.Procedure.Add(new Claim.ProcedureComponent { Sequence = 1, Date = S(c, "procedure_date", "2024-01-01"), Procedure = Cc(Sys.Icd10pcsTw, S(c, "procedure_icd", "3E0Y704")) });
 
         var item1 = new Claim.ItemComponent
         {
             Sequence = 1,
             ProductOrService = Cc(Sys.CsOrderType, "1", "藥品"),
             Modifier = { Cc(Sys.CsContinuation, "1", "初次使用"), Cc(Sys.CsLineOfTherapy, "1", "第一線治療") },
-            ProgramCode = { Text("ALK陽性的晚期非小細胞肺癌第一線治療") },
-            Quantity = new Quantity { Value = 52, System = Sys.Ucum, Code = "{tbl}" },
+            ProgramCode = { Text(S(c, "program_text", "ALK陽性的晚期非小細胞肺癌第一線治療")) },
+            Quantity = new Quantity { Value = I(c, "drug_qty", 52), System = Sys.Ucum, Code = "{tbl}" },
         };
         item1.Extension.Add(new Extension(Sys.ExtRequestedService, Ref(medApply1)));
         var item2 = new Claim.ItemComponent
@@ -417,8 +420,8 @@ public sealed class ImmunologicAssembler : AbstractCaseAssembler
             Sequence = 2,
             ProductOrService = Cc(Sys.CsOrderType, "1", "藥品"),
             Modifier = { Cc(Sys.CsContinuation, "1", "初次使用"), Cc(Sys.CsLineOfTherapy, "1", "第一線治療") },
-            ProgramCode = { new CodeableConcept(Sys.CsApplyReason, "C50P1") },
-            Quantity = new Quantity { Value = 70, System = Sys.Ucum, Code = "{tbl}" },
+            ProgramCode = { new CodeableConcept(Sys.CsApplyReason, S(c, "apply_reason", "C50P1")) },
+            Quantity = new Quantity { Value = I(c, "drug_qty_2", 70), System = Sys.Ucum, Code = "{tbl}" },
         };
         item2.Extension.Add(new Extension(Sys.ExtRequestedService, Ref(medApply2)));
         claim.Item.Add(item1);

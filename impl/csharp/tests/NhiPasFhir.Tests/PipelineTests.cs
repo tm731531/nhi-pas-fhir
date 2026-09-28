@@ -65,4 +65,15 @@ public class PipelineTests
         Assert.Equal(36, bundle.Entry.Count);                       // full SOAP + evidence chain + 2 applied drugs
         Assert.All(bundle.Entry, e => Assert.StartsWith("https://", e.FullUrl));  // C2 absolute fullUrls
     }
+
+    [Fact] public void Immunologic_reads_case_payload_from_PACase()
+    {
+        var c = Samples.ImmunologicCase();
+        var data = new Dictionary<string, object>(c.Data)
+        { ["drug_code"] = "AC55555555", ["diagnosis_icd"] = "C50.911", ["drug_qty"] = 99 };
+        var json = NhiPas.ToJson(NhiPas.Build(c with { Data = data }));
+        Assert.Contains("AC55555555", json);   // overridden drug flows through
+        Assert.Contains("C50.911", json);       // overridden diagnosis flows through
+        Assert.DoesNotContain("BC27730100", json);  // default no longer present
+    }
 }

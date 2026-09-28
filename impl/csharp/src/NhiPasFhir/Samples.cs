@@ -34,5 +34,13 @@ public static class Samples
           ["hospital_code"] = "0101090517", ["hospital_name"] = "臺北市立聯合醫院" },
         Vitals: new Dictionary<string, double> { ["weight_kg"] = 59.65, ["height_cm"] = 170.0 },
         Created: "2024-05-30",
-        Data: new Dictionary<string, object>());
+        // Case payload — a caller sets these to describe their own case; omit any to fall back to the example.
+        Data: new Dictionary<string, object>
+        {
+            ["diagnosis_icd"] = "I50.812", ["diagnosis_date"] = "2024-01-01",
+            ["diagnosis_text"] = "Adenocarcinoma, descending colon, cT3N2M1a, cStage IVA, KRAS G12V, with multiple liver metastases, status post FOLFIRI",
+            ["procedure_icd"] = "3E0Y704", ["procedure_date"] = "2024-01-01",
+            ["drug_code"] = "BC27730100", ["drug_qty"] = 52, ["program_text"] = "ALK陽性的晚期非小細胞肺癌第一線治療",
+            ["drug_code_2"] = "KC011162B5", ["drug_qty_2"] = 70, ["apply_reason"] = "C50P1",
+        });
 }

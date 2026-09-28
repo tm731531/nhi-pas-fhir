@@ -1,5 +1,7 @@
 # Claude Code local tooling (skills, etc.) — not project source
 .claude/
+# Spec Kit scaffolding (templates, scripts, workflows) — not project source
+.specify/
 
 __pycache__/
 *.pyc

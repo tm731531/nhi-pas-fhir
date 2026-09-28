@@ -24,4 +24,8 @@
     <ProjectReference Include="..\..\src\NhiPasFhir\NhiPasFhir.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="goldens\**\*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
