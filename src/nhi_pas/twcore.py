@@ -26,6 +26,13 @@ SYS_RESIDENT = "http://www.immigration.gov.tw"                   # 居留證號
 SYS_MED_LICENSE = "https://dep.mohw.gov.tw/DOMA"                 # 醫師證號
 SYS_ORG_ID = f"{PAS_BASE}/CodeSystem/organization-identifier-tw"  # 醫事機構代碼
 SYS_UCUM = "http://unitsofmeasure.org"
+# verified from official Bundle-bun-1.json
+SYS_V3_ACTCODE = "http://terminology.hl7.org/CodeSystem/v3-ActCode"
+SYS_ORG_TYPE = "http://terminology.hl7.org/CodeSystem/organization-type"
+SYS_TWCORE_V2_0203 = "https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/v2-0203"
+SYS_SERVICE_DEPT = "https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/medical-consultation-department-nhi-tw"
+SYS_OID_NAT = "https://oid.nat.gov.tw/"
+TWCORE_SD = "https://twcore.mohw.gov.tw/ig/twcore/StructureDefinition"
 
 ID_CARD_RE = re.compile(r"^[A-Za-z][0-9]{9}$")
 
@@ -111,6 +118,17 @@ def profile(name: str) -> Meta:
     return Meta(profile=[f"{SD}/{name}"])
 
 
+def prune(obj):
+    """Recursively drop None, empty lists, and empty dicts — FHIR forbids empty arrays/elements."""
+    if isinstance(obj, dict):
+        out = {k: prune(v) for k, v in obj.items()}
+        return {k: v for k, v in out.items() if v not in (None, [], {})}
+    if isinstance(obj, list):
+        items = [prune(v) for v in obj]
+        return [v for v in items if v not in (None, [], {})]
+    return obj
+
+
 # --- clinical resources -----------------------------------------------------
 
 
@@ -165,36 +183,51 @@ class Practitioner(Resource):
 class Organization(Resource):
     resourceType: Literal["Organization"] = "Organization"
     identifier: list[Identifier]
+    type: list[CodeableConcept] = Field(default_factory=list)
     name: str | None = None
 
     @classmethod
     def hospital(cls, *, id: str, org_code: str, name: str | None = None) -> "Organization":
+        # verified: identifier.type PRN + Organization.type prov; value from 特約醫事機構值集.
         return cls(
             id=id, meta=profile("Organization-twpas"),
-            identifier=[Identifier(system=SYS_ORG_ID, value=org_code)],
+            identifier=[Identifier(use="official",
+                                   type=CodeableConcept.of(SYS_V2_0203, "PRN"),
+                                   system=SYS_ORG_ID, value=org_code)],
+            type=[CodeableConcept.of(SYS_ORG_TYPE, "prov")],
             name=name,
         )
 
     @classmethod
-    def govt_nhi(cls, *, id: str = "org-nhi", org_code: str, name: str = "衛生福利部中央健康保險署") -> "Organization":
+    def govt_nhi(cls, *, id: str = "org-nhi", oid: str = "A21030000I",
+                 name: str = "衛生福利部中央健康保險署") -> "Organization":
         # Bundle entry slice 'organizationOrg' expects TW Core Organization-govt-twcore.
+        # verified: identifier.type GOI (twcore v2-0203), system oid.nat.gov.tw, Organization.type govt.
         return cls(
-            id=id,
-            meta=Meta(profile=["https://twcore.mohw.gov.tw/ig/twcore/StructureDefinition/Organization-govt-twcore"]),
-            identifier=[Identifier(system=SYS_ORG_ID, value=org_code)],
+            id=id, meta=Meta(profile=[f"{TWCORE_SD}/Organization-govt-twcore"]),
+            identifier=[Identifier(use="official",
+                                   type=CodeableConcept.of(SYS_TWCORE_V2_0203, "GOI"),
+                                   system=SYS_OID_NAT, value=oid)],
+            type=[CodeableConcept.of(SYS_ORG_TYPE, "govt")],
             name=name,
         )
 
 
 class Encounter(Resource):
     resourceType: Literal["Encounter"] = "Encounter"
-    status: str = "finished"          # TODO: confirm required value from Encounter-twpas SD
-    class_: dict | None = Field(default=None, alias="class")
+    status: str = "planned"           # verified: fixed to 'planned' in Encounter-twpas
+    class_: Coding | None = Field(default=None, alias="class")
+    serviceType: CodeableConcept | None = None
     subject: Reference | None = None
 
     model_config = {"populate_by_name": True}
 
     @classmethod
-    def minimal(cls, *, id: str, patient_ref: Reference) -> "Encounter":
-        # TODO: model serviceType (就醫科別) + class per Encounter-twpas SD; minimal shell for now.
-        return cls(id=id, meta=profile("Encounter-twpas"), subject=patient_ref)
+    def minimal(cls, *, id: str, patient_ref: Reference, service_dept: str = "AJ") -> "Encounter":
+        # verified: class AMB (v3-ActCode), serviceType 就醫科別 (twcore dept code).
+        return cls(
+            id=id, meta=profile("Encounter-twpas"),
+            class_=Coding(system=SYS_V3_ACTCODE, code="AMB"),
+            serviceType=CodeableConcept.of(SYS_SERVICE_DEPT, service_dept),
+            subject=patient_ref,
+        )

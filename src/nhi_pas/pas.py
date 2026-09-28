@@ -12,7 +12,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field
 
 from .twcore import (
-    PAS_BASE, SD, SYS_UCUM, CodeableConcept, Coding, Quantity, Reference, Resource, Meta, profile,
+    PAS_BASE, SD, SYS_UCUM, CodeableConcept, Coding, Quantity, Reference, Resource, Meta, profile, prune,
 )
 
 # --- CodeSystems (verified against official Claim example) ------------------
@@ -31,6 +31,79 @@ EXT_REQUESTED_SERVICE = f"{SD}/extension-requestedService"
 EXT_DX_RECORDED_DATE = "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-diagnosisRecordedDate"
 
 SYS_ICD10CM_TW = "https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-cm-2023-tw"
+SYS_SNOMED = "http://snomed.info/sct"
+SYS_LOINC = "http://loinc.org"
+CS_NCI_THESAURUS = f"{PAS_BASE}/CodeSystem/nci-thesaurus"
+
+
+class ObservationLabResult(Resource):
+    """Observation-laboratory-result-twpas — 檢驗 (tests); the simplest report that satisfies the
+    priority=1/3 and C90/C91/C92 supportingInfo invariants (performer is a Practitioner)."""
+    resourceType: Literal["Observation"] = "Observation"
+    status: str = "final"
+    category: list[CodeableConcept]
+    code: CodeableConcept
+    subject: Reference
+    effectiveDateTime: str
+    performer: list[Reference]
+    valueQuantity: Quantity
+
+    @classmethod
+    def test(cls, *, id: str, patient_ref: Reference, performer_ref: Reference, effective: str,
+             loinc_code: str, value: float, unit: str) -> "ObservationLabResult":
+        return cls(
+            id=id, meta=profile("Observation-laboratory-result-twpas"),
+            category=[CodeableConcept.of(CS_SUPPORTINGINFO, "tests")],
+            code=CodeableConcept.of(SYS_LOINC, loinc_code),
+            subject=patient_ref, effectiveDateTime=effective, performer=[performer_ref],
+            valueQuantity=Quantity(value=value, unit=unit),
+        )
+
+
+class ObservationDiagnostic(Resource):
+    """Observation-diagnostic-twpas — 基因資訊 (geneInfo); satisfies the priority=1/3 report invariant."""
+    resourceType: Literal["Observation"] = "Observation"
+    status: str = "final"
+    category: list[CodeableConcept]
+    code: CodeableConcept
+    subject: Reference
+    effectiveDateTime: str
+    performer: list[Reference]
+    valueString: str
+
+    @classmethod
+    def gene(cls, *, id: str, patient_ref: Reference, performer_ref: Reference,
+             effective: str, loinc_code: str = "69548-6", value: str = "基因檢測報告結果") -> "ObservationDiagnostic":
+        return cls(
+            id=id, meta=profile("Observation-diagnostic-twpas"),
+            category=[CodeableConcept.of(CS_SUPPORTINGINFO, "geneInfo")],
+            code=CodeableConcept.of(SYS_LOINC, loinc_code),
+            subject=patient_ref, effectiveDateTime=effective, performer=[performer_ref],
+            valueString=value,
+        )
+
+
+class ObservationCancerStage(Resource):
+    """Observation-cancer-stage-twpas — a supporting report (satisfies the priority=1/3 invariant)."""
+    resourceType: Literal["Observation"] = "Observation"
+    status: str = "final"
+    category: list[CodeableConcept]
+    code: CodeableConcept
+    subject: Reference
+    effectiveDateTime: str
+    performer: list[Reference]
+    valueCodeableConcept: CodeableConcept
+
+    @classmethod
+    def figo(cls, *, id: str, patient_ref: Reference, performer_ref: Reference,
+             effective: str, stage_code: str, stage_system_code: str = "385361009") -> "ObservationCancerStage":
+        return cls(
+            id=id, meta=profile("Observation-cancer-stage-twpas"),
+            category=[CodeableConcept.of(CS_SUPPORTINGINFO, "cancerStage")],
+            code=CodeableConcept.of(SYS_SNOMED, stage_system_code),
+            subject=patient_ref, effectiveDateTime=effective, performer=[performer_ref],
+            valueCodeableConcept=CodeableConcept.of(CS_NCI_THESAURUS, stage_code),
+        )
 
 
 # --- Coverage (verified: status/beneficiary/payor) --------------------------
@@ -134,7 +207,20 @@ class Claim(Resource):
               patient: Resource, enterer: Resource, provider: Resource,
               encounter: Resource, coverage: Resource,
               created: str, weight_kg: float, height_cm: float,
-              diagnosis: list[Diagnosis], item: list[Item]) -> "Claim":
+              diagnosis: list[Diagnosis], item: list[Item],
+              supporting_reports: list[tuple[str, Reference]] | None = None) -> "Claim":
+        # weight/height are supportingInfo seq 1/2; supporting reports (imagingReport/cancerStage/
+        # examinationReport/geneInfo/…) follow — priority 1/3 requires at least one report.
+        si = [
+            SupportingInfo(sequence=1, category=CodeableConcept.of(CS_SUPPORTINGINFO, "weight"),
+                           valueQuantity=Quantity.ucum(weight_kg, "kg")),
+            SupportingInfo(sequence=2, category=CodeableConcept.of(CS_SUPPORTINGINFO, "height"),
+                           valueQuantity=Quantity.ucum(height_cm, "cm")),
+        ]
+        for i, (cat_code, ref) in enumerate(supporting_reports or [], start=3):
+            si.append(SupportingInfo(sequence=i,
+                                     category=CodeableConcept.of(CS_SUPPORTINGINFO, cat_code),
+                                     valueReference=ref))
         return cls(
             id=id, meta=profile("Claim-twpas"),
             subType=CodeableConcept.of(CS_APPLY_TYPE, subtype_code, subtype_display),
@@ -145,12 +231,7 @@ class Claim(Resource):
             insurance=[Insurance(sequence=1, focal=True, coverage=coverage.ref())],
             item=item,
             diagnosis=diagnosis,
-            supportingInfo=[
-                SupportingInfo(sequence=1, category=CodeableConcept.of(CS_SUPPORTINGINFO, "weight"),
-                               valueQuantity=Quantity.ucum(weight_kg, "kg")),
-                SupportingInfo(sequence=2, category=CodeableConcept.of(CS_SUPPORTINGINFO, "height"),
-                               valueQuantity=Quantity.ucum(height_cm, "cm")),
-            ],
+            supportingInfo=si,
         )
 
 
@@ -201,6 +282,6 @@ class Bundle(Resource):
         return cls(
             id=id, meta=profile("Bundle-twpas"),
             entry=[BundleEntry(fullUrl=r.full_url(),
-                               resource=r.model_dump(exclude_none=True, by_alias=True))
+                               resource=prune(r.model_dump(exclude_none=True, by_alias=True)))
                    for r in resources],
         )
