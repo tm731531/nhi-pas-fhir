@@ -1,5 +1,8 @@
 # NhiPasFhir (C#) — Taiwan NHI 事前審查 FHIR library
 
+> 🇹🇼 中文版:[README.zh.md](README.zh.md) · 逐案件使用手冊:[MANUAL.md](MANUAL.md)
+
+
 A C# implementation of the framework, built on the **Firely .NET SDK** (`Hl7.Fhir.R4`). It follows the
 same contract as the language-agnostic `spec/`: it produces a FHIR `Bundle` that passes the **official
 HL7 FHIR validator at 0 errors**.
