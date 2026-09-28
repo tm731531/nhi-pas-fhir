@@ -6,6 +6,7 @@ from .interface import (
     Adjudication, ApplyCategory, Disposition, FilingCategory,
     SubmitResult, TWPASClient, TWPASServer, SEARCH_PARAMETERS,
 )
+from .precheck import Finding, RuleSet, precheck_pairs, has_blocking_errors
 from .resources import (
     BundleTWPAS, ClaimTWPAS, PatientTWPAS, PractitionerTWPAS,
     OrganizationTWPAS, MedicationRequestApplyTWPAS, EncounterTWPAS, CoverageTWPAS,
@@ -18,5 +19,6 @@ __all__ = [
     "BundleTWPAS", "ClaimTWPAS", "PatientTWPAS", "PractitionerTWPAS",
     "OrganizationTWPAS", "MedicationRequestApplyTWPAS", "EncounterTWPAS",
     "CoverageTWPAS", "CodeableConcept", "Reference",
+    "Finding", "RuleSet", "precheck_pairs", "has_blocking_errors",
 ]
 __version__ = "0.0.1"

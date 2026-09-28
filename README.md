@@ -48,7 +48,7 @@ examples/                 Build a sample Bundle (TODO)
 
 ## Status
 
-Phase 1 (this repo now): **docs + interface design**. App comes later.
+Progress: A ✅ core models · B ✅ worked example + 核刪 pre-check · next C (LTC IG) → D (app decision).
 
 ## License / data
 
