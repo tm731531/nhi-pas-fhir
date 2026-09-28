@@ -45,7 +45,7 @@ public class PipelineTests
         var r = Pipeline.Run(Samples.CancerDrugCase());
         Assert.False(r.Blocked);
         Assert.NotNull(r.Bundle);
-        Assert.Equal(9, r.Bundle!.Entry.Count);
+        Assert.Equal(28, r.Bundle!.Entry.Count);   // full bun-1 cancer bundle
     }
 
     [Fact] public void Factory_has_two_case_types()

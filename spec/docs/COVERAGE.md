@@ -6,13 +6,12 @@
 ## 維度 1｜送出組裝(申請案 Bundle)
 | 情境(官方範例) | 申報別 subType | 案件別 priority | 資源數 | 狀態 |
 |---|---|---|---|---|
-| 一般送核·癌藥(bun-1) | 送核 | 一般 | 28 | ⚠️ 只做 9 資源精簡版(官方完整版 28,含 Specimen/基因檢測) |
+| 一般送核·癌藥(bun-1) | 送核 | 一般 | 28 | ✅ **完整 28 資源**,0 errors(含 Specimen/基因/cancer-stage/影像鏈) |
 | 免疫製劑(bun-imm) | 送核 | 一般 | 36 | ✅ 全 36 資源,0 errors,可吃 PACase |
 | **申復(bun-3)** | **申復** | 一般 | 26 | ✅ 0 errors(subtype_code=3 + old_acpt_no invariant) |
 | **自主審查(bun-self)** | 送核 | **自主審查** | 30 | ✅ 0 errors(priority_code=3 + 自動塞 self-assessment) |
 
-**申報別×案件別矩陣已由 `subtype_code`(1-5)×`priority_code`(1/3/4)參數化** → 送核/送核補件/申復/爭議審議/申復補件 × 一般/自主審查/緊急報備 皆可組(補件類自動要求 old_acpt_no)。
-剩:把癌藥精簡版升級到完整 28 資源(Specimen/基因)。
+**申報別×案件別矩陣已由 `subtype_code`(1-5)×`priority_code`(1/3/4)參數化** → 送核/送核補件/申復/爭議審議/申復補件 × 一般/自主審查/緊急報備 皆可組(補件類自動要求 old_acpt_no)。申復/自主審查即癌藥完整版的參數變體,皆 0 errors。
 
 ## 維度 2｜核定回應(ClaimResponse)—— ✅ 已做
 | | profile | 狀態 |

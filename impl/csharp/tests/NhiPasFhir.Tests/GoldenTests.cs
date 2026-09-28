@@ -23,4 +23,17 @@ public class GoldenTests
 
     [Fact] public void Immunologic_reproduces_golden()
         => AssertReproducesGolden(Samples.ImmunologicCase(), "immunologic-agent.golden.json");
+
+    [Fact] public void Appeal_reproduces_golden()
+        => AssertReproducesGolden(Samples.AppealCase(), "appeal.golden.json");
+
+    [Fact] public void SelfAssessment_reproduces_golden()
+        => AssertReproducesGolden(Samples.SelfAssessmentCase(), "self-assessment.golden.json");
+
+    [Fact] public void Response_reproduces_golden()
+    {
+        var expected = File.ReadAllText(GoldenPath("response.golden.json"));
+        var actual = NhiPas.ToJson(NhiPas.BuildResponse(Samples.ResponseCase()));
+        Assert.Equal(expected, actual);
+    }
 }

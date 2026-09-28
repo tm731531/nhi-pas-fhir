@@ -48,6 +48,7 @@ public static class Sys
     public const string CsTxAst = PasBase + "/CodeSystem/nhi-tx-ast";
     public const string CsPhototherapy = PasBase + "/CodeSystem/nhi-phototherapy";
     public const string CsApplyReason = PasBase + "/CodeSystem/nhi-apply-reason";
+    public const string NciThesaurus = PasBase + "/CodeSystem/nci-thesaurus";
     public const string V3InterpObs = "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation";
     public const string OrderableDrugForm = "http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm";
 
