@@ -55,11 +55,14 @@ public class PipelineTests
         Assert.Contains(("tw.gov.mohw.nhi.pas#1.2.6", "immunologic-agent"), reg);
     }
 
-    [Fact] public void Immunologic_dispatches_and_fails_loud()
+    [Fact] public void Immunologic_dispatches_and_builds_full_bundle()
     {
-        var c = Samples.CancerDrugCase() with { CaseType = "immunologic-agent" };
+        var c = Samples.ImmunologicCase();
         var a = AssemblerFactory.ForCase(c);
         Assert.IsType<ImmunologicAssembler>(a);
-        Assert.Throws<System.NotImplementedException>(() => a.Assemble(c));
+        var bundle = a.Assemble(c);
+        Assert.Equal("Bundle-immunologic-agent-twpas", bundle.Meta.Profile.Single().Split('/').Last());
+        Assert.Equal(36, bundle.Entry.Count);                       // full SOAP + evidence chain + 2 applied drugs
+        Assert.All(bundle.Entry, e => Assert.StartsWith("https://", e.FullUrl));  // C2 absolute fullUrls
     }
 }

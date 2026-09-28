@@ -19,6 +19,10 @@ public static class Sys
     public const string OrgType = "http://terminology.hl7.org/CodeSystem/organization-type";
     public const string ClaimType = "http://terminology.hl7.org/CodeSystem/claim-type";
     public const string ServiceDept = "https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/medical-consultation-department-nhi-tw";
+    // This is the system the TW Core ValueSet icd-10-cm-2023-tw includes. NOTE: TW Core 0.3.2 ships the
+    // CodeSystem with a wrong canonical url (points to a /ValueSet/ path), so the validator cannot resolve
+    // it → Condition-twpas CLOSED slicing fails. tools/fetch_validation_assets.sh builds a corrected
+    // CodeSystem patch (right url + the 96802 concepts) passed via -ig so validation can prove conformance.
     public const string Icd10cmTw = "https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-cm-2023-tw";
     public const string GtsAbbrev = "http://terminology.hl7.org/CodeSystem/v3-GTSAbbreviation";
     public const string MedFreqNhi = PasBase + "/CodeSystem/medication-frequency-nhi-tw";
@@ -30,6 +34,22 @@ public static class Sys
     public const string CsContinuation = PasBase + "/CodeSystem/nhi-continuation-status";
     public const string CsLineOfTherapy = PasBase + "/CodeSystem/nhi-line-of-therapy";
     public const string CsMedication = PasBase + "/CodeSystem/nhi-medication";
+
+    // --- immunologic-agent additional systems (transcribed from the official example) ---
+    public const string Icd10pcsTw = "https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-pcs-2023-tw";  // see Icd10cmTw note (same CodeSystem-url bug in TW Core 0.3.2)
+    public const string ConditionClinical = "http://terminology.hl7.org/CodeSystem/condition-clinical";
+    public const string ObsCategory = "http://terminology.hl7.org/CodeSystem/observation-category";
+    public const string AllergyClinical = "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical";
+    public const string CarePlanCatTw = "https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/careplan-category-tw";
+    public const string Dcm = "http://dicom.nema.org/resources/ontology/DCM";
+    public const string CsPdfType = PasBase + "/CodeSystem/nhi-pdf-type";
+    public const string CsDrugCategory = PasBase + "/CodeSystem/nhi-drug-category";
+    public const string MedReqStatusReason = "http://terminology.hl7.org/CodeSystem/medicationrequest-status-reason";
+    public const string CsTxAst = PasBase + "/CodeSystem/nhi-tx-ast";
+    public const string CsPhototherapy = PasBase + "/CodeSystem/nhi-phototherapy";
+    public const string CsApplyReason = PasBase + "/CodeSystem/nhi-apply-reason";
+    public const string V3InterpObs = "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation";
+    public const string OrderableDrugForm = "http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm";
 
     public const string ExtClaimEncounter = Sd + "/extension-claim-encounter";
     public const string ExtRequestedService = Sd + "/extension-requestedService";

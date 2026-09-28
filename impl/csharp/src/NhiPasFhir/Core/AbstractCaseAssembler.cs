@@ -20,57 +20,89 @@ public abstract class AbstractCaseAssembler : ICaseAssembler
 
     protected abstract CaseParts BuildCase(PACase c, Patient patient, Practitioner doctor, Organization hospital);
 
-    public Bundle Assemble(PACase c)
+    // --- Shared TW Core clinical-layer builders (reused by every case type, incl. overridden Assemble). ---
+    protected Patient BuildPatient(PACase c) => new()
     {
-        var patient = new Patient
+        Id = "pat-1", Meta = Profile("Patient-twpas"),
+        Identifier = { new Identifier
         {
-            Id = "pat-1", Meta = Profile("Patient-twpas"),
-            Identifier = { new Identifier
-            {
-                Use = Identifier.IdentifierUse.Official,
-                Type = new CodeableConcept(Sys.V2_0203, "NNxxx"),
-                System = Sys.IdCard, Value = c.Patient["id_card"],
-            } },
-            Name = { new HumanName { Use = HumanName.NameUse.Usual, Text = c.Patient["name"] } },
-            Gender = Enum.Parse<AdministrativeGender>(c.Patient["gender"], true),
-            BirthDate = c.Patient["birth_date"],
-        };
-        var doctor = new Practitioner
+            Use = Identifier.IdentifierUse.Official,
+            Type = new CodeableConcept(Sys.V2_0203, "NNxxx"),
+            System = Sys.IdCard, Value = c.Patient["id_card"],
+        } },
+        Name = { new HumanName { Use = HumanName.NameUse.Usual, Text = c.Patient["name"] } },
+        Gender = Enum.Parse<AdministrativeGender>(c.Patient["gender"], true),
+        BirthDate = c.Patient["birth_date"],
+    };
+
+    protected Practitioner BuildDoctor(PACase c) => new()
+    {
+        Id = "pra-1", Meta = Profile("Practitioner-twpas"),
+        Identifier = { new Identifier
         {
-            Id = "pra-1", Meta = Profile("Practitioner-twpas"),
-            Identifier = { new Identifier
-            {
-                Use = Identifier.IdentifierUse.Official,
-                Type = new CodeableConcept(Sys.V2_0203, "NNxxx"),
-                System = Sys.IdCard, Value = c.Provider["doctor_id_card"],
-            } },
-            Name = { new HumanName { Text = c.Provider["doctor_name"] } },
-        };
-        var hospital = new Organization
+            Use = Identifier.IdentifierUse.Official,
+            Type = new CodeableConcept(Sys.V2_0203, "NNxxx"),
+            System = Sys.IdCard, Value = c.Provider["doctor_id_card"],
+        } },
+        Name = { new HumanName { Text = c.Provider["doctor_name"] } },
+    };
+
+    protected Organization BuildHospital(PACase c) => new()
+    {
+        Id = "org-hosp", Meta = Profile("Organization-twpas"),
+        Identifier = { new Identifier
         {
-            Id = "org-hosp", Meta = Profile("Organization-twpas"),
-            Identifier = { new Identifier
-            {
-                Use = Identifier.IdentifierUse.Official,
-                Type = new CodeableConcept(Sys.V2_0203, "PRN"),
-                System = Sys.OrgId, Value = c.Provider["hospital_code"],
-            } },
-            Type = { new CodeableConcept(Sys.OrgType, "prov") },
-            Name = c.Provider.GetValueOrDefault("hospital_name"),
-        };
-        var nhi = new Organization
+            Use = Identifier.IdentifierUse.Official,
+            Type = new CodeableConcept(Sys.V2_0203, "PRN"),
+            System = Sys.OrgId, Value = c.Provider["hospital_code"],
+        } },
+        Type = { new CodeableConcept(Sys.OrgType, "prov") },
+        Name = c.Provider.GetValueOrDefault("hospital_name"),
+    };
+
+    protected Organization BuildNhi() => new()
+    {
+        Id = "org-nhi",
+        Meta = new Meta { Profile = new[] { $"{Sys.TwcoreSd}/Organization-govt-twcore" } },
+        Identifier = { new Identifier
         {
-            Id = "org-nhi",
-            Meta = new Meta { Profile = new[] { $"{Sys.TwcoreSd}/Organization-govt-twcore" } },
-            Identifier = { new Identifier
-            {
-                Use = Identifier.IdentifierUse.Official,
-                Type = new CodeableConcept(Sys.TwcoreV2_0203, "GOI"),
-                System = Sys.OidNat, Value = "A21030000I",
-            } },
-            Type = { new CodeableConcept(Sys.OrgType, "govt") },
-            Name = "衛生福利部中央健康保險署",
-        };
+            Use = Identifier.IdentifierUse.Official,
+            Type = new CodeableConcept(Sys.TwcoreV2_0203, "GOI"),
+            System = Sys.OidNat, Value = "A21030000I",
+        } },
+        Type = { new CodeableConcept(Sys.OrgType, "govt") },
+        Name = "衛生福利部中央健康保險署",
+    };
+
+    protected Coverage BuildCoverage(Patient patient, Organization nhi) => new()
+    {
+        Id = "cov-1", Meta = Profile("Coverage-twpas"),
+        Status = FinancialResourceStatusCodes.Active,
+        Beneficiary = Ref(patient), Payor = { Ref(nhi) },
+    };
+
+    protected Claim.SupportingInformationComponent Vital(int seq, string code, decimal value, string unit) => new()
+    {
+        Sequence = seq, Category = new CodeableConcept(Sys.CsSupportingInfo, code),
+        Value = new Quantity(value, unit, Sys.Ucum),
+    };
+
+    protected Bundle WrapBundle(string profile, IEnumerable<Resource> ordered)
+    {
+        var bundle = new Bundle { Id = "bun-demo", Meta = Profile(profile), Type = Bundle.BundleType.Collection };
+        foreach (var r in ordered)
+            bundle.Entry.Add(new Bundle.EntryComponent { FullUrl = FullUrl(r), Resource = r });
+        return bundle;
+    }
+
+    /// <summary>Default assembly = the cancer-drug-shaped Claim-twpas template. Divergent case types
+    /// (e.g. immunologic, which needs a different Claim profile + Composition + many resources) override this.</summary>
+    public virtual Bundle Assemble(PACase c)
+    {
+        var patient = BuildPatient(c);
+        var doctor = BuildDoctor(c);
+        var hospital = BuildHospital(c);
+        var nhi = BuildNhi();
         var enc = new Encounter
         {
             Id = "enc-1", Meta = Profile("Encounter-twpas"),
@@ -79,21 +111,14 @@ public abstract class AbstractCaseAssembler : ICaseAssembler
             ServiceType = new CodeableConcept(Sys.ServiceDept, "AJ"),
             Subject = Ref(patient),
         };
-        var cov = new Coverage
-        {
-            Id = "cov-1", Meta = Profile("Coverage-twpas"),
-            Status = FinancialResourceStatusCodes.Active,
-            Beneficiary = Ref(patient), Payor = { Ref(nhi) },
-        };
+        var cov = BuildCoverage(patient, nhi);
 
         var parts = BuildCase(c, patient, doctor, hospital);
 
         var supportingInfo = new List<Claim.SupportingInformationComponent>
         {
-            new() { Sequence = 1, Category = new CodeableConcept(Sys.CsSupportingInfo, "weight"),
-                    Value = new Quantity((decimal)c.Vitals["weight_kg"], "kg", Sys.Ucum) },
-            new() { Sequence = 2, Category = new CodeableConcept(Sys.CsSupportingInfo, "height"),
-                    Value = new Quantity((decimal)c.Vitals["height_cm"], "cm", Sys.Ucum) },
+            Vital(1, "weight", (decimal)c.Vitals["weight_kg"], "kg"),
+            Vital(2, "height", (decimal)c.Vitals["height_cm"], "cm"),
         };
         int seq = 3;
         foreach (var (cat, report) in parts.Reports)
@@ -122,9 +147,6 @@ public abstract class AbstractCaseAssembler : ICaseAssembler
         ordered.Add(nhi);
         ordered.AddRange(parts.Reports.Select(r => r.Report));
 
-        var bundle = new Bundle { Id = "bun-demo", Meta = Profile("Bundle-twpas"), Type = Bundle.BundleType.Collection };
-        foreach (var r in ordered)
-            bundle.Entry.Add(new Bundle.EntryComponent { FullUrl = FullUrl(r), Resource = r });
-        return bundle;
+        return WrapBundle("Bundle-twpas", ordered);
     }
 }

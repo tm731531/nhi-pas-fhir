@@ -22,4 +22,17 @@ public static class Samples
             ["drug_qty_tbl"] = 52, ["program_text"] = "多發性骨髓瘤第一線治療",
             ["lab_loinc"] = "777-3", ["lab_value"] = 5.1, ["lab_unit"] = "mmol/l", ["lab_date"] = "2024-01-01",
         });
+
+    /// <summary>免疫製劑 case. v1 reads patient/provider/vitals/created; clinical evidence is example-fixed
+    /// inside the assembler (see ImmunologicAssembler). Fabricated data only.</summary>
+    public static PACase ImmunologicCase() => new(
+        Ig: "tw.gov.mohw.nhi.pas#1.2.6", CaseType: "immunologic-agent",
+        Patient: new Dictionary<string, string>
+        { ["id_card"] = "A123456789", ["name"] = "王大明", ["gender"] = "male", ["birth_date"] = "2001-01-01" },
+        Provider: new Dictionary<string, string>
+        { ["doctor_id_card"] = "F123456789", ["doctor_name"] = "李醫師",
+          ["hospital_code"] = "0101090517", ["hospital_name"] = "臺北市立聯合醫院" },
+        Vitals: new Dictionary<string, double> { ["weight_kg"] = 59.65, ["height_cm"] = 170.0 },
+        Created: "2024-05-30",
+        Data: new Dictionary<string, object>());
 }

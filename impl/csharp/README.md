@@ -8,13 +8,20 @@ HL7 FHIR validator at 0 errors**.
 
 ```
 ICaseAssembler                      interface  — Assemble(PACase) -> Bundle
-  └ AbstractCaseAssembler           abstract   — shared TW Core clinical build + Bundle wiring
-      └ CancerDrugAssembler         concrete   — 癌藥 case (registered via [ModuleInitializer])
+  └ AbstractCaseAssembler           abstract   — shared TW Core clinical builders + default Claim-twpas Assemble
+      ├ CancerDrugAssembler         concrete   — 癌藥 case, 9 resources (uses the default Assemble template)
+      └ ImmunologicAssembler        concrete   — 免疫製劑 case, 36 resources (overrides Assemble: different
+                                                 Claim/Bundle profiles + full SOAP note + evidence chain)
 AssemblerFactory                    registry   — ForCase(pacase) picks the impl; unknown = throws
 NhiPas                              facade     — Build(pacase) / ToJson(resource)
 ```
 
-Adding a case type = one `AbstractCaseAssembler` subclass + register it. Core/interface/factory untouched.
+Adding a case type = one `AbstractCaseAssembler` subclass + register it. A case whose Claim/Bundle
+profiles match the default gets it for free (cancer-drug); a divergent case overrides `Assemble` and
+reuses the shared clinical builders (immunologic). Core/interface/factory untouched.
+
+Both cases validate at **0 errors** (structural + terminology). Immunologic needs the ICD terminology
+patch that `tools/fetch_validation_assets.sh` builds — see `spec/docs/validation/PASS-immunologic-2026-09-28.md`.
 
 ## Use it (3 lines)
 

@@ -1,3 +1,6 @@
+# Claude Code local tooling (skills, etc.) — not project source
+.claude/
+
 __pycache__/
 *.pyc
 .venv/

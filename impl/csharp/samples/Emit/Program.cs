@@ -1,10 +1,15 @@
-// Minimal usage example: build a cancer-drug PA bundle and write it as FHIR JSON.
+// Minimal usage example: build the PA bundles and write them as FHIR JSON.
 using NhiPasFhir;
+using NhiPasFhir.Core;
 
-var bundle = NhiPas.Build(Samples.CancerDrugCase());   // PACase -> Factory -> Assembler -> Bundle
-var json = NhiPas.ToJson(bundle);
-var outPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "build", "pa-bundle.cs.json");
-outPath = Path.GetFullPath(outPath);
-Directory.CreateDirectory(Path.GetDirectoryName(outPath)!);
-File.WriteAllText(outPath, json);
-Console.WriteLine($"wrote {outPath} — {bundle.Entry.Count} entries");
+void Emit(string file, PACase c)
+{
+    var bundle = NhiPas.Build(c);                       // PACase -> Factory -> Assembler -> Bundle
+    var outPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "build", file));
+    Directory.CreateDirectory(Path.GetDirectoryName(outPath)!);
+    File.WriteAllText(outPath, NhiPas.ToJson(bundle));
+    Console.WriteLine($"wrote {outPath} — {bundle.Entry.Count} entries");
+}
+
+Emit("pa-bundle.cs.json", Samples.CancerDrugCase());
+Emit("pa-bundle-immunologic.cs.json", Samples.ImmunologicCase());
