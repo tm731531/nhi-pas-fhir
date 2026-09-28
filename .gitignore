@@ -7,3 +7,5 @@ dist/
 
 # validation assets (large; fetched, not committed)
 .fhir/
+impl/python/.venv/
+impl/python/build/

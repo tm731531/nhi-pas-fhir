@@ -51,7 +51,7 @@ def build() -> pas.Bundle:
 
 def main() -> None:
     b = build()
-    out = pathlib.Path(".fhir/generated/pa-bundle.json")
+    out = pathlib.Path(__file__).resolve().parents[1] / "build" / "pa-bundle.json"  # impl/python/build/
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(b.model_dump(exclude_none=True, by_alias=True), ensure_ascii=False, indent=2))
     print(f"wrote {out} — {len(b.entry)} entries")

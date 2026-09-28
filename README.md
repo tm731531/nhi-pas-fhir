@@ -1,70 +1,79 @@
-# nhi-pas-fhir
+# nhi-pas-fhir — a spec-driven, multi-language Taiwan NHI FHIR framework
 
-A Python study/reference implementation of Taiwan NHI's **Prior Authorization** (事前審查)
-FHIR Implementation Guide (IG).
+A framework for generating **officially-valid** Taiwan NHI FHIR artifacts (starting with 事前審查 /
+Prior Authorization). One language-agnostic **spec** is the source of truth; **each language
+implementation** conforms to it and is gated by the **official HL7 FHIR validator (0 errors)**.
 
-- **Source of truth (SoT):** <https://nhicore.nhi.gov.tw/pas/> — 臺灣健保事前審查實作指引 v1.2.6
-  published by 衛生福利部中央健康保險署 (NHI). FHIR base: **R4 (4.0.1)**.
-- **Goal:** faithfully mirror the IG's *interface* (schemas + API contract) and *workflow*,
-  documented clearly, so the domain becomes buildable. Code follows docs, not the reverse.
+> SoT for the domain: <https://nhicore.nhi.gov.tw/pas/> · IG `tw.gov.mohw.nhi.pas#1.2.6` · FHIR R4.
 
-> **pas is one IG in a family.** Taiwan has a whole FHIR IG set — all inheriting **TW Core** —
-> incl. EMR exchange (電子病歷) and a **Long-Term Care IG (長期照顧)**. See `docs/04-ig-landscape.md`.
-> This repo starts with pas but is structured so sibling IGs (EMR, LTC) plug in later on a shared base.
+## The model (read this first)
 
-## What "事前審查 / Prior Authorization" is (one line)
+```
+                ┌──────────────────────────────────────────┐
+   YOU MONITOR  │  spec/   ← the single source of truth      │
+                │    · constitution (.specify/memory/…)      │
+                │    · specs/         feature specs           │
+                │    · docs/          IG mirror, architecture,│
+                │                     explainer, strategy      │
+                │    · reference-bundles/  the validated       │
+                │                     "correct" JSON (golden)  │
+                └───────────────────┬──────────────────────────┘
+                                    │  spec changes drive all impls
+        ┌───────────────────────────┼───────────────────────────┐
+        ▼                           ▼                           ▼
+  impl/python/                impl/csharp/                impl/java/
+  (reference / AI)            (Firely SDK — primary)      (HAPI — enterprise)
+        │                           │                           │
+        └───────────────┬───────────┴───────────┬───────────────┘
+                        ▼                        ▼
+             shared tools/ + .fhir/  →  official HL7 validator
+                        every impl must reach:  0 errors
+```
 
-Expensive NHI-reimbursed therapies — mainly **癌症用藥 (cancer drugs)** and
-**免疫製劑 (immunologic agents)** — must be **applied for and approved before use**.
-A provider packages the clinical evidence into a FHIR `Bundle`, uploads it to NHI, and NHI
-adjudicates (approve / reject / request more info).
-
-## Coverage policy (honest)
-
-The IG is large (~40 profiles, 44 ValueSets, 22 CodeSystems, 3 Bundle types, 65 examples).
-This repo covers it in two layers:
-
-| Layer | Coverage |
-|---|---|
-| **Docs / catalog** (`docs/`) | **Complete** — every IG artifact is catalogued & mapped |
-| **Code** (`src/`) | **Core-first** — the Bundle→submit→ClaimResponse path + key resources; the rest is stubbed with `# TODO: map from IG` and never fabricated |
-
-Anything not yet verified against the IG is marked `TODO` — we do **not** invent fields.
+- **`spec/` is the master.** It is language-agnostic (rules, profiles map, architecture, the golden
+  reference bundle). When it changes, every `impl/` must be updated to match — ideally in the same PR.
+- **Each `impl/<lang>/` is a conforming implementation.** They never depend on each other; they each
+  reproduce the `spec/reference-bundles/*.json` and each pass the official validator at **0 errors**.
+- **Correctness is machine-proven, not asserted** (see `spec/` → constitution). "It runs" ≠ "it is correct".
 
 ## Layout
 
 ```
-docs/
-  00-overview.md          What 事前審查 is, and how FHIR models it
-  01-workflow.md          End-to-end flow (submit → validate → review → result) + case types
-  02-interface.md         The API contract (from TWPAS Server/Client CapabilityStatements)
-  03-artifacts-catalog.md Full catalogue of every IG artifact (profiles/valuesets/codesystems)
-src/nhi_pas/
-  interface.py            Python Protocols mirroring TWPAS Client/Server capabilities
-  resources.py            Core resource models (Bundle/Claim/Patient/... — subset, typed)
-  valuesets.py            (TODO) code enums subset
-examples/                 Build a sample Bundle (TODO)
+spec/                         ← source of truth (what YOU monitor)
+  specs/                      feature specifications (spec-kit format)
+  docs/                       EXPLAINER, ARCHITECTURE, IG mirror (00–04), strategy, validation evidence
+  reference-bundles/          the validated "correct" bundles all impls must reproduce
+impl/
+  python/                     reference implementation (pydantic) — proven 0 errors
+  csharp/                     (planned) primary — Firely .NET SDK; fits Taiwan medical (.NET) ecosystem
+  java/                       (planned) HAPI FHIR — enterprise/hospital
+tools/                        shared, language-agnostic: fetch IG package + run official validator
+.fhir/                        (gitignored) fetched IG package + validator jar
+.specify/ .claude/            spec-kit workflow + skills
+CLAUDE.md AGENTS.md           working rules + agent staffing
 ```
-
-## Status
-
-Progress: A ✅ core models · B ✅ worked example + 核刪 pre-check · next C (LTC IG) → D (app decision).
-
-## License / data
-
-Study material. Uses **no real patient data**. All identifiers in examples are fabricated.
-
-## Governance & strategy (this is a serious project)
-
-- `CLAUDE.md` — working rules (never fabricate FHIR fields; English code; dev-branch; verify).
-- `AGENTS.md` — agent-team staffing map (spin up on demand).
-- `docs/strategy/BUSINESS.md` — the money side: goal, market, ICP, product, monetisation, competitor.
-- Strategy memory: `~/.claude/projects/-home-tom/memory/project-nhi-pas-fhir.md`.
 
 ## Quickstart
 
 ```bash
-make venv          # create .venv + install deps
-. .venv/bin/activate
-make test          # pytest (should pass)
+# 1. shared: fetch the authoritative IG package + official validator (large, gitignored)
+make fetch-validator
+
+# 2. build + validate the Python implementation
+cd impl/python && make venv && make validate     # builds a bundle, validates → expect 0 errors
+
+# validate ANY fhir json against the pinned IG (from repo root):
+make validate FILE=spec/reference-bundles/cancer-drug-pa-bundle.json
 ```
+
+## Adding a language implementation (the contract)
+An `impl/<lang>/` is "done" when it (a) reproduces `spec/reference-bundles/*.json` for each supported
+case type and (b) passes the official validator at **0 errors** (structural + terminology). Nothing
+else counts as conformant.
+
+## Governance & strategy
+`spec/docs/EXPLAINER.md` (what FHIR is, for a systems owner) · `spec/docs/ARCHITECTURE.md`
+(interface/entities/engine/factory — the framework design) · `spec/docs/strategy/BUSINESS.md` (the
+money side). Working rules: `CLAUDE.md`. Constitution: `.specify/memory/constitution.md`.
+
+No real patient data, ever. All examples use fabricated identifiers.
