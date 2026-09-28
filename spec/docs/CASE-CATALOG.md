@@ -38,7 +38,7 @@ adjudicated{approved|rejected|need_info} → (resubmit) …`
 | Case type | Profiles / notes | Status |
 |---|---|---|
 | **癌藥 (cancer drug)** | Bundle/Claim/MedicationRequest-apply TWPAS + supporting reports; drug↔適應症 invariants | ✅ verified (0 errors) |
-| **免疫製劑 (immunologic agent)** | Bundle Immunologic Agent / Claim Immunologic + SOAP note (Observation Subjective/Objective, ClinicalImpression, CarePlan), AllergyIntolerance, Blood Group | 🔶 profiles in package; flow TODO |
+| **免疫製劑 (immunologic agent)** | Bundle-immunologic-agent-twpas **mandates ~35 resource slices (min=1)**: full SOAP (Composition-opd, Observation subjective/objective, ClinicalImpression, CarePlan) + blood group + allergy + imaging/gene/lab/procedure/substance evidence + self-assessment ClaimResponse | 🔶 **registered** (factory dispatches; fails loud); body = large scoped follow-up, model from IG one resource at a time like 癌藥 (45→0) |
 | **自主審查 (self-assessment)** | ClaimResponse Self Assessment TWPAS (心/肝移植) | 🔶 profile seen; flow TODO |
 
 ### 2b. Other NHI IGs (nhicore.nhi.gov.tw)
