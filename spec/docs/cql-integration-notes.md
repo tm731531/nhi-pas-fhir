@@ -59,8 +59,22 @@ clinical-reasoning 整台 FHIR server(docker),C# 打它 API**。理由:最乾淨
 - ✅ `load-libraries.mjs` 可重跑:把 `../elm/*.json` 包成 Library resource 載入(url 對齊 include canonical,
   FHIRHelpers→HL7 path,呼應 JS 端 LenientRepository 的同一個 mismatch)。
 
-**唯一剩下的(有邊界):** HAPI-CR 的 `Library/$evaluate` 是從 **CQL 文字(text/cql)** 載 source,不吃我們
-vendored 的 raw `application/elm+json`(真規則噴 "Could not load source … version null";text/cql 版就成功)。
-我們當初只抽了 4 個 ELM、沒帶 `.cql`。→ **下一步:從官方 `tw.gov.mohw.nhi.cql` package 抓規則的 `.cql` 文字
-一起 vendor 進 `cql-engine/elm/`(或新 `cql/`),再走已證實可行的 text/cql 路徑,即可讓真規則跑出核准/核刪。**
-(或改用 HAPI-CR 吃 elm+json 的設定,但取得 .cql 較直接。)
+✅ **端到端打通(2026-09-29 收尾):真規則跑出核定結果了。**
+- 從官方 `tw.gov.mohw.nhi.cql` package(build.fhir.org)抓官方 Library resource;每個內含
+  `text/cql` + `elm+xml` + `elm+json`。**HAPI-CR 是從 `text/cql` 載 source(自己編譯),不吃 raw
+  `elm+json`**(這就是先前 "Could not load source … version null" 的真因)。
+- vendored 官方 Library 的 **text/cql-only** 版進 `cql-engine/rules/Library-*.json`(4 檔僅 416 KB;
+  丟掉跟 `elm/` 重複的 elm+xml/json)。`load-libraries.mjs` 改成載這些。
+- `Library/BCAbemaciclibRule1/$evaluate` 對我方 Bundle → **68 個 define 全求值**,拿到
+  `乳癌Abemaciclib申請結果_布林=false`、`乳癌Abemaciclib申請之CQL檢核結果=✖不通過…`、`報告總結=…`、
+  `主要疾病ICD資料存在=true`(InCodeSystem 有在跑)。判「不通過」正確 —— 測試 Bundle 是骨髓瘤案,不符乳癌條件。
+- **C# 已接上**:`Core/CqfRulerCqlEngine.cs` = `ICqlEngine` 實作,POST `Library/{ruleId}/$evaluate`
+  (subject+useServerData=false+data:Bundle),把具名結果餵回 `CqlPreCheck.Interpret()`。整合測試
+  `CqfRulerIntegrationTests.cs`(server 沒開就跳過)綠:引擎回具名值、PreCheck 對骨髓瘤案 Block。
+
+**啟用方式**:`Pipeline.Run(case, cql: new CqlPreCheck(new CqfRulerCqlEngine(http, "http://localhost:8095/fhir"),
+藥碼→規則map))`。不傳 cql = 照舊不啟動。
+
+**仍待做(非阻塞)**:(1) 建完整 藥碼→規則 1:N 對映表(全 66 條);(2) 組裝器補「縱貫病歷」讓續用/回診規則
+撈得到病史;(3) 若要 Pass 範例,備一份符合乳癌 Abemaciclib 條件的 Bundle;(4) server 目前 localhost 手動起,
+未來要常駐/上你的 infra。

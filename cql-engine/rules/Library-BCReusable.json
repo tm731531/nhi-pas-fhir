@@ -1,0 +1,731 @@
+{
+ "resourceType": "Library",
+ "id": "BCReusable",
+ "text": {
+  "status": "extensions",
+  "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">\n  <table class=\"narrative-table\">\n    <tbody>\n<tr>\n\n\n<th colspan=\"2\" scope=\"row\" class=\"row-header\">Metadata</th>\n\n\n</tr>\n\n<tr>\n\n\n<th scope=\"row\" class=\"row-header\">Title</th>\n\n\n\n<td class=\"content-container\">BCReusable</td>\n\n\n</tr>\n\n\n\n<tr>\n\n\n<th scope=\"row\" class=\"row-header\">Version</th>\n\n\n\n<td class=\"content-container\">1.0.0</td>\n\n\n</tr>\n\n\n\n\n\n\n\n\n\n\n\n\n<tr>\n\n\n<th scope=\"row\" class=\"row-header\">Status</th>\n\n\n\n<td class=\"content-container\">Draft</td>\n\n\n</tr>\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n<tr>\n\n\n<th scope=\"row\" class=\"row-header\">Description</th>\n\n\n\n<td class=\"content-container\"><div><p>此 Library 為乳癌藥事前審查共通使用規則模組。</p>\n</div></td>\n\n\n</tr>\n\n\n\n\n\n\n<tr>\n\n\n<th scope=\"row\" class=\"row-header\">Type</th>\n\n\n\n<td class=\"content-container\">\n    logic-library from <a href=\"http://terminology.hl7.org/7.4.0/CodeSystem-library-type.html\">http://terminology.hl7.org/CodeSystem/library-type</a> \n\n\n</td>\n\n\n</tr>\n\n\n\n<tr>\n  \n  \n  \n  \n  \n\n<th scope=\"row\" class=\"row-header\">Dependency</th>\n\n\n  \n  \n  <td class=\"content-container\">\n    \n    <em>Description</em>: Library CodeConcept\n    \n    <br/>\n    \n    \n    \n    \n    \n    \n    \n    \n    <em>Resource</em>: <a href=\"Library-BCCodeConcept.html\">https://nhicore.nhi.gov.tw/cql/Library/BCCodeConcept|1.0.0</a>\n    \n    <br/>\n    <em>Canonical URL</em>: <tt>https://nhicore.nhi.gov.tw/cql/Library/BCCodeConcept|1.0.0</tt>\n    \n    \n    \n  </td>\n</tr>\n\n\n\n\n\n\n\n\n\n\n  <tr>\n\n\n<th colspan=\"2\" scope=\"row\" class=\"row-header\">Library Content</th>\n\n\n</tr>\n  \n    \n    <tr>\n      <th scope=\"row\" class=\"row-header\">CQL Content</th>\n      <td>\n        <a name=\"cql-content\"> </a>\n        <pre style=\"border: none;\" class=\"content-container highlight language-cql\"><code class=\"language-cql\">library BCReusable version '1.0.0'\n\nusing FHIR version '4.0.1'\n\ninclude FHIRHelpers version '4.0.1' called FHIRHelpers\n\ninclude BCCodeConcept version '1.0.0' called CodeConcept\n\ncontext Patient\n\n// 病人年齡計算\n// ReferenceDate 使用申請起始日期轉成 Date 後傳入。\ndefine function &quot;PatientAgeInYearsAt&quot;(ReferenceDate Date):\n  if Patient.birthDate is null or ReferenceDate is null then null\n  else difference in years between\n    FHIRHelpers.ToDate(Patient.birthDate)\n    and ReferenceDate\n\ndefine function &quot;IsPatientAtLeastAgeAt&quot;(ReferenceDate Date, MinimumAge Integer):\n  &quot;PatientAgeInYearsAt&quot;(ReferenceDate) is not null\n  and &quot;PatientAgeInYearsAt&quot;(ReferenceDate) &gt;= MinimumAge\n\ndefine function &quot;IsPatientYoungerThanAgeAt&quot;(ReferenceDate Date, MaximumAge Integer):\n  &quot;PatientAgeInYearsAt&quot;(ReferenceDate) is not null\n  and &quot;PatientAgeInYearsAt&quot;(ReferenceDate) &lt; MaximumAge\n\ndefine function &quot;IsPatientAdultAt&quot;(ReferenceDate Date):\n  &quot;IsPatientAtLeastAgeAt&quot;(ReferenceDate, 18)\n\n\n//乳癌疾病代碼：ICD-10-CM = C50\ndefine &quot;ICD-10使用C50&quot;:\n  exists (\n    [Claim] C\n      where exists (\n        C.diagnosis D\n          where D.sequence = 1\n            and exists ( \n              D.diagnosis.coding Cdg\n                where (\n                  Cdg in CodeConcept.ICD10CM2023\n                  or Cdg in CodeConcept.ICD10CM2014\n                )\n                and Substring(Cdg.code, 0, 3) in CodeConcept.ICDBC\n            )\n      )\n  )\n\n//乳癌疾病之腫瘤代碼：ICD-10-CM = C77、C78、C79\ndefine &quot;ICD-10使用C77、C78、C79&quot;:\n  exists (\n    [Claim] C\n      where exists (\n        C.diagnosis D\n          where D.sequence = 1\n            and exists ( \n              D.diagnosis.coding Cdg\n                where (\n                  Cdg in CodeConcept.ICD10CM2023\n                  or Cdg in CodeConcept.ICD10CM2014\n                )\n              and Substring(Cdg.code, 0, 3) in CodeConcept.ICDBCandTumor\n          )\n      )\n  )\n\n\n//乳癌疾病之腫瘤代碼：ICD-10-CM = C77、C78、C79但排除C79.3\ndefine &quot;ICD-10使用C77、C78、C79但排除C79.3&quot;:\n  exists (\n    [Claim] C\n    where exists (\n      C.diagnosis D\n      where exists ( \n        D.diagnosis.coding Cdg\n        where (\n          Cdg in CodeConcept.ICD10CM2023\n          or Cdg in CodeConcept.ICD10CM2014\n        )\n        and (\n          (Substring(Cdg.code, 0, 3) in { 'C77', 'C78' })\n          or (Substring(Cdg.code, 0, 3) = 'C79' and Cdg.code != 'C79.3')\n        )\n      )\n    )\n  )\n\n\n//續用判斷\ndefine &quot;續用註記為1&quot;:\n  exists (\n    [Claim] C\n      where exists (\n        C.item I\n          where exists (\n            I.modifier M\n                where exists (\n                  M.coding Cdg\n                         where Cdg in CodeConcept.NHIContinuationStatus\n                         and Cdg.code in CodeConcept.&quot;續用註記為1&quot;\n                  )\n          )\n      )\n  )\n\n\n//續用判斷\ndefine &quot;續用註記為2&quot;:\n  exists (\n    [Claim] C\n      where exists (\n        C.item I\n          where exists (\n            I.modifier M\n                where exists (\n                  M.coding Cdg\n                         where Cdg in CodeConcept.NHIContinuationStatus\n                         and Cdg.code in CodeConcept.&quot;續用註記為2&quot;\n                  )\n          )\n      )\n  )\n\n//申請類型判斷\ndefine &quot;申請類型&quot;:\n  case\n    when &quot;續用註記為1&quot; then '初次使用'\n    when &quot;續用註記為2&quot; then '續用'\n    else '無法判斷申請類型'\n  end\n\ndefine &quot;初次申請&quot;:\n  &quot;申請類型&quot; = '初次使用'\n\ndefine &quot;續用申請&quot;:\n  &quot;申請類型&quot; = '續用'\n\ndefine &quot;申請類型未知&quot;:\n  &quot;申請類型&quot; = '無法判斷申請類型'\n\n//用藥線別不為1\ndefine &quot;用藥線別≠1&quot;:\n  exists (\n    [Claim] C\n      where exists (\n        C.item I\n          where exists (\n            I.modifier M\n              where exists (\n                M.coding Cdg\n                  where Cdg in CodeConcept.NHILOT\n                    and Cdg.code != '1'\n              )\n          )\n      )\n  )\n\n\n//用藥線別為2\ndefine &quot;用藥線別=2&quot;:\n  exists (\n    [Claim] C\n      where exists (\n        C.item I\n          where exists (\n            I.modifier M\n              where exists (\n                M.coding Cdg\n                  where Cdg in CodeConcept.NHILOT\n                    and Cdg.code = '2'\n              )\n          )\n      )\n  )\n\n//用藥線別為1\ndefine &quot;用藥線別=1&quot;:\n  exists (\n    [Claim] C\n      where exists (\n        C.item I\n          where exists (\n            I.modifier M\n              where exists (\n                M.coding Cdg\n                  where Cdg in CodeConcept.NHILOT\n                    and Cdg.code = '1'\n              )\n          )\n      )\n  )\n\n\n// 醫令類別=1 (orderType = '1')\ndefine &quot;醫令類別為1&quot;:\n exists (\n    [Claim] C\n      where exists (\n        C.item I\n          where exists (\n            I.productOrService.coding PSC\n              where PSC in CodeConcept.NHIOrderType\n              and PSC.code in CodeConcept.&quot;醫令類別&quot;\n          )\n      )\n  )\n\n// 是否有主要疾病 ICD 診斷資料（不限定是否為 C50）。\ndefine &quot;主要疾病ICD診斷資料存在&quot;:\n  exists (\n    [Claim] C\n      where exists (\n        C.diagnosis D\n          where D.sequence = 1\n            and exists (\n              D.diagnosis.coding Cdg\n                where (\n                  Cdg in CodeConcept.ICD10CM2023\n                  or Cdg in CodeConcept.ICD10CM2014\n                )\n            )\n      )\n  )\n\n// 是否有用藥線別資料（不限定線別內容）。\ndefine &quot;用藥線別資料存在&quot;:\n  exists (\n    [Claim] C\n      where exists (\n        C.item I\n          where exists (\n            I.modifier M\n              where exists (\n                M.coding Cdg\n                  where Cdg in CodeConcept.NHILOT\n              )\n          )\n      )\n  )\n\n// 是否有醫令類別資料（不限定是否為癌症治療）。\ndefine &quot;醫令類別資料存在&quot;:\n  exists (\n    [Claim] C\n      where exists (\n        C.item I\n          where exists (\n            I.productOrService.coding PSC\n              where PSC in CodeConcept.NHIOrderType\n          )\n      )\n  )\n\n//影像報告\ndefine function &quot;IsImageReport&quot;(Report DiagnosticReport):\n  exists (\n    Report.code.coding Cdg\n    where (\n      Cdg in CodeConcept.ICD10PCS2023Image\n      or Cdg in CodeConcept.ICD10PCS2014Image\n    )\n    and Cdg.code in CodeConcept.ImageCodes\n  )\n\n//分子/病理檢查報告\ndefine function &quot;IsMolecularReport&quot;(Report DiagnosticReport):\n  exists (\n    Report.code.coding Cdg\n    where Cdg in CodeConcept.LOINC\n      and Cdg.code in CodeConcept.MolecularReport\n  )\n\n//報告日期是否落在參考日期前指定天數內\ndefine function &quot;IsReportWithinDaysBefore&quot;(Report DiagnosticReport, ReferenceDate DateTime, LookbackDays Integer):\n  Report.effective is not null\n  and ReferenceDate is not null\n  and FHIRHelpers.ToDateTime(Report.effective) &lt;= ReferenceDate\n  and (duration in days between FHIRHelpers.ToDateTime(Report.effective) and ReferenceDate) &lt;= LookbackDays\n\ndefine function &quot;HasRecentImageReport&quot;(ReferenceDate DateTime, LookbackDays Integer):\n  exists (\n    [DiagnosticReport] Report\n    where &quot;IsImageReport&quot;(Report)\n      and &quot;IsReportWithinDaysBefore&quot;(Report, ReferenceDate, LookbackDays)\n  )\n\ndefine function &quot;HasRecentMolecularReport&quot;(ReferenceDate DateTime, LookbackDays Integer):\n  exists (\n    [DiagnosticReport] Report\n    where &quot;IsMolecularReport&quot;(Report)\n      and &quot;IsReportWithinDaysBefore&quot;(Report, ReferenceDate, LookbackDays)\n  )\n\n// 是否有影像報告資料（不限定時間）。\ndefine &quot;影像報告資料存在&quot;:\n  exists (\n    [DiagnosticReport] Report\n    where &quot;IsImageReport&quot;(Report)\n      and Report.effective is not null\n  )\n\n// 是否有分子/病理檢查報告資料（不限定時間）。\ndefine &quot;檢查報告資料存在&quot;:\n  exists (\n    [DiagnosticReport] Report\n    where &quot;IsMolecularReport&quot;(Report)\n      and Report.effective is not null\n  )\n\n// 是否有影像或分子/病理檢查報告資料（不限定時間）。\ndefine &quot;影像或檢查報告資料存在&quot;:\n  &quot;影像報告資料存在&quot;\n  or &quot;檢查報告資料存在&quot;\n\ndefine function &quot;IsTestObservation&quot;(OBs Observation):\n  exists (\n    OBs.category C\n      where exists (\n        C.coding Cdg\n          where Cdg in CodeConcept.NHIPASSupportingInfoType\n            and Cdg.code = 'tests'\n      )\n  )\n\n// 取得檢驗數值，相容 valueInteger、valueDecimal、valueQuantity、valueString（可解析為數字）四種型態；皆不符合則回傳 null\ndefine function &quot;GetNumericValue&quot;(V Choice&lt;FHIR.integer, FHIR.decimal, Quantity, FHIR.string&gt;):\n  case\n    when V is FHIR.integer then (V as FHIR.integer).value\n    when V is FHIR.decimal then (V as FHIR.decimal).value\n    when V is Quantity then (V as Quantity).value\n    when V is FHIR.string then ToDecimal((V as FHIR.string).value)\n    else null\n  end\n\n// 若數值為 Quantity 型態則回傳其 comparator（如 '&gt;'、'&lt;'），否則回傳 null\ndefine function &quot;GetQuantityComparator&quot;(V Choice&lt;FHIR.integer, FHIR.decimal, Quantity, FHIR.string&gt;):\n  if V is Quantity then (V as Quantity).comparator else null\n\ndefine function &quot;IsGeneInfoObservation&quot;(OBs Observation):\n  exists (\n    OBs.category C\n      where exists (\n        C.coding Cdg\n          where Cdg in CodeConcept.NHIPASSupportingInfoType\n            and Cdg.code = 'geneInfo'\n      )\n  )\n\ndefine function &quot;IsGenePanelObservation&quot;(OBs Observation):\n  exists (\n    OBs.code.coding Cdg\n      where Cdg in CodeConcept.LOINC\n        and Cdg.code = '69548-6'\n  )\n\ndefine function &quot;IsObservationDateTimeWithinDaysBefore&quot;(OBs Observation, ReferenceDate DateTime, LookbackDays Integer):\n  OBs.effective is FHIR.dateTime\n  and ReferenceDate is not null\n  and FHIRHelpers.ToDateTime(OBs.effective as FHIR.dateTime) &lt;= ReferenceDate\n  and (duration in days between FHIRHelpers.ToDateTime(OBs.effective as FHIR.dateTime) and ReferenceDate) &lt;= LookbackDays\n\n// 是否有癌症分期資料（不限定 M/N 值內容）。\ndefine &quot;癌症分期資料存在&quot;:\n  exists (\n    [Observation] O\n    where exists (\n      O.code.coding Cdg\n      where Cdg.code = '399390009'\n        and Cdg in CodeConcept.SNOMED\n    )\n    and O.value is not null\n  )\n\n// 是否有指定 LOINC 檢驗 Observation（不限定結果）。\ndefine function &quot;HasTestObservationData&quot;(MarkerCodes List&lt;String&gt;):\n  exists (\n    [Observation] OBs\n      where &quot;IsTestObservation&quot;(OBs)\n        and exists (\n          OBs.code.coding Cdg\n            where Cdg in CodeConcept.LOINC\n              and Cdg.code in MarkerCodes\n        )\n        and (OBs.value is not null or OBs.interpretation is not null)\n  )\n\n// 是否有指定 geneInfo component 檢驗資料（不限定結果）。\ndefine function &quot;HasGeneInfoComponentData&quot;(MarkerCodes List&lt;String&gt;):\n  exists (\n    [Observation] OBs\n      where &quot;IsGeneInfoObservation&quot;(OBs)\n        and &quot;IsGenePanelObservation&quot;(OBs)\n        and exists (\n          OBs.component Comp\n            where exists (\n              Comp.code.coding Cdg\n                where Cdg in CodeConcept.LOINC\n                  and Cdg.code in MarkerCodes\n            )\n            and Comp.value is not null\n        )\n  )\n\n// 指標代碼與同一筆 DiagnosticReport 的結論文字符合指定結果。\ndefine function &quot;HasDiagnosticReportResult&quot;(MarkerCodes List&lt;String&gt;, ResultPattern String):\n  exists (\n    [DiagnosticReport] Report\n      where exists (\n        Report.code.coding Cdg\n          where Cdg in CodeConcept.LOINC\n            and Cdg.code in MarkerCodes\n      )\n      and Report.conclusion is not null\n      and Matches(Report.conclusion.value, ResultPattern)\n  )\n\n// 僅用於原本有檢測日期限制的結果條件。\ndefine function &quot;HasRecentDiagnosticReportResult&quot;(MarkerCodes List&lt;String&gt;, ResultPattern String, ReferenceDate DateTime, LookbackDays Integer):\n  exists (\n    [DiagnosticReport] Report\n      where exists (\n        Report.code.coding Cdg\n          where Cdg in CodeConcept.LOINC\n            and Cdg.code in MarkerCodes\n      )\n      and &quot;IsReportWithinDaysBefore&quot;(Report, ReferenceDate, LookbackDays)\n      and Report.conclusion is not null\n      and Matches(Report.conclusion.value, ResultPattern)\n  )\n\n// 有填報告結果與結果符合分開判定。\ndefine function &quot;HasDiagnosticReportData&quot;(MarkerCodes List&lt;String&gt;):\n  exists (\n    [DiagnosticReport] Report\n      where exists (\n        Report.code.coding Cdg\n          where Cdg in CodeConcept.LOINC\n            and Cdg.code in MarkerCodes\n      )\n      and Report.conclusion is not null\n      and Matches(Report.conclusion.value, '(?s).*\\\\S.*')\n  )\n\ndefine function &quot;HasMarkerData&quot;(MarkerCodes List&lt;String&gt;):\n  &quot;HasTestObservationData&quot;(MarkerCodes)\n  or &quot;HasGeneInfoComponentData&quot;(MarkerCodes)\n  or &quot;HasDiagnosticReportData&quot;(MarkerCodes)\n\ndefine &quot;HER2檢測資料存在&quot;:\n  &quot;HasMarkerData&quot;(CodeConcept.HER2)\n\ndefine &quot;ER檢測資料存在&quot;:\n  &quot;HasMarkerData&quot;(CodeConcept.MolecularER)\n\ndefine &quot;PR檢測資料存在&quot;:\n  &quot;HasMarkerData&quot;(CodeConcept.MolecularPR)\n\ndefine &quot;BRCA1或BRCA2檢測資料存在&quot;:\n  &quot;HasMarkerData&quot;(CodeConcept.BRCA1or2)\n\ndefine function &quot;HasTestObservationResult&quot;(MarkerCodes List&lt;String&gt;, ResultCodes List&lt;String&gt;, ValuePattern String):\n  exists (\n    [Observation] OBs\n      where &quot;IsTestObservation&quot;(OBs)\n        and exists (\n          OBs.code.coding Cdg\n            where Cdg in CodeConcept.LOINC\n              and Cdg.code in MarkerCodes\n        )\n        and (\n          (OBs.value is FHIR.CodeableConcept\n            and exists (\n              ((OBs.value as FHIR.CodeableConcept).coding) ValueCoding\n                where ValueCoding in CodeConcept.InterpretationCodes\n                  and ValueCoding.code in ResultCodes\n            )\n          )\n          or (OBs.value is FHIR.string\n            and Matches((OBs.value as FHIR.string).value, ValuePattern)\n          )\n          or exists (\n            OBs.interpretation.coding INT\n              where INT in CodeConcept.InterpretationCodes\n                and INT.code in ResultCodes\n          )\n        )\n  )\n\ndefine function &quot;HasRecentTestObservationResult&quot;(MarkerCodes List&lt;String&gt;, ResultCodes List&lt;String&gt;, ValuePattern String, ReferenceDate DateTime, LookbackDays Integer):\n  exists (\n    [Observation] OBs\n      where &quot;IsTestObservation&quot;(OBs)\n        and &quot;IsObservationDateTimeWithinDaysBefore&quot;(OBs, ReferenceDate, LookbackDays)\n        and exists (\n          OBs.code.coding Cdg\n            where Cdg in CodeConcept.LOINC\n              and Cdg.code in MarkerCodes\n        )\n        and (\n          (OBs.value is FHIR.CodeableConcept\n            and exists (\n              ((OBs.value as FHIR.CodeableConcept).coding) ValueCoding\n                where ValueCoding in CodeConcept.InterpretationCodes\n                  and ValueCoding.code in ResultCodes\n            )\n          )\n          or (OBs.value is FHIR.string\n            and Matches((OBs.value as FHIR.string).value, ValuePattern)\n          )\n          or exists (\n            OBs.interpretation.coding INT\n              where INT in CodeConcept.InterpretationCodes\n                and INT.code in ResultCodes\n          )\n        )\n  )\n\ndefine function &quot;HasGeneInfoComponentResult&quot;(MarkerCodes List&lt;String&gt;, ResultCodes List&lt;String&gt;, ValuePattern String):\n  exists (\n    [Observation] OBs\n      where &quot;IsGeneInfoObservation&quot;(OBs)\n        and &quot;IsGenePanelObservation&quot;(OBs)\n        and exists (\n          OBs.component Comp\n            where exists (\n              Comp.code.coding Cdg\n                where Cdg in CodeConcept.LOINC\n                  and Cdg.code in MarkerCodes\n            )\n              and (\n                (Comp.value is FHIR.CodeableConcept\n                  and exists (\n                    ((Comp.value as FHIR.CodeableConcept).coding) ValueCoding\n                      where ValueCoding in CodeConcept.InterpretationCodes\n                        and ValueCoding.code in ResultCodes\n                  )\n                )\n                or (Comp.value is FHIR.string\n                  and Matches((Comp.value as FHIR.string).value, ValuePattern)\n                )\n              )\n        )\n  )\n\ndefine function &quot;HasRecentGeneInfoComponentResult&quot;(MarkerCodes List&lt;String&gt;, ResultCodes List&lt;String&gt;, ValuePattern String, ReferenceDate DateTime, LookbackDays Integer):\n  exists (\n    [Observation] OBs\n      where &quot;IsGeneInfoObservation&quot;(OBs)\n        and &quot;IsGenePanelObservation&quot;(OBs)\n        and &quot;IsObservationDateTimeWithinDaysBefore&quot;(OBs, ReferenceDate, LookbackDays)\n        and exists (\n          OBs.component Comp\n            where exists (\n              Comp.code.coding Cdg\n                where Cdg in CodeConcept.LOINC\n                  and Cdg.code in MarkerCodes\n            )\n              and (\n                (Comp.value is FHIR.CodeableConcept\n                  and exists (\n                    ((Comp.value as FHIR.CodeableConcept).coding) ValueCoding\n                      where ValueCoding in CodeConcept.InterpretationCodes\n                        and ValueCoding.code in ResultCodes\n                  )\n                )\n                or (Comp.value is FHIR.string\n                  and Matches((Comp.value as FHIR.string).value, ValuePattern)\n                )\n              )\n        )\n  )\n\ndefine function &quot;HasTestObservationWithInterpretationAndValuePattern&quot;(MarkerCodes List&lt;String&gt;, InterpretationCodes List&lt;String&gt;, ValuePattern String):\n  &quot;HasTestObservationResult&quot;(MarkerCodes, InterpretationCodes, ValuePattern)\n\ndefine function &quot;HasGeneInfoObservationWithInterpretationAndTextPattern&quot;(MarkerCodes List&lt;String&gt;, InterpretationCodes List&lt;String&gt;, TextPattern String):\n  &quot;HasGeneInfoComponentResult&quot;(MarkerCodes, InterpretationCodes, TextPattern)\n\ndefine function &quot;HasTestObservationWithInterpretationCodes&quot;(MarkerCodes List&lt;String&gt;, InterpretationCodes List&lt;String&gt;):\n  exists (\n    [Observation] OBs\n      where &quot;IsTestObservation&quot;(OBs)\n        and exists (\n          OBs.code.coding Cdg\n            where Cdg in CodeConcept.LOINC\n              and Cdg.code in MarkerCodes\n        )\n        and (\n          (OBs.value is FHIR.CodeableConcept\n            and exists (\n              ((OBs.value as FHIR.CodeableConcept).coding) ValueCoding\n                where ValueCoding in CodeConcept.InterpretationCodes\n                  and ValueCoding.code in InterpretationCodes\n            )\n          )\n          or exists (\n            OBs.interpretation.coding INT\n              where INT in CodeConcept.InterpretationCodes\n                and INT.code in InterpretationCodes\n          )\n        )\n  )\n\ndefine function &quot;HasGeneInfoObservationWithInterpretationCodes&quot;(MarkerCodes List&lt;String&gt;, InterpretationCodes List&lt;String&gt;):\n  exists (\n    [Observation] OBs\n      where &quot;IsGeneInfoObservation&quot;(OBs)\n        and &quot;IsGenePanelObservation&quot;(OBs)\n        and exists (\n          OBs.component Comp\n            where exists (\n              Comp.code.coding Cdg\n                where Cdg in CodeConcept.LOINC\n                  and Cdg.code in MarkerCodes\n            )\n              and Comp.value is FHIR.CodeableConcept\n              and exists (\n                ((Comp.value as FHIR.CodeableConcept).coding) INT\n                  where INT in CodeConcept.InterpretationCodes\n                    and INT.code in InterpretationCodes\n              )\n        )\n  )\n\ndefine function &quot;HasTestObservationWithValuePattern&quot;(MarkerCodes List&lt;String&gt;, ValuePattern String):\n  exists (\n    [Observation] OBs\n      where &quot;IsTestObservation&quot;(OBs)\n        and exists (\n          OBs.code.coding Cdg\n            where Cdg in CodeConcept.LOINC\n              and Cdg.code in MarkerCodes\n        )\n        and OBs.value is FHIR.string\n        and Matches((OBs.value as FHIR.string).value, ValuePattern)\n  )\n\ndefine function &quot;HasGeneInfoObservationWithTextPattern&quot;(MarkerCodes List&lt;String&gt;, TextPattern String):\n  exists (\n    [Observation] OBs\n      where &quot;IsGeneInfoObservation&quot;(OBs)\n        and &quot;IsGenePanelObservation&quot;(OBs)\n        and exists (\n          OBs.component Comp\n            where exists (\n              Comp.code.coding Cdg\n                where Cdg in CodeConcept.LOINC\n                  and Cdg.code in MarkerCodes\n            )\n              and Comp.value is FHIR.string\n              and Matches((Comp.value as FHIR.string).value, TextPattern)\n        )\n  )\n\ndefine function &quot;HasMarkerNegative&quot;(MarkerCodes List&lt;String&gt;):\n  &quot;HasTestObservationWithInterpretationAndValuePattern&quot;(MarkerCodes, { 'NEG' }, '(?i).*(陰性|negative).*')\n  or &quot;HasGeneInfoObservationWithInterpretationAndTextPattern&quot;(MarkerCodes, { 'NEG' }, '(?i).*(陰性|negative).*')\n\ndefine function &quot;HasMarkerNegativeTest&quot;(MarkerCodes List&lt;String&gt;):\n  &quot;HasTestObservationWithInterpretationAndValuePattern&quot;(MarkerCodes, { 'NEG' }, '(?i).*(陰性|negative).*')\n\ndefine function &quot;HasMarkerNegativeGene&quot;(MarkerCodes List&lt;String&gt;):\n  &quot;HasGeneInfoObservationWithInterpretationAndTextPattern&quot;(MarkerCodes, { 'NEG' }, '(?i).*(陰性|negative).*')\n\ndefine function &quot;HasMarkerPositive&quot;(MarkerCodes List&lt;String&gt;):\n  &quot;HasTestObservationWithInterpretationAndValuePattern&quot;(MarkerCodes, { 'POS' }, '(?i).*(\\+|陽性|positive).*')\n  or &quot;HasGeneInfoObservationWithInterpretationAndTextPattern&quot;(MarkerCodes, { 'POS' }, '(?i).*(\\+|陽性|positive).*')\n\ndefine function &quot;HasMarkerPositiveTest&quot;(MarkerCodes List&lt;String&gt;):\n  &quot;HasTestObservationWithInterpretationAndValuePattern&quot;(MarkerCodes, { 'POS' }, '(?i).*(\\+|陽性|positive).*')\n\ndefine function &quot;HasMarkerPositiveGene&quot;(MarkerCodes List&lt;String&gt;):\n  &quot;HasGeneInfoObservationWithInterpretationAndTextPattern&quot;(MarkerCodes, { 'POS' }, '(?i).*(\\+|陽性|positive).*')\n\ndefine &quot;HasHER2NegativeTest&quot;:\n  &quot;HasMarkerNegativeTest&quot;(CodeConcept.HER2)\n\ndefine &quot;HasHER2NegativeGene&quot;:\n  &quot;HasMarkerNegativeGene&quot;(CodeConcept.HER2)\n\ndefine &quot;HasHER2Negative&quot;:\n  &quot;HasMarkerNegative&quot;(CodeConcept.HER2)\n\ndefine &quot;HasHER2OverexpressionTest&quot;:\n  &quot;HasTestObservationWithValuePattern&quot;(CodeConcept.HER2, '(?i).*(IHC3\\+|FISH\\+).*')\n\ndefine &quot;HasHER2OverexpressionGene&quot;:\n  &quot;HasGeneInfoObservationWithTextPattern&quot;(CodeConcept.HER2, '(?i).*(IHC3\\+|FISH\\+).*')\n\ndefine &quot;HasHER2NegativeOrND&quot;:\n  &quot;HasTestObservationWithInterpretationCodes&quot;(CodeConcept.HER2, { 'NEG', 'ND' })\n  or &quot;HasGeneInfoObservationWithInterpretationCodes&quot;(CodeConcept.HER2, { 'NEG', 'ND' })\n\ndefine &quot;HasHER2NegativeOrNDTest&quot;:\n  &quot;HasTestObservationWithInterpretationCodes&quot;(CodeConcept.HER2, { 'NEG', 'ND' })\n\ndefine &quot;HasHER2NegativeOrNDGene&quot;:\n  &quot;HasGeneInfoObservationWithInterpretationCodes&quot;(CodeConcept.HER2, { 'NEG', 'ND' })\n\ndefine &quot;HasHER2Overexpression&quot;:\n  &quot;HasHER2OverexpressionTest&quot;\n  or &quot;HasHER2OverexpressionGene&quot;\n\ndefine &quot;HasHER2LowExpressionTest&quot;:\n  &quot;HasTestObservationWithValuePattern&quot;(CodeConcept.HER2, '(?i).*(IHC\\s*1\\+|IHC\\s*2\\+|ISH-).*')\n\ndefine &quot;HasHER2LowExpressionGene&quot;:\n  &quot;HasGeneInfoObservationWithTextPattern&quot;(CodeConcept.HER2, '(?i).*(IHC\\s*1\\+|IHC\\s*2\\+|ISH-).*')\n\ndefine &quot;HasHER2LowExpression&quot;:\n  &quot;HasHER2LowExpressionTest&quot;\n  or &quot;HasHER2LowExpressionGene&quot;\n\ndefine function &quot;HasCancerStageValue&quot;(ValuePattern String):\n  exists (\n    [Observation] O\n      where exists (\n        O.code.coding Cdg\n          where Cdg.code = '399390009'\n            and Cdg in CodeConcept.SNOMED\n      )\n        and O.value is not null\n        and O.value is FHIR.string\n        and Matches((O.value as FHIR.string).value, ValuePattern)\n  )\n\n//癌症分期分數或結果為 M1-M9\ndefine &quot;癌症分期分數或結果為M≠0&quot;:\n  &quot;HasCancerStageValue&quot;('.*M[1-9].*')\n\n//癌症分期分數或結果為 M0\ndefine &quot;癌症分期分數或結果為M=0&quot;:\n  &quot;HasCancerStageValue&quot;('.*M0.*')\n\n//癌症分期分數或結果為 M1-M9\ndefine &quot;癌症分期分數或結果為M&gt;=1&quot;:\n  &quot;HasCancerStageValue&quot;('.*M[1-9].*')\n\n//癌症分期分數或結果為 N0\ndefine &quot;癌症分期分數或結果為N=0&quot;:\n  &quot;HasCancerStageValue&quot;('.*N0.*')\n\n//癌症分期分數或結果為 N1-N9\ndefine &quot;癌症分期分數或結果為N&gt;=1&quot;:\n  &quot;HasCancerStageValue&quot;('.*N[1-9].*')\n\n//癌症分期分數或結果為 N1-N9\ndefine &quot;癌症分期分數或結果為N≠0&quot;:\n  &quot;癌症分期分數或結果為N&gt;=1&quot;\n\n// 檢查 MedicationRequest 是否有有效的時間資訊\ndefine function &quot;HasValidTiming&quot;(MR MedicationRequest):\n  MR.dosageInstruction is not null\n  and Count(MR.dosageInstruction) &gt; 0\n  and MR.dosageInstruction[0].timing is not null\n  and MR.dosageInstruction[0].timing.repeat is not null\n  and MR.dosageInstruction[0].timing.repeat.bounds is Period\n  and (MR.dosageInstruction[0].timing.repeat.bounds as Period).start is not null\n  and (MR.dosageInstruction[0].timing.repeat.bounds as Period).end is not null\n\n// 取得 MedicationRequest 的起始時間\ndefine function &quot;GetStartTime&quot;(MR MedicationRequest):\n  FHIRHelpers.ToDateTime((MR.dosageInstruction[0].timing.repeat.bounds as Period).start)\n\n// 取得 MedicationRequest 的結束時間  \ndefine function &quot;GetEndTime&quot;(MR MedicationRequest):\n  FHIRHelpers.ToDateTime((MR.dosageInstruction[0].timing.repeat.bounds as Period).end)\n\n// 檢查 Plan 的時間範圍是否在 Order 的時間範圍內\ndefine function &quot;PlanTimeWithinOrderTime&quot;(MRPlan MedicationRequest, MROrder MedicationRequest):\n  &quot;HasValidTiming&quot;(MRPlan) \n  and &quot;HasValidTiming&quot;(MROrder)\n  and &quot;GetStartTime&quot;(MRPlan) &gt;= &quot;GetStartTime&quot;(MROrder)\n  and &quot;GetStartTime&quot;(MRPlan) &lt;= &quot;GetEndTime&quot;(MROrder)\n  and &quot;GetEndTime&quot;(MRPlan) &gt;= &quot;GetStartTime&quot;(MROrder)\n  and &quot;GetEndTime&quot;(MRPlan) &lt;= &quot;GetEndTime&quot;(MROrder)\n\n// 檢查兩個藥物的時間範圍是否重疊\ndefine function &quot;MedicationTimesOverlap&quot;(MR1 MedicationRequest, MR2 MedicationRequest):\n  &quot;HasValidTiming&quot;(MR1) and &quot;HasValidTiming&quot;(MR2)\n  and &quot;GetStartTime&quot;(MR1) &lt;= &quot;GetEndTime&quot;(MR2)\n  and &quot;GetEndTime&quot;(MR1) &gt;= &quot;GetStartTime&quot;(MR2)\n\n// 檢查 MedicationRequest 是否為指定藥物申請\ndefine function &quot;HasMedicationCode&quot;(MR MedicationRequest, DrugCodes List&lt;String&gt;):\n  exists (\n    MR.medication.coding Cdg\n    where Cdg in CodeConcept.NHIMedication\n      and Cdg.code in DrugCodes\n  )\n\n// 是否出現指定藥物用藥紀錄，不檢查療程時間\ndefine function &quot;HasMedicationUse&quot;(DrugCodes List&lt;String&gt;):\n  exists (\n    [MedicationRequest] MR\n    where &quot;HasMedicationCode&quot;(MR, DrugCodes)\n  )\n\n// 是否有指定藥物本次申請紀錄，不檢查療程時間。\ndefine function &quot;HasMedicationPlanRecord&quot;(DrugCodes List&lt;String&gt;):\n  exists (\n    [MedicationRequest] MR\n    where MR.intent = 'plan'\n      and &quot;HasMedicationCode&quot;(MR, DrugCodes)\n  )\n\n// 是否有指定藥物歷史醫令紀錄，不檢查療程時間。\ndefine function &quot;HasMedicationOrderRecord&quot;(DrugCodes List&lt;String&gt;):\n  exists (\n    [MedicationRequest] MR\n    where MR.intent = 'order'\n      and &quot;HasMedicationCode&quot;(MR, DrugCodes)\n  )\n\n// 是否有指定藥物本次申請療程起迄日期。\ndefine function &quot;HasMedicationPlanTiming&quot;(DrugCodes List&lt;String&gt;):\n  exists (\n    [MedicationRequest] MR\n    where MR.intent = 'plan'\n      and &quot;HasMedicationCode&quot;(MR, DrugCodes)\n      and &quot;HasValidTiming&quot;(MR)\n  )\n\n// 本次藥物申請（plan）\ndefine function &quot;IsMedicationPlan&quot;(MR MedicationRequest, DrugCodes List&lt;String&gt;):\n  MR.intent = 'plan'\n  and &quot;HasMedicationCode&quot;(MR, DrugCodes)\n  and &quot;HasValidTiming&quot;(MR)\n\n// 歷史藥物醫令（order）\ndefine function &quot;IsMedicationOrder&quot;(MR MedicationRequest, DrugCodes List&lt;String&gt;):\n  MR.intent = 'order'\n  and &quot;HasMedicationCode&quot;(MR, DrugCodes)\n  and &quot;HasValidTiming&quot;(MR)\n\n// 指定藥物最近一次本次申請（plan）\ndefine function &quot;LatestMedicationPlan&quot;(DrugCodes List&lt;String&gt;):\n  Last(\n    [MedicationRequest] MR\n      where &quot;IsMedicationPlan&quot;(MR, DrugCodes)\n      sort by FHIRHelpers.ToDateTime((dosageInstruction[0].timing.repeat.bounds as Period).start)\n  )\n\n// 指定藥物於參考日期前最近一次本次申請（plan）\ndefine function &quot;LatestMedicationPlanBefore&quot;(DrugCodes List&lt;String&gt;, ReferenceDate DateTime):\n  Last(\n    [MedicationRequest] MR\n      where &quot;IsMedicationPlan&quot;(MR, DrugCodes)\n        and &quot;GetStartTime&quot;(MR) &lt; ReferenceDate\n      sort by FHIRHelpers.ToDateTime((dosageInstruction[0].timing.repeat.bounds as Period).start)\n  )\n\n// 指定藥物於參考日期前最近一次已完成醫令（order）\ndefine function &quot;LatestCompletedMedicationOrderBefore&quot;(DrugCodes List&lt;String&gt;, ReferenceDate DateTime):\n  Last(\n    [MedicationRequest] MR\n      where &quot;IsMedicationOrder&quot;(MR, DrugCodes)\n        and MR.status = 'completed'\n        and &quot;GetStartTime&quot;(MR) &lt; ReferenceDate\n      sort by FHIRHelpers.ToDateTime((dosageInstruction[0].timing.repeat.bounds as Period).start)\n  )\n\ndefine function &quot;HasImageReportBetween&quot;(StartDate DateTime, EndDate DateTime):\n  exists (\n    [DiagnosticReport] Report\n    where &quot;IsImageReport&quot;(Report)\n      and Report.effective is not null\n      and FHIRHelpers.ToDateTime(Report.effective) &gt;= StartDate\n      and FHIRHelpers.ToDateTime(Report.effective) &lt; EndDate\n  )\n\ndefine function &quot;HasImageReportBetweenPreviousTreatmentAndCurrentApply&quot;(DrugCodes List&lt;String&gt;):\n  exists (\n    [MedicationRequest] CurrentMR\n    where &quot;IsMedicationPlan&quot;(CurrentMR, DrugCodes)\n      and &quot;LatestCompletedMedicationOrderBefore&quot;(DrugCodes, &quot;GetStartTime&quot;(CurrentMR)) is not null\n      and &quot;HasImageReportBetween&quot;(\n        &quot;GetStartTime&quot;(&quot;LatestCompletedMedicationOrderBefore&quot;(DrugCodes, &quot;GetStartTime&quot;(CurrentMR))),\n        &quot;GetStartTime&quot;(CurrentMR)\n      )\n  )\n\n// 歷史藥物療程結束時間早於或等於本次申請療程開始時間\ndefine function &quot;IsBeforeMedicationPlan&quot;(PriorMR MedicationRequest, CurrentMR MedicationRequest):\n  &quot;GetEndTime&quot;(PriorMR) &lt;= &quot;GetStartTime&quot;(CurrentMR)\n\n// 兩筆藥物療程期間有重疊\ndefine function &quot;MedicationPeriodsOverlap&quot;(LeftMR MedicationRequest, RightMR MedicationRequest):\n  &quot;GetStartTime&quot;(LeftMR) &lt;= &quot;GetEndTime&quot;(RightMR)\n  and &quot;GetEndTime&quot;(LeftMR) &gt;= &quot;GetStartTime&quot;(RightMR)\n\n// 任兩種指定藥物用藥紀錄期間是否重疊\ndefine function &quot;HasMedicationPeriodsOverlap&quot;(DrugCodesA List&lt;String&gt;, DrugCodesB List&lt;String&gt;):\n  exists (\n    [MedicationRequest] MRA\n    where &quot;HasMedicationCode&quot;(MRA, DrugCodesA)\n      and &quot;HasValidTiming&quot;(MRA)\n      and exists (\n        [MedicationRequest] MRB\n        where MRB.id != MRA.id\n          and &quot;HasMedicationCode&quot;(MRB, DrugCodesB)\n          and &quot;HasValidTiming&quot;(MRB)\n          and &quot;MedicationPeriodsOverlap&quot;(MRA, MRB)\n      )\n  )\n\n// 是否於本次指定藥物申請前，曾使用過指定歷史藥物\ndefine function &quot;HasPriorMedicationUse&quot;(CurrentDrugCodes List&lt;String&gt;, PriorDrugCodes List&lt;String&gt;):\n  exists (\n    [MedicationRequest] CurrentMR\n    where &quot;IsMedicationPlan&quot;(CurrentMR, CurrentDrugCodes)\n      and exists (\n        [MedicationRequest] PriorMR\n        where &quot;IsMedicationOrder&quot;(PriorMR, PriorDrugCodes)\n          and &quot;IsBeforeMedicationPlan&quot;(PriorMR, CurrentMR)\n      )\n  )\n\n// 是否於本次指定藥物申請前，曾併用兩種指定歷史藥物\ndefine function &quot;HasPriorConcurrentMedicationUse&quot;(CurrentDrugCodes List&lt;String&gt;, PriorDrugCodesA List&lt;String&gt;, PriorDrugCodesB List&lt;String&gt;):\n  exists (\n    [MedicationRequest] CurrentMR\n    where &quot;IsMedicationPlan&quot;(CurrentMR, CurrentDrugCodes)\n      and exists (\n        [MedicationRequest] PriorA\n        where &quot;IsMedicationOrder&quot;(PriorA, PriorDrugCodesA)\n          and &quot;IsBeforeMedicationPlan&quot;(PriorA, CurrentMR)\n          and exists (\n            [MedicationRequest] PriorB\n            where &quot;IsMedicationOrder&quot;(PriorB, PriorDrugCodesB)\n              and &quot;MedicationPeriodsOverlap&quot;(PriorA, PriorB)\n              and &quot;IsBeforeMedicationPlan&quot;(PriorB, CurrentMR)\n          )\n      )\n  )\n\n// 本次指定藥物申請期間，是否與另一指定藥物申請期間重疊\ndefine function &quot;HasConcurrentMedicationPlan&quot;(CurrentDrugCodes List&lt;String&gt;, ConcurrentDrugCodes List&lt;String&gt;):\n  exists (\n    [MedicationRequest] CurrentMR\n    where &quot;IsMedicationPlan&quot;(CurrentMR, CurrentDrugCodes)\n      and exists (\n        [MedicationRequest] ConcurrentMR\n        where ConcurrentMR.id != CurrentMR.id\n          and &quot;IsMedicationPlan&quot;(ConcurrentMR, ConcurrentDrugCodes)\n          and &quot;MedicationPeriodsOverlap&quot;(CurrentMR, ConcurrentMR)\n      )\n  )\n\n// 本次指定藥物申請期間，是否與指定藥物用藥紀錄期間重疊\ndefine function &quot;HasConcurrentMedicationUse&quot;(CurrentDrugCodes List&lt;String&gt;, ConcurrentDrugCodes List&lt;String&gt;):\n  exists (\n    [MedicationRequest] CurrentMR\n    where &quot;IsMedicationPlan&quot;(CurrentMR, CurrentDrugCodes)\n      and exists (\n        [MedicationRequest] ConcurrentMR\n        where ConcurrentMR.id != CurrentMR.id\n          and &quot;HasMedicationCode&quot;(ConcurrentMR, ConcurrentDrugCodes)\n          and &quot;HasValidTiming&quot;(ConcurrentMR)\n          and &quot;MedicationPeriodsOverlap&quot;(CurrentMR, ConcurrentMR)\n      )\n  )\n\n// 本次指定藥物申請期間，是否與指定藥物醫令期間重疊\ndefine function &quot;HasConcurrentMedicationOrder&quot;(CurrentDrugCodes List&lt;String&gt;, ConcurrentDrugCodes List&lt;String&gt;):\n  exists (\n    [MedicationRequest] CurrentMR\n    where &quot;IsMedicationPlan&quot;(CurrentMR, CurrentDrugCodes)\n      and exists (\n        [MedicationRequest] ConcurrentMR\n        where &quot;IsMedicationOrder&quot;(ConcurrentMR, ConcurrentDrugCodes)\n          and &quot;MedicationPeriodsOverlap&quot;(CurrentMR, ConcurrentMR)\n      )\n  )\n\n// 本次指定藥物申請期間，是否同時與兩種指定藥物醫令期間重疊\ndefine function &quot;HasConcurrentMedicationOrders2&quot;(CurrentDrugCodes List&lt;String&gt;, ConcurrentDrugCodesA List&lt;String&gt;, ConcurrentDrugCodesB List&lt;String&gt;):\n  exists (\n    [MedicationRequest] CurrentMR\n    where &quot;IsMedicationPlan&quot;(CurrentMR, CurrentDrugCodes)\n      and exists (\n        [MedicationRequest] ConcurrentA\n        where &quot;IsMedicationOrder&quot;(ConcurrentA, ConcurrentDrugCodesA)\n          and &quot;MedicationPeriodsOverlap&quot;(CurrentMR, ConcurrentA)\n      )\n      and exists (\n        [MedicationRequest] ConcurrentB\n        where &quot;IsMedicationOrder&quot;(ConcurrentB, ConcurrentDrugCodesB)\n          and &quot;MedicationPeriodsOverlap&quot;(CurrentMR, ConcurrentB)\n      )\n  )\n\n// 本次指定藥物申請期間，是否同時與三種指定藥物醫令期間重疊\ndefine function &quot;HasConcurrentMedicationOrders3&quot;(CurrentDrugCodes List&lt;String&gt;, ConcurrentDrugCodesA List&lt;String&gt;, ConcurrentDrugCodesB List&lt;String&gt;, ConcurrentDrugCodesC List&lt;String&gt;):\n  exists (\n    [MedicationRequest] CurrentMR\n    where &quot;IsMedicationPlan&quot;(CurrentMR, CurrentDrugCodes)\n      and exists (\n        [MedicationRequest] ConcurrentA\n        where &quot;IsMedicationOrder&quot;(ConcurrentA, ConcurrentDrugCodesA)\n          and &quot;MedicationPeriodsOverlap&quot;(CurrentMR, ConcurrentA)\n      )\n      and exists (\n        [MedicationRequest] ConcurrentB\n        where &quot;IsMedicationOrder&quot;(ConcurrentB, ConcurrentDrugCodesB)\n          and &quot;MedicationPeriodsOverlap&quot;(CurrentMR, ConcurrentB)\n      )\n      and exists (\n        [MedicationRequest] ConcurrentC\n        where &quot;IsMedicationOrder&quot;(ConcurrentC, ConcurrentDrugCodesC)\n          and &quot;MedicationPeriodsOverlap&quot;(CurrentMR, ConcurrentC)\n      )\n  )\n\n// 指定藥物本次申請療程天數是否未超過上限\ndefine function &quot;HasMedicationPlanDurationWithin&quot;(CurrentDrugCodes List&lt;String&gt;, MaxDays Integer):\n  exists (\n    [MedicationRequest] CurrentMR\n    where &quot;IsMedicationPlan&quot;(CurrentMR, CurrentDrugCodes)\n      and difference in days between &quot;GetStartTime&quot;(CurrentMR)\n          and &quot;GetEndTime&quot;(CurrentMR) &lt;= MaxDays\n  )\n\ndefine function &quot;HasMedicationPlanPeriodWithinDays&quot;(DrugCodes List&lt;String&gt;, MaxDays Integer):\n  &quot;HasMedicationPlanDurationWithin&quot;(DrugCodes, MaxDays)\n\ndefine function &quot;HasDailyDoseAtMost&quot;(DrugCodes List&lt;String&gt;, MaxValue Decimal, UnitCode String, TimingCode String):\n  exists (\n    [MedicationRequest] MR\n    where &quot;IsMedicationPlan&quot;(MR, DrugCodes)\n      and exists (\n        MR.dosageInstruction DI\n        where exists (\n          DI.timing.code.coding C\n          where C.code = TimingCode\n        )\n        and exists (\n          DI.doseAndRate DR\n          where (DR.dose as FHIR.SimpleQuantity) is not null\n            and (DR.dose as FHIR.SimpleQuantity).value &lt;= MaxValue\n            and (DR.dose as FHIR.SimpleQuantity).code = UnitCode\n        )\n      )\n  )\n\n// 指定藥物所有申請療程天數加總是否未超過上限\ndefine function &quot;HasMedicationTotalDurationWithin&quot;(DrugCodes List&lt;String&gt;, MaxDays Integer):\n  Coalesce(\n    Sum(\n      [MedicationRequest] MR\n      where MR.intent = 'plan'\n        and (MR.status is null or MR.status in { 'active', 'completed', 'on-hold' })\n        and &quot;HasMedicationCode&quot;(MR, DrugCodes)\n        and &quot;HasValidTiming&quot;(MR)\n      return\n        difference in days between &quot;GetStartTime&quot;(MR)\n          and &quot;GetEndTime&quot;(MR)\n    ),\n    0\n  ) &lt;= MaxDays\n\n// 是否有同藥物先前療程與本次療程間隔超過指定天數\ndefine function &quot;HasPriorMedicationGapLongerThan&quot;(CurrentDrugCodes List&lt;String&gt;, GapDays Integer):\n  exists (\n    [MedicationRequest] CurrentMR\n    where &quot;IsMedicationPlan&quot;(CurrentMR, CurrentDrugCodes)\n      and exists (\n        [MedicationRequest] PreviousMR\n        where PreviousMR.id != CurrentMR.id\n          and &quot;IsMedicationPlan&quot;(PreviousMR, CurrentDrugCodes)\n          and &quot;GetEndTime&quot;(PreviousMR) &lt; &quot;GetStartTime&quot;(CurrentMR)\n          and difference in days between &quot;GetEndTime&quot;(PreviousMR)\n              and &quot;GetStartTime&quot;(CurrentMR) &gt; GapDays\n      )\n  )\n</code></pre>\n      </td>\n    </tr>\n    \n  \n    \n    <tr>\n      <th scope=\"row\" class=\"row-header\">ELM XML Content</th>\n      <td>\n        <pre style=\"border: none;\" class=\"content-container highlight language-cql\"><code>Encoded data </code></pre>\n      </td>\n    </tr>\n    \n  \n    \n    <tr>\n      <th scope=\"row\" class=\"row-header\">ELM JSON Content</th>\n      <td>\n        <pre style=\"border: none;\" class=\"content-container highlight language-cql\"><code>Encoded data </code></pre>\n      </td>\n    </tr>\n    \n  \n\n\n<tr>\n  <th colspan=\"2\" scope=\"row\" class=\"row-header\">Generated using version 0.5.3-cibuild of the sample-content-ig Liquid templates</th>\n</tr>\n\n    </tbody>\n  </table>\n</div>"
+ },
+ "url": "https://nhicore.nhi.gov.tw/cql/Library/BCReusable",
+ "version": "1.0.0",
+ "name": "BCReusable",
+ "title": "BCReusable",
+ "status": "draft",
+ "type": {
+  "coding": [
+   {
+    "system": "http://terminology.hl7.org/CodeSystem/library-type",
+    "code": "logic-library"
+   }
+  ]
+ },
+ "date": "2026-07-30",
+ "description": "此 Library 為乳癌藥事前審查共通使用規則模組。",
+ "relatedArtifact": [
+  {
+   "type": "depends-on",
+   "display": "Library CodeConcept",
+   "resource": "https://nhicore.nhi.gov.tw/cql/Library/BCCodeConcept|1.0.0"
+  }
+ ],
+ "parameter": [
+  {
+   "name": "Patient",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "Patient"
+  },
+  {
+   "name": "ICD-10使用C50",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "ICD-10使用C77、C78、C79",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "ICD-10使用C77、C78、C79但排除C79.3",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "續用註記為1",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "續用註記為2",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "申請類型",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "string"
+  },
+  {
+   "name": "初次申請",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "續用申請",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "申請類型未知",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "用藥線別≠1",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "用藥線別=2",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "用藥線別=1",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "醫令類別為1",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "主要疾病ICD診斷資料存在",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "用藥線別資料存在",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "醫令類別資料存在",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "影像報告資料存在",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "檢查報告資料存在",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "影像或檢查報告資料存在",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "癌症分期資料存在",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "HER2檢測資料存在",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "ER檢測資料存在",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "PR檢測資料存在",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "BRCA1或BRCA2檢測資料存在",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "HasHER2NegativeTest",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "HasHER2NegativeGene",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "HasHER2Negative",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "HasHER2OverexpressionTest",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "HasHER2OverexpressionGene",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "HasHER2NegativeOrND",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "HasHER2NegativeOrNDTest",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "HasHER2NegativeOrNDGene",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "HasHER2Overexpression",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "HasHER2LowExpressionTest",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "HasHER2LowExpressionGene",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "HasHER2LowExpression",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "癌症分期分數或結果為M≠0",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "癌症分期分數或結果為M=0",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "癌症分期分數或結果為M>=1",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "癌症分期分數或結果為N=0",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "癌症分期分數或結果為N>=1",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "癌症分期分數或結果為N≠0",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  }
+ ],
+ "dataRequirement": [
+  {
+   "type": "Claim",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Claim"
+   ]
+  },
+  {
+   "type": "Claim",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Claim"
+   ]
+  },
+  {
+   "type": "Claim",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Claim"
+   ]
+  },
+  {
+   "type": "Claim",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Claim"
+   ]
+  },
+  {
+   "type": "Claim",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Claim"
+   ]
+  },
+  {
+   "type": "Claim",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Claim"
+   ]
+  },
+  {
+   "type": "Claim",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Claim"
+   ]
+  },
+  {
+   "type": "Claim",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Claim"
+   ]
+  },
+  {
+   "type": "Claim",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Claim"
+   ]
+  },
+  {
+   "type": "Claim",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Claim"
+   ]
+  },
+  {
+   "type": "Claim",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Claim"
+   ]
+  },
+  {
+   "type": "Claim",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Claim"
+   ]
+  },
+  {
+   "type": "DiagnosticReport",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/DiagnosticReport"
+   ]
+  },
+  {
+   "type": "DiagnosticReport",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/DiagnosticReport"
+   ]
+  },
+  {
+   "type": "DiagnosticReport",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/DiagnosticReport"
+   ]
+  },
+  {
+   "type": "DiagnosticReport",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/DiagnosticReport"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "DiagnosticReport",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/DiagnosticReport"
+   ]
+  },
+  {
+   "type": "DiagnosticReport",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/DiagnosticReport"
+   ]
+  },
+  {
+   "type": "DiagnosticReport",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/DiagnosticReport"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "DiagnosticReport",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/DiagnosticReport"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  }
+ ],
+ "content": [
+  {
+   "contentType": "text/cql",
+   "data": "bGlicmFyeSBCQ1JldXNhYmxlIHZlcnNpb24gJzEuMC4wJwoKdXNpbmcgRkhJUiB2ZXJzaW9uICc0LjAuMScKCmluY2x1ZGUgRkhJUkhlbHBlcnMgdmVyc2lvbiAnNC4wLjEnIGNhbGxlZCBGSElSSGVscGVycwoKaW5jbHVkZSBCQ0NvZGVDb25jZXB0IHZlcnNpb24gJzEuMC4wJyBjYWxsZWQgQ29kZUNvbmNlcHQKCmNvbnRleHQgUGF0aWVudAoKLy8g55eF5Lq65bm06b2h6KiI566XCi8vIFJlZmVyZW5jZURhdGUg5L2/55So55Sz6KuL6LW35aeL5pel5pyf6L2J5oiQIERhdGUg5b6M5YKz5YWl44CCCmRlZmluZSBmdW5jdGlvbiAiUGF0aWVudEFnZUluWWVhcnNBdCIoUmVmZXJlbmNlRGF0ZSBEYXRlKToKICBpZiBQYXRpZW50LmJpcnRoRGF0ZSBpcyBudWxsIG9yIFJlZmVyZW5jZURhdGUgaXMgbnVsbCB0aGVuIG51bGwKICBlbHNlIGRpZmZlcmVuY2UgaW4geWVhcnMgYmV0d2VlbgogICAgRkhJUkhlbHBlcnMuVG9EYXRlKFBhdGllbnQuYmlydGhEYXRlKQogICAgYW5kIFJlZmVyZW5jZURhdGUKCmRlZmluZSBmdW5jdGlvbiAiSXNQYXRpZW50QXRMZWFzdEFnZUF0IihSZWZlcmVuY2VEYXRlIERhdGUsIE1pbmltdW1BZ2UgSW50ZWdlcik6CiAgIlBhdGllbnRBZ2VJblllYXJzQXQiKFJlZmVyZW5jZURhdGUpIGlzIG5vdCBudWxsCiAgYW5kICJQYXRpZW50QWdlSW5ZZWFyc0F0IihSZWZlcmVuY2VEYXRlKSA+PSBNaW5pbXVtQWdlCgpkZWZpbmUgZnVuY3Rpb24gIklzUGF0aWVudFlvdW5nZXJUaGFuQWdlQXQiKFJlZmVyZW5jZURhdGUgRGF0ZSwgTWF4aW11bUFnZSBJbnRlZ2VyKToKICAiUGF0aWVudEFnZUluWWVhcnNBdCIoUmVmZXJlbmNlRGF0ZSkgaXMgbm90IG51bGwKICBhbmQgIlBhdGllbnRBZ2VJblllYXJzQXQiKFJlZmVyZW5jZURhdGUpIDwgTWF4aW11bUFnZQoKZGVmaW5lIGZ1bmN0aW9uICJJc1BhdGllbnRBZHVsdEF0IihSZWZlcmVuY2VEYXRlIERhdGUpOgogICJJc1BhdGllbnRBdExlYXN0QWdlQXQiKFJlZmVyZW5jZURhdGUsIDE4KQoKCi8v5Lmz55mM55a+55eF5Luj56K877yaSUNELTEwLUNNID0gQzUwCmRlZmluZSAiSUNELTEw5L2/55SoQzUwIjoKICBleGlzdHMgKAogICAgW0NsYWltXSBDCiAgICAgIHdoZXJlIGV4aXN0cyAoCiAgICAgICAgQy5kaWFnbm9zaXMgRAogICAgICAgICAgd2hlcmUgRC5zZXF1ZW5jZSA9IDEKICAgICAgICAgICAgYW5kIGV4aXN0cyAoIAogICAgICAgICAgICAgIEQuZGlhZ25vc2lzLmNvZGluZyBDZGcKICAgICAgICAgICAgICAgIHdoZXJlICgKICAgICAgICAgICAgICAgICAgQ2RnIGluIENvZGVDb25jZXB0LklDRDEwQ00yMDIzCiAgICAgICAgICAgICAgICAgIG9yIENkZyBpbiBDb2RlQ29uY2VwdC5JQ0QxMENNMjAxNAogICAgICAgICAgICAgICAgKQogICAgICAgICAgICAgICAgYW5kIFN1YnN0cmluZyhDZGcuY29kZSwgMCwgMykgaW4gQ29kZUNvbmNlcHQuSUNEQkMKICAgICAgICAgICAgKQogICAgICApCiAgKQoKLy/kubPnmYznlr7nl4XkuYvohavnmKTku6PnorzvvJpJQ0QtMTAtQ00gPSBDNzfjgIFDNzjjgIFDNzkKZGVmaW5lICJJQ0QtMTDkvb/nlKhDNzfjgIFDNzjjgIFDNzkiOgogIGV4aXN0cyAoCiAgICBbQ2xhaW1dIEMKICAgICAgd2hlcmUgZXhpc3RzICgKICAgICAgICBDLmRpYWdub3NpcyBECiAgICAgICAgICB3aGVyZSBELnNlcXVlbmNlID0gMQogICAgICAgICAgICBhbmQgZXhpc3RzICggCiAgICAgICAgICAgICAgRC5kaWFnbm9zaXMuY29kaW5nIENkZwogICAgICAgICAgICAgICAgd2hlcmUgKAogICAgICAgICAgICAgICAgICBDZGcgaW4gQ29kZUNvbmNlcHQuSUNEMTBDTTIwMjMKICAgICAgICAgICAgICAgICAgb3IgQ2RnIGluIENvZGVDb25jZXB0LklDRDEwQ00yMDE0CiAgICAgICAgICAgICAgICApCiAgICAgICAgICAgICAgYW5kIFN1YnN0cmluZyhDZGcuY29kZSwgMCwgMykgaW4gQ29kZUNvbmNlcHQuSUNEQkNhbmRUdW1vcgogICAgICAgICAgKQogICAgICApCiAgKQoKCi8v5Lmz55mM55a+55eF5LmL6IWr55ik5Luj56K877yaSUNELTEwLUNNID0gQzc344CBQzc444CBQzc55L2G5o6S6ZmkQzc5LjMKZGVmaW5lICJJQ0QtMTDkvb/nlKhDNzfjgIFDNzjjgIFDNznkvYbmjpLpmaRDNzkuMyI6CiAgZXhpc3RzICgKICAgIFtDbGFpbV0gQwogICAgd2hlcmUgZXhpc3RzICgKICAgICAgQy5kaWFnbm9zaXMgRAogICAgICB3aGVyZSBleGlzdHMgKCAKICAgICAgICBELmRpYWdub3Npcy5jb2RpbmcgQ2RnCiAgICAgICAgd2hlcmUgKAogICAgICAgICAgQ2RnIGluIENvZGVDb25jZXB0LklDRDEwQ00yMDIzCiAgICAgICAgICBvciBDZGcgaW4gQ29kZUNvbmNlcHQuSUNEMTBDTTIwMTQKICAgICAgICApCiAgICAgICAgYW5kICgKICAgICAgICAgIChTdWJzdHJpbmcoQ2RnLmNvZGUsIDAsIDMpIGluIHsgJ0M3NycsICdDNzgnIH0pCiAgICAgICAgICBvciAoU3Vic3RyaW5nKENkZy5jb2RlLCAwLCAzKSA9ICdDNzknIGFuZCBDZGcuY29kZSAhPSAnQzc5LjMnKQogICAgICAgICkKICAgICAgKQogICAgKQogICkKCgovL+e6jOeUqOWIpOaWtwpkZWZpbmUgIue6jOeUqOiou+iomOeCujEiOgogIGV4aXN0cyAoCiAgICBbQ2xhaW1dIEMKICAgICAgd2hlcmUgZXhpc3RzICgKICAgICAgICBDLml0ZW0gSQogICAgICAgICAgd2hlcmUgZXhpc3RzICgKICAgICAgICAgICAgSS5tb2RpZmllciBNCiAgICAgICAgICAgICAgICB3aGVyZSBleGlzdHMgKAogICAgICAgICAgICAgICAgICBNLmNvZGluZyBDZGcKICAgICAgICAgICAgICAgICAgICAgICAgIHdoZXJlIENkZyBpbiBDb2RlQ29uY2VwdC5OSElDb250aW51YXRpb25TdGF0dXMKICAgICAgICAgICAgICAgICAgICAgICAgIGFuZCBDZGcuY29kZSBpbiBDb2RlQ29uY2VwdC4i57qM55So6Ki76KiY54K6MSIKICAgICAgICAgICAgICAgICAgKQogICAgICAgICAgKQogICAgICApCiAgKQoKCi8v57qM55So5Yik5pa3CmRlZmluZSAi57qM55So6Ki76KiY54K6MiI6CiAgZXhpc3RzICgKICAgIFtDbGFpbV0gQwogICAgICB3aGVyZSBleGlzdHMgKAogICAgICAgIEMuaXRlbSBJCiAgICAgICAgICB3aGVyZSBleGlzdHMgKAogICAgICAgICAgICBJLm1vZGlmaWVyIE0KICAgICAgICAgICAgICAgIHdoZXJlIGV4aXN0cyAoCiAgICAgICAgICAgICAgICAgIE0uY29kaW5nIENkZwogICAgICAgICAgICAgICAgICAgICAgICAgd2hlcmUgQ2RnIGluIENvZGVDb25jZXB0Lk5ISUNvbnRpbnVhdGlvblN0YXR1cwogICAgICAgICAgICAgICAgICAgICAgICAgYW5kIENkZy5jb2RlIGluIENvZGVDb25jZXB0LiLnuoznlKjoqLvoqJjngroyIgogICAgICAgICAgICAgICAgICApCiAgICAgICAgICApCiAgICAgICkKICApCgovL+eUs+iri+mhnuWei+WIpOaWtwpkZWZpbmUgIueUs+iri+mhnuWeiyI6CiAgY2FzZQogICAgd2hlbiAi57qM55So6Ki76KiY54K6MSIgdGhlbiAn5Yid5qyh5L2/55SoJwogICAgd2hlbiAi57qM55So6Ki76KiY54K6MiIgdGhlbiAn57qM55SoJwogICAgZWxzZSAn54Sh5rOV5Yik5pa355Sz6KuL6aGe5Z6LJwogIGVuZAoKZGVmaW5lICLliJ3mrKHnlLPoq4siOgogICLnlLPoq4vpoZ7lnosiID0gJ+WIneasoeS9v+eUqCcKCmRlZmluZSAi57qM55So55Sz6KuLIjoKICAi55Sz6KuL6aGe5Z6LIiA9ICfnuoznlKgnCgpkZWZpbmUgIueUs+iri+mhnuWei+acquefpSI6CiAgIueUs+iri+mhnuWeiyIgPSAn54Sh5rOV5Yik5pa355Sz6KuL6aGe5Z6LJwoKLy/nlKjol6Xnt5rliKXkuI3ngroxCmRlZmluZSAi55So6Jel57ea5Yil4omgMSI6CiAgZXhpc3RzICgKICAgIFtDbGFpbV0gQwogICAgICB3aGVyZSBleGlzdHMgKAogICAgICAgIEMuaXRlbSBJCiAgICAgICAgICB3aGVyZSBleGlzdHMgKAogICAgICAgICAgICBJLm1vZGlmaWVyIE0KICAgICAgICAgICAgICB3aGVyZSBleGlzdHMgKAogICAgICAgICAgICAgICAgTS5jb2RpbmcgQ2RnCiAgICAgICAgICAgICAgICAgIHdoZXJlIENkZyBpbiBDb2RlQ29uY2VwdC5OSElMT1QKICAgICAgICAgICAgICAgICAgICBhbmQgQ2RnLmNvZGUgIT0gJzEnCiAgICAgICAgICAgICAgKQogICAgICAgICAgKQogICAgICApCiAgKQoKCi8v55So6Jel57ea5Yil54K6MgpkZWZpbmUgIueUqOiXpee3muWIpT0yIjoKICBleGlzdHMgKAogICAgW0NsYWltXSBDCiAgICAgIHdoZXJlIGV4aXN0cyAoCiAgICAgICAgQy5pdGVtIEkKICAgICAgICAgIHdoZXJlIGV4aXN0cyAoCiAgICAgICAgICAgIEkubW9kaWZpZXIgTQogICAgICAgICAgICAgIHdoZXJlIGV4aXN0cyAoCiAgICAgICAgICAgICAgICBNLmNvZGluZyBDZGcKICAgICAgICAgICAgICAgICAgd2hlcmUgQ2RnIGluIENvZGVDb25jZXB0Lk5ISUxPVAogICAgICAgICAgICAgICAgICAgIGFuZCBDZGcuY29kZSA9ICcyJwogICAgICAgICAgICAgICkKICAgICAgICAgICkKICAgICAgKQogICkKCi8v55So6Jel57ea5Yil54K6MQpkZWZpbmUgIueUqOiXpee3muWIpT0xIjoKICBleGlzdHMgKAogICAgW0NsYWltXSBDCiAgICAgIHdoZXJlIGV4aXN0cyAoCiAgICAgICAgQy5pdGVtIEkKICAgICAgICAgIHdoZXJlIGV4aXN0cyAoCiAgICAgICAgICAgIEkubW9kaWZpZXIgTQogICAgICAgICAgICAgIHdoZXJlIGV4aXN0cyAoCiAgICAgICAgICAgICAgICBNLmNvZGluZyBDZGcKICAgICAgICAgICAgICAgICAgd2hlcmUgQ2RnIGluIENvZGVDb25jZXB0Lk5ISUxPVAogICAgICAgICAgICAgICAgICAgIGFuZCBDZGcuY29kZSA9ICcxJwogICAgICAgICAgICAgICkKICAgICAgICAgICkKICAgICAgKQogICkKCgovLyDphqvku6TpoZ7liKU9MSAob3JkZXJUeXBlID0gJzEnKQpkZWZpbmUgIumGq+S7pOmhnuWIpeeCujEiOgogZXhpc3RzICgKICAgIFtDbGFpbV0gQwogICAgICB3aGVyZSBleGlzdHMgKAogICAgICAgIEMuaXRlbSBJCiAgICAgICAgICB3aGVyZSBleGlzdHMgKAogICAgICAgICAgICBJLnByb2R1Y3RPclNlcnZpY2UuY29kaW5nIFBTQwogICAgICAgICAgICAgIHdoZXJlIFBTQyBpbiBDb2RlQ29uY2VwdC5OSElPcmRlclR5cGUKICAgICAgICAgICAgICBhbmQgUFNDLmNvZGUgaW4gQ29kZUNvbmNlcHQuIumGq+S7pOmhnuWIpSIKICAgICAgICAgICkKICAgICAgKQogICkKCi8vIOaYr+WQpuacieS4u+imgeeWvueXhSBJQ0Qg6Ki65pa36LOH5paZ77yI5LiN6ZmQ5a6a5piv5ZCm54K6IEM1MO+8ieOAggpkZWZpbmUgIuS4u+imgeeWvueXhUlDROiouuaWt+izh+aWmeWtmOWcqCI6CiAgZXhpc3RzICgKICAgIFtDbGFpbV0gQwogICAgICB3aGVyZSBleGlzdHMgKAogICAgICAgIEMuZGlhZ25vc2lzIEQKICAgICAgICAgIHdoZXJlIEQuc2VxdWVuY2UgPSAxCiAgICAgICAgICAgIGFuZCBleGlzdHMgKAogICAgICAgICAgICAgIEQuZGlhZ25vc2lzLmNvZGluZyBDZGcKICAgICAgICAgICAgICAgIHdoZXJlICgKICAgICAgICAgICAgICAgICAgQ2RnIGluIENvZGVDb25jZXB0LklDRDEwQ00yMDIzCiAgICAgICAgICAgICAgICAgIG9yIENkZyBpbiBDb2RlQ29uY2VwdC5JQ0QxMENNMjAxNAogICAgICAgICAgICAgICAgKQogICAgICAgICAgICApCiAgICAgICkKICApCgovLyDmmK/lkKbmnInnlKjol6Xnt5rliKXos4fmlpnvvIjkuI3pmZDlrprnt5rliKXlhaflrrnvvInjgIIKZGVmaW5lICLnlKjol6Xnt5rliKXos4fmlpnlrZjlnKgiOgogIGV4aXN0cyAoCiAgICBbQ2xhaW1dIEMKICAgICAgd2hlcmUgZXhpc3RzICgKICAgICAgICBDLml0ZW0gSQogICAgICAgICAgd2hlcmUgZXhpc3RzICgKICAgICAgICAgICAgSS5tb2RpZmllciBNCiAgICAgICAgICAgICAgd2hlcmUgZXhpc3RzICgKICAgICAgICAgICAgICAgIE0uY29kaW5nIENkZwogICAgICAgICAgICAgICAgICB3aGVyZSBDZGcgaW4gQ29kZUNvbmNlcHQuTkhJTE9UCiAgICAgICAgICAgICAgKQogICAgICAgICAgKQogICAgICApCiAgKQoKLy8g5piv5ZCm5pyJ6Yar5Luk6aGe5Yil6LOH5paZ77yI5LiN6ZmQ5a6a5piv5ZCm54K655mM55eH5rK755mC77yJ44CCCmRlZmluZSAi6Yar5Luk6aGe5Yil6LOH5paZ5a2Y5ZyoIjoKICBleGlzdHMgKAogICAgW0NsYWltXSBDCiAgICAgIHdoZXJlIGV4aXN0cyAoCiAgICAgICAgQy5pdGVtIEkKICAgICAgICAgIHdoZXJlIGV4aXN0cyAoCiAgICAgICAgICAgIEkucHJvZHVjdE9yU2VydmljZS5jb2RpbmcgUFNDCiAgICAgICAgICAgICAgd2hlcmUgUFNDIGluIENvZGVDb25jZXB0Lk5ISU9yZGVyVHlwZQogICAgICAgICAgKQogICAgICApCiAgKQoKLy/lvbHlg4/loLHlkYoKZGVmaW5lIGZ1bmN0aW9uICJJc0ltYWdlUmVwb3J0IihSZXBvcnQgRGlhZ25vc3RpY1JlcG9ydCk6CiAgZXhpc3RzICgKICAgIFJlcG9ydC5jb2RlLmNvZGluZyBDZGcKICAgIHdoZXJlICgKICAgICAgQ2RnIGluIENvZGVDb25jZXB0LklDRDEwUENTMjAyM0ltYWdlCiAgICAgIG9yIENkZyBpbiBDb2RlQ29uY2VwdC5JQ0QxMFBDUzIwMTRJbWFnZQogICAgKQogICAgYW5kIENkZy5jb2RlIGluIENvZGVDb25jZXB0LkltYWdlQ29kZXMKICApCgovL+WIhuWtkC/nl4XnkIbmqqLmn6XloLHlkYoKZGVmaW5lIGZ1bmN0aW9uICJJc01vbGVjdWxhclJlcG9ydCIoUmVwb3J0IERpYWdub3N0aWNSZXBvcnQpOgogIGV4aXN0cyAoCiAgICBSZXBvcnQuY29kZS5jb2RpbmcgQ2RnCiAgICB3aGVyZSBDZGcgaW4gQ29kZUNvbmNlcHQuTE9JTkMKICAgICAgYW5kIENkZy5jb2RlIGluIENvZGVDb25jZXB0Lk1vbGVjdWxhclJlcG9ydAogICkKCi8v5aCx5ZGK5pel5pyf5piv5ZCm6JC95Zyo5Y+D6ICD5pel5pyf5YmN5oyH5a6a5aSp5pW45YWnCmRlZmluZSBmdW5jdGlvbiAiSXNSZXBvcnRXaXRoaW5EYXlzQmVmb3JlIihSZXBvcnQgRGlhZ25vc3RpY1JlcG9ydCwgUmVmZXJlbmNlRGF0ZSBEYXRlVGltZSwgTG9va2JhY2tEYXlzIEludGVnZXIpOgogIFJlcG9ydC5lZmZlY3RpdmUgaXMgbm90IG51bGwKICBhbmQgUmVmZXJlbmNlRGF0ZSBpcyBub3QgbnVsbAogIGFuZCBGSElSSGVscGVycy5Ub0RhdGVUaW1lKFJlcG9ydC5lZmZlY3RpdmUpIDw9IFJlZmVyZW5jZURhdGUKICBhbmQgKGR1cmF0aW9uIGluIGRheXMgYmV0d2VlbiBGSElSSGVscGVycy5Ub0RhdGVUaW1lKFJlcG9ydC5lZmZlY3RpdmUpIGFuZCBSZWZlcmVuY2VEYXRlKSA8PSBMb29rYmFja0RheXMKCmRlZmluZSBmdW5jdGlvbiAiSGFzUmVjZW50SW1hZ2VSZXBvcnQiKFJlZmVyZW5jZURhdGUgRGF0ZVRpbWUsIExvb2tiYWNrRGF5cyBJbnRlZ2VyKToKICBleGlzdHMgKAogICAgW0RpYWdub3N0aWNSZXBvcnRdIFJlcG9ydAogICAgd2hlcmUgIklzSW1hZ2VSZXBvcnQiKFJlcG9ydCkKICAgICAgYW5kICJJc1JlcG9ydFdpdGhpbkRheXNCZWZvcmUiKFJlcG9ydCwgUmVmZXJlbmNlRGF0ZSwgTG9va2JhY2tEYXlzKQogICkKCmRlZmluZSBmdW5jdGlvbiAiSGFzUmVjZW50TW9sZWN1bGFyUmVwb3J0IihSZWZlcmVuY2VEYXRlIERhdGVUaW1lLCBMb29rYmFja0RheXMgSW50ZWdlcik6CiAgZXhpc3RzICgKICAgIFtEaWFnbm9zdGljUmVwb3J0XSBSZXBvcnQKICAgIHdoZXJlICJJc01vbGVjdWxhclJlcG9ydCIoUmVwb3J0KQogICAgICBhbmQgIklzUmVwb3J0V2l0aGluRGF5c0JlZm9yZSIoUmVwb3J0LCBSZWZlcmVuY2VEYXRlLCBMb29rYmFja0RheXMpCiAgKQoKLy8g5piv5ZCm5pyJ5b2x5YOP5aCx5ZGK6LOH5paZ77yI5LiN6ZmQ5a6a5pmC6ZaT77yJ44CCCmRlZmluZSAi5b2x5YOP5aCx5ZGK6LOH5paZ5a2Y5ZyoIjoKICBleGlzdHMgKAogICAgW0RpYWdub3N0aWNSZXBvcnRdIFJlcG9ydAogICAgd2hlcmUgIklzSW1hZ2VSZXBvcnQiKFJlcG9ydCkKICAgICAgYW5kIFJlcG9ydC5lZmZlY3RpdmUgaXMgbm90IG51bGwKICApCgovLyDmmK/lkKbmnInliIblrZAv55eF55CG5qqi5p+l5aCx5ZGK6LOH5paZ77yI5LiN6ZmQ5a6a5pmC6ZaT77yJ44CCCmRlZmluZSAi5qqi5p+l5aCx5ZGK6LOH5paZ5a2Y5ZyoIjoKICBleGlzdHMgKAogICAgW0RpYWdub3N0aWNSZXBvcnRdIFJlcG9ydAogICAgd2hlcmUgIklzTW9sZWN1bGFyUmVwb3J0IihSZXBvcnQpCiAgICAgIGFuZCBSZXBvcnQuZWZmZWN0aXZlIGlzIG5vdCBudWxsCiAgKQoKLy8g5piv5ZCm5pyJ5b2x5YOP5oiW5YiG5a2QL+eXheeQhuaqouafpeWgseWRiuizh+aWme+8iOS4jemZkOWumuaZgumWk++8ieOAggpkZWZpbmUgIuW9seWDj+aIluaqouafpeWgseWRiuizh+aWmeWtmOWcqCI6CiAgIuW9seWDj+WgseWRiuizh+aWmeWtmOWcqCIKICBvciAi5qqi5p+l5aCx5ZGK6LOH5paZ5a2Y5ZyoIgoKZGVmaW5lIGZ1bmN0aW9uICJJc1Rlc3RPYnNlcnZhdGlvbiIoT0JzIE9ic2VydmF0aW9uKToKICBleGlzdHMgKAogICAgT0JzLmNhdGVnb3J5IEMKICAgICAgd2hlcmUgZXhpc3RzICgKICAgICAgICBDLmNvZGluZyBDZGcKICAgICAgICAgIHdoZXJlIENkZyBpbiBDb2RlQ29uY2VwdC5OSElQQVNTdXBwb3J0aW5nSW5mb1R5cGUKICAgICAgICAgICAgYW5kIENkZy5jb2RlID0gJ3Rlc3RzJwogICAgICApCiAgKQoKLy8g5Y+W5b6X5qqi6amX5pW45YC877yM55u45a65IHZhbHVlSW50ZWdlcuOAgXZhbHVlRGVjaW1hbOOAgXZhbHVlUXVhbnRpdHnjgIF2YWx1ZVN0cmluZ++8iOWPr+ino+aekOeCuuaVuOWtl++8ieWbm+eoruWei+aFi++8m+eahuS4jeespuWQiOWJh+WbnuWCsyBudWxsCmRlZmluZSBmdW5jdGlvbiAiR2V0TnVtZXJpY1ZhbHVlIihWIENob2ljZTxGSElSLmludGVnZXIsIEZISVIuZGVjaW1hbCwgUXVhbnRpdHksIEZISVIuc3RyaW5nPik6CiAgY2FzZQogICAgd2hlbiBWIGlzIEZISVIuaW50ZWdlciB0aGVuIChWIGFzIEZISVIuaW50ZWdlcikudmFsdWUKICAgIHdoZW4gViBpcyBGSElSLmRlY2ltYWwgdGhlbiAoViBhcyBGSElSLmRlY2ltYWwpLnZhbHVlCiAgICB3aGVuIFYgaXMgUXVhbnRpdHkgdGhlbiAoViBhcyBRdWFudGl0eSkudmFsdWUKICAgIHdoZW4gViBpcyBGSElSLnN0cmluZyB0aGVuIFRvRGVjaW1hbCgoViBhcyBGSElSLnN0cmluZykudmFsdWUpCiAgICBlbHNlIG51bGwKICBlbmQKCi8vIOiLpeaVuOWAvOeCuiBRdWFudGl0eSDlnovmhYvliYflm57lgrPlhbYgY29tcGFyYXRvcu+8iOWmgiAnPifjgIEnPCfvvInvvIzlkKbliYflm57lgrMgbnVsbApkZWZpbmUgZnVuY3Rpb24gIkdldFF1YW50aXR5Q29tcGFyYXRvciIoViBDaG9pY2U8RkhJUi5pbnRlZ2VyLCBGSElSLmRlY2ltYWwsIFF1YW50aXR5LCBGSElSLnN0cmluZz4pOgogIGlmIFYgaXMgUXVhbnRpdHkgdGhlbiAoViBhcyBRdWFudGl0eSkuY29tcGFyYXRvciBlbHNlIG51bGwKCmRlZmluZSBmdW5jdGlvbiAiSXNHZW5lSW5mb09ic2VydmF0aW9uIihPQnMgT2JzZXJ2YXRpb24pOgogIGV4aXN0cyAoCiAgICBPQnMuY2F0ZWdvcnkgQwogICAgICB3aGVyZSBleGlzdHMgKAogICAgICAgIEMuY29kaW5nIENkZwogICAgICAgICAgd2hlcmUgQ2RnIGluIENvZGVDb25jZXB0Lk5ISVBBU1N1cHBvcnRpbmdJbmZvVHlwZQogICAgICAgICAgICBhbmQgQ2RnLmNvZGUgPSAnZ2VuZUluZm8nCiAgICAgICkKICApCgpkZWZpbmUgZnVuY3Rpb24gIklzR2VuZVBhbmVsT2JzZXJ2YXRpb24iKE9CcyBPYnNlcnZhdGlvbik6CiAgZXhpc3RzICgKICAgIE9Ccy5jb2RlLmNvZGluZyBDZGcKICAgICAgd2hlcmUgQ2RnIGluIENvZGVDb25jZXB0LkxPSU5DCiAgICAgICAgYW5kIENkZy5jb2RlID0gJzY5NTQ4LTYnCiAgKQoKZGVmaW5lIGZ1bmN0aW9uICJJc09ic2VydmF0aW9uRGF0ZVRpbWVXaXRoaW5EYXlzQmVmb3JlIihPQnMgT2JzZXJ2YXRpb24sIFJlZmVyZW5jZURhdGUgRGF0ZVRpbWUsIExvb2tiYWNrRGF5cyBJbnRlZ2VyKToKICBPQnMuZWZmZWN0aXZlIGlzIEZISVIuZGF0ZVRpbWUKICBhbmQgUmVmZXJlbmNlRGF0ZSBpcyBub3QgbnVsbAogIGFuZCBGSElSSGVscGVycy5Ub0RhdGVUaW1lKE9Ccy5lZmZlY3RpdmUgYXMgRkhJUi5kYXRlVGltZSkgPD0gUmVmZXJlbmNlRGF0ZQogIGFuZCAoZHVyYXRpb24gaW4gZGF5cyBiZXR3ZWVuIEZISVJIZWxwZXJzLlRvRGF0ZVRpbWUoT0JzLmVmZmVjdGl2ZSBhcyBGSElSLmRhdGVUaW1lKSBhbmQgUmVmZXJlbmNlRGF0ZSkgPD0gTG9va2JhY2tEYXlzCgovLyDmmK/lkKbmnInnmYznl4fliIbmnJ/os4fmlpnvvIjkuI3pmZDlrpogTS9OIOWAvOWFp+Wuue+8ieOAggpkZWZpbmUgIueZjOeXh+WIhuacn+izh+aWmeWtmOWcqCI6CiAgZXhpc3RzICgKICAgIFtPYnNlcnZhdGlvbl0gTwogICAgd2hlcmUgZXhpc3RzICgKICAgICAgTy5jb2RlLmNvZGluZyBDZGcKICAgICAgd2hlcmUgQ2RnLmNvZGUgPSAnMzk5MzkwMDA5JwogICAgICAgIGFuZCBDZGcgaW4gQ29kZUNvbmNlcHQuU05PTUVECiAgICApCiAgICBhbmQgTy52YWx1ZSBpcyBub3QgbnVsbAogICkKCi8vIOaYr+WQpuacieaMh+WumiBMT0lOQyDmqqLpqZcgT2JzZXJ2YXRpb27vvIjkuI3pmZDlrprntZDmnpzvvInjgIIKZGVmaW5lIGZ1bmN0aW9uICJIYXNUZXN0T2JzZXJ2YXRpb25EYXRhIihNYXJrZXJDb2RlcyBMaXN0PFN0cmluZz4pOgogIGV4aXN0cyAoCiAgICBbT2JzZXJ2YXRpb25dIE9CcwogICAgICB3aGVyZSAiSXNUZXN0T2JzZXJ2YXRpb24iKE9CcykKICAgICAgICBhbmQgZXhpc3RzICgKICAgICAgICAgIE9Ccy5jb2RlLmNvZGluZyBDZGcKICAgICAgICAgICAgd2hlcmUgQ2RnIGluIENvZGVDb25jZXB0LkxPSU5DCiAgICAgICAgICAgICAgYW5kIENkZy5jb2RlIGluIE1hcmtlckNvZGVzCiAgICAgICAgKQogICAgICAgIGFuZCAoT0JzLnZhbHVlIGlzIG5vdCBudWxsIG9yIE9Ccy5pbnRlcnByZXRhdGlvbiBpcyBub3QgbnVsbCkKICApCgovLyDmmK/lkKbmnInmjIflrpogZ2VuZUluZm8gY29tcG9uZW50IOaqoumpl+izh+aWme+8iOS4jemZkOWumue1kOaenO+8ieOAggpkZWZpbmUgZnVuY3Rpb24gIkhhc0dlbmVJbmZvQ29tcG9uZW50RGF0YSIoTWFya2VyQ29kZXMgTGlzdDxTdHJpbmc+KToKICBleGlzdHMgKAogICAgW09ic2VydmF0aW9uXSBPQnMKICAgICAgd2hlcmUgIklzR2VuZUluZm9PYnNlcnZhdGlvbiIoT0JzKQogICAgICAgIGFuZCAiSXNHZW5lUGFuZWxPYnNlcnZhdGlvbiIoT0JzKQogICAgICAgIGFuZCBleGlzdHMgKAogICAgICAgICAgT0JzLmNvbXBvbmVudCBDb21wCiAgICAgICAgICAgIHdoZXJlIGV4aXN0cyAoCiAgICAgICAgICAgICAgQ29tcC5jb2RlLmNvZGluZyBDZGcKICAgICAgICAgICAgICAgIHdoZXJlIENkZyBpbiBDb2RlQ29uY2VwdC5MT0lOQwogICAgICAgICAgICAgICAgICBhbmQgQ2RnLmNvZGUgaW4gTWFya2VyQ29kZXMKICAgICAgICAgICAgKQogICAgICAgICAgICBhbmQgQ29tcC52YWx1ZSBpcyBub3QgbnVsbAogICAgICAgICkKICApCgovLyDmjIfmqJnku6PnorzoiIflkIzkuIDnrYYgRGlhZ25vc3RpY1JlcG9ydCDnmoTntZDoq5bmloflrZfnrKblkIjmjIflrprntZDmnpzjgIIKZGVmaW5lIGZ1bmN0aW9uICJIYXNEaWFnbm9zdGljUmVwb3J0UmVzdWx0IihNYXJrZXJDb2RlcyBMaXN0PFN0cmluZz4sIFJlc3VsdFBhdHRlcm4gU3RyaW5nKToKICBleGlzdHMgKAogICAgW0RpYWdub3N0aWNSZXBvcnRdIFJlcG9ydAogICAgICB3aGVyZSBleGlzdHMgKAogICAgICAgIFJlcG9ydC5jb2RlLmNvZGluZyBDZGcKICAgICAgICAgIHdoZXJlIENkZyBpbiBDb2RlQ29uY2VwdC5MT0lOQwogICAgICAgICAgICBhbmQgQ2RnLmNvZGUgaW4gTWFya2VyQ29kZXMKICAgICAgKQogICAgICBhbmQgUmVwb3J0LmNvbmNsdXNpb24gaXMgbm90IG51bGwKICAgICAgYW5kIE1hdGNoZXMoUmVwb3J0LmNvbmNsdXNpb24udmFsdWUsIFJlc3VsdFBhdHRlcm4pCiAgKQoKLy8g5YOF55So5pa85Y6f5pys5pyJ5qqi5ris5pel5pyf6ZmQ5Yi255qE57WQ5p6c5qKd5Lu244CCCmRlZmluZSBmdW5jdGlvbiAiSGFzUmVjZW50RGlhZ25vc3RpY1JlcG9ydFJlc3VsdCIoTWFya2VyQ29kZXMgTGlzdDxTdHJpbmc+LCBSZXN1bHRQYXR0ZXJuIFN0cmluZywgUmVmZXJlbmNlRGF0ZSBEYXRlVGltZSwgTG9va2JhY2tEYXlzIEludGVnZXIpOgogIGV4aXN0cyAoCiAgICBbRGlhZ25vc3RpY1JlcG9ydF0gUmVwb3J0CiAgICAgIHdoZXJlIGV4aXN0cyAoCiAgICAgICAgUmVwb3J0LmNvZGUuY29kaW5nIENkZwogICAgICAgICAgd2hlcmUgQ2RnIGluIENvZGVDb25jZXB0LkxPSU5DCiAgICAgICAgICAgIGFuZCBDZGcuY29kZSBpbiBNYXJrZXJDb2RlcwogICAgICApCiAgICAgIGFuZCAiSXNSZXBvcnRXaXRoaW5EYXlzQmVmb3JlIihSZXBvcnQsIFJlZmVyZW5jZURhdGUsIExvb2tiYWNrRGF5cykKICAgICAgYW5kIFJlcG9ydC5jb25jbHVzaW9uIGlzIG5vdCBudWxsCiAgICAgIGFuZCBNYXRjaGVzKFJlcG9ydC5jb25jbHVzaW9uLnZhbHVlLCBSZXN1bHRQYXR0ZXJuKQogICkKCi8vIOacieWhq+WgseWRiue1kOaenOiIh+e1kOaenOespuWQiOWIhumWi+WIpOWumuOAggpkZWZpbmUgZnVuY3Rpb24gIkhhc0RpYWdub3N0aWNSZXBvcnREYXRhIihNYXJrZXJDb2RlcyBMaXN0PFN0cmluZz4pOgogIGV4aXN0cyAoCiAgICBbRGlhZ25vc3RpY1JlcG9ydF0gUmVwb3J0CiAgICAgIHdoZXJlIGV4aXN0cyAoCiAgICAgICAgUmVwb3J0LmNvZGUuY29kaW5nIENkZwogICAgICAgICAgd2hlcmUgQ2RnIGluIENvZGVDb25jZXB0LkxPSU5DCiAgICAgICAgICAgIGFuZCBDZGcuY29kZSBpbiBNYXJrZXJDb2RlcwogICAgICApCiAgICAgIGFuZCBSZXBvcnQuY29uY2x1c2lvbiBpcyBub3QgbnVsbAogICAgICBhbmQgTWF0Y2hlcyhSZXBvcnQuY29uY2x1c2lvbi52YWx1ZSwgJyg/cykuKlxcUy4qJykKICApCgpkZWZpbmUgZnVuY3Rpb24gIkhhc01hcmtlckRhdGEiKE1hcmtlckNvZGVzIExpc3Q8U3RyaW5nPik6CiAgIkhhc1Rlc3RPYnNlcnZhdGlvbkRhdGEiKE1hcmtlckNvZGVzKQogIG9yICJIYXNHZW5lSW5mb0NvbXBvbmVudERhdGEiKE1hcmtlckNvZGVzKQogIG9yICJIYXNEaWFnbm9zdGljUmVwb3J0RGF0YSIoTWFya2VyQ29kZXMpCgpkZWZpbmUgIkhFUjLmqqLmuKzos4fmlpnlrZjlnKgiOgogICJIYXNNYXJrZXJEYXRhIihDb2RlQ29uY2VwdC5IRVIyKQoKZGVmaW5lICJFUuaqoua4rOizh+aWmeWtmOWcqCI6CiAgIkhhc01hcmtlckRhdGEiKENvZGVDb25jZXB0Lk1vbGVjdWxhckVSKQoKZGVmaW5lICJQUuaqoua4rOizh+aWmeWtmOWcqCI6CiAgIkhhc01hcmtlckRhdGEiKENvZGVDb25jZXB0Lk1vbGVjdWxhclBSKQoKZGVmaW5lICJCUkNBMeaIlkJSQ0Ey5qqi5ris6LOH5paZ5a2Y5ZyoIjoKICAiSGFzTWFya2VyRGF0YSIoQ29kZUNvbmNlcHQuQlJDQTFvcjIpCgpkZWZpbmUgZnVuY3Rpb24gIkhhc1Rlc3RPYnNlcnZhdGlvblJlc3VsdCIoTWFya2VyQ29kZXMgTGlzdDxTdHJpbmc+LCBSZXN1bHRDb2RlcyBMaXN0PFN0cmluZz4sIFZhbHVlUGF0dGVybiBTdHJpbmcpOgogIGV4aXN0cyAoCiAgICBbT2JzZXJ2YXRpb25dIE9CcwogICAgICB3aGVyZSAiSXNUZXN0T2JzZXJ2YXRpb24iKE9CcykKICAgICAgICBhbmQgZXhpc3RzICgKICAgICAgICAgIE9Ccy5jb2RlLmNvZGluZyBDZGcKICAgICAgICAgICAgd2hlcmUgQ2RnIGluIENvZGVDb25jZXB0LkxPSU5DCiAgICAgICAgICAgICAgYW5kIENkZy5jb2RlIGluIE1hcmtlckNvZGVzCiAgICAgICAgKQogICAgICAgIGFuZCAoCiAgICAgICAgICAoT0JzLnZhbHVlIGlzIEZISVIuQ29kZWFibGVDb25jZXB0CiAgICAgICAgICAgIGFuZCBleGlzdHMgKAogICAgICAgICAgICAgICgoT0JzLnZhbHVlIGFzIEZISVIuQ29kZWFibGVDb25jZXB0KS5jb2RpbmcpIFZhbHVlQ29kaW5nCiAgICAgICAgICAgICAgICB3aGVyZSBWYWx1ZUNvZGluZyBpbiBDb2RlQ29uY2VwdC5JbnRlcnByZXRhdGlvbkNvZGVzCiAgICAgICAgICAgICAgICAgIGFuZCBWYWx1ZUNvZGluZy5jb2RlIGluIFJlc3VsdENvZGVzCiAgICAgICAgICAgICkKICAgICAgICAgICkKICAgICAgICAgIG9yIChPQnMudmFsdWUgaXMgRkhJUi5zdHJpbmcKICAgICAgICAgICAgYW5kIE1hdGNoZXMoKE9Ccy52YWx1ZSBhcyBGSElSLnN0cmluZykudmFsdWUsIFZhbHVlUGF0dGVybikKICAgICAgICAgICkKICAgICAgICAgIG9yIGV4aXN0cyAoCiAgICAgICAgICAgIE9Ccy5pbnRlcnByZXRhdGlvbi5jb2RpbmcgSU5UCiAgICAgICAgICAgICAgd2hlcmUgSU5UIGluIENvZGVDb25jZXB0LkludGVycHJldGF0aW9uQ29kZXMKICAgICAgICAgICAgICAgIGFuZCBJTlQuY29kZSBpbiBSZXN1bHRDb2RlcwogICAgICAgICAgKQogICAgICAgICkKICApCgpkZWZpbmUgZnVuY3Rpb24gIkhhc1JlY2VudFRlc3RPYnNlcnZhdGlvblJlc3VsdCIoTWFya2VyQ29kZXMgTGlzdDxTdHJpbmc+LCBSZXN1bHRDb2RlcyBMaXN0PFN0cmluZz4sIFZhbHVlUGF0dGVybiBTdHJpbmcsIFJlZmVyZW5jZURhdGUgRGF0ZVRpbWUsIExvb2tiYWNrRGF5cyBJbnRlZ2VyKToKICBleGlzdHMgKAogICAgW09ic2VydmF0aW9uXSBPQnMKICAgICAgd2hlcmUgIklzVGVzdE9ic2VydmF0aW9uIihPQnMpCiAgICAgICAgYW5kICJJc09ic2VydmF0aW9uRGF0ZVRpbWVXaXRoaW5EYXlzQmVmb3JlIihPQnMsIFJlZmVyZW5jZURhdGUsIExvb2tiYWNrRGF5cykKICAgICAgICBhbmQgZXhpc3RzICgKICAgICAgICAgIE9Ccy5jb2RlLmNvZGluZyBDZGcKICAgICAgICAgICAgd2hlcmUgQ2RnIGluIENvZGVDb25jZXB0LkxPSU5DCiAgICAgICAgICAgICAgYW5kIENkZy5jb2RlIGluIE1hcmtlckNvZGVzCiAgICAgICAgKQogICAgICAgIGFuZCAoCiAgICAgICAgICAoT0JzLnZhbHVlIGlzIEZISVIuQ29kZWFibGVDb25jZXB0CiAgICAgICAgICAgIGFuZCBleGlzdHMgKAogICAgICAgICAgICAgICgoT0JzLnZhbHVlIGFzIEZISVIuQ29kZWFibGVDb25jZXB0KS5jb2RpbmcpIFZhbHVlQ29kaW5nCiAgICAgICAgICAgICAgICB3aGVyZSBWYWx1ZUNvZGluZyBpbiBDb2RlQ29uY2VwdC5JbnRlcnByZXRhdGlvbkNvZGVzCiAgICAgICAgICAgICAgICAgIGFuZCBWYWx1ZUNvZGluZy5jb2RlIGluIFJlc3VsdENvZGVzCiAgICAgICAgICAgICkKICAgICAgICAgICkKICAgICAgICAgIG9yIChPQnMudmFsdWUgaXMgRkhJUi5zdHJpbmcKICAgICAgICAgICAgYW5kIE1hdGNoZXMoKE9Ccy52YWx1ZSBhcyBGSElSLnN0cmluZykudmFsdWUsIFZhbHVlUGF0dGVybikKICAgICAgICAgICkKICAgICAgICAgIG9yIGV4aXN0cyAoCiAgICAgICAgICAgIE9Ccy5pbnRlcnByZXRhdGlvbi5jb2RpbmcgSU5UCiAgICAgICAgICAgICAgd2hlcmUgSU5UIGluIENvZGVDb25jZXB0LkludGVycHJldGF0aW9uQ29kZXMKICAgICAgICAgICAgICAgIGFuZCBJTlQuY29kZSBpbiBSZXN1bHRDb2RlcwogICAgICAgICAgKQogICAgICAgICkKICApCgpkZWZpbmUgZnVuY3Rpb24gIkhhc0dlbmVJbmZvQ29tcG9uZW50UmVzdWx0IihNYXJrZXJDb2RlcyBMaXN0PFN0cmluZz4sIFJlc3VsdENvZGVzIExpc3Q8U3RyaW5nPiwgVmFsdWVQYXR0ZXJuIFN0cmluZyk6CiAgZXhpc3RzICgKICAgIFtPYnNlcnZhdGlvbl0gT0JzCiAgICAgIHdoZXJlICJJc0dlbmVJbmZvT2JzZXJ2YXRpb24iKE9CcykKICAgICAgICBhbmQgIklzR2VuZVBhbmVsT2JzZXJ2YXRpb24iKE9CcykKICAgICAgICBhbmQgZXhpc3RzICgKICAgICAgICAgIE9Ccy5jb21wb25lbnQgQ29tcAogICAgICAgICAgICB3aGVyZSBleGlzdHMgKAogICAgICAgICAgICAgIENvbXAuY29kZS5jb2RpbmcgQ2RnCiAgICAgICAgICAgICAgICB3aGVyZSBDZGcgaW4gQ29kZUNvbmNlcHQuTE9JTkMKICAgICAgICAgICAgICAgICAgYW5kIENkZy5jb2RlIGluIE1hcmtlckNvZGVzCiAgICAgICAgICAgICkKICAgICAgICAgICAgICBhbmQgKAogICAgICAgICAgICAgICAgKENvbXAudmFsdWUgaXMgRkhJUi5Db2RlYWJsZUNvbmNlcHQKICAgICAgICAgICAgICAgICAgYW5kIGV4aXN0cyAoCiAgICAgICAgICAgICAgICAgICAgKChDb21wLnZhbHVlIGFzIEZISVIuQ29kZWFibGVDb25jZXB0KS5jb2RpbmcpIFZhbHVlQ29kaW5nCiAgICAgICAgICAgICAgICAgICAgICB3aGVyZSBWYWx1ZUNvZGluZyBpbiBDb2RlQ29uY2VwdC5JbnRlcnByZXRhdGlvbkNvZGVzCiAgICAgICAgICAgICAgICAgICAgICAgIGFuZCBWYWx1ZUNvZGluZy5jb2RlIGluIFJlc3VsdENvZGVzCiAgICAgICAgICAgICAgICAgICkKICAgICAgICAgICAgICAgICkKICAgICAgICAgICAgICAgIG9yIChDb21wLnZhbHVlIGlzIEZISVIuc3RyaW5nCiAgICAgICAgICAgICAgICAgIGFuZCBNYXRjaGVzKChDb21wLnZhbHVlIGFzIEZISVIuc3RyaW5nKS52YWx1ZSwgVmFsdWVQYXR0ZXJuKQogICAgICAgICAgICAgICAgKQogICAgICAgICAgICAgICkKICAgICAgICApCiAgKQoKZGVmaW5lIGZ1bmN0aW9uICJIYXNSZWNlbnRHZW5lSW5mb0NvbXBvbmVudFJlc3VsdCIoTWFya2VyQ29kZXMgTGlzdDxTdHJpbmc+LCBSZXN1bHRDb2RlcyBMaXN0PFN0cmluZz4sIFZhbHVlUGF0dGVybiBTdHJpbmcsIFJlZmVyZW5jZURhdGUgRGF0ZVRpbWUsIExvb2tiYWNrRGF5cyBJbnRlZ2VyKToKICBleGlzdHMgKAogICAgW09ic2VydmF0aW9uXSBPQnMKICAgICAgd2hlcmUgIklzR2VuZUluZm9PYnNlcnZhdGlvbiIoT0JzKQogICAgICAgIGFuZCAiSXNHZW5lUGFuZWxPYnNlcnZhdGlvbiIoT0JzKQogICAgICAgIGFuZCAiSXNPYnNlcnZhdGlvbkRhdGVUaW1lV2l0aGluRGF5c0JlZm9yZSIoT0JzLCBSZWZlcmVuY2VEYXRlLCBMb29rYmFja0RheXMpCiAgICAgICAgYW5kIGV4aXN0cyAoCiAgICAgICAgICBPQnMuY29tcG9uZW50IENvbXAKICAgICAgICAgICAgd2hlcmUgZXhpc3RzICgKICAgICAgICAgICAgICBDb21wLmNvZGUuY29kaW5nIENkZwogICAgICAgICAgICAgICAgd2hlcmUgQ2RnIGluIENvZGVDb25jZXB0LkxPSU5DCiAgICAgICAgICAgICAgICAgIGFuZCBDZGcuY29kZSBpbiBNYXJrZXJDb2RlcwogICAgICAgICAgICApCiAgICAgICAgICAgICAgYW5kICgKICAgICAgICAgICAgICAgIChDb21wLnZhbHVlIGlzIEZISVIuQ29kZWFibGVDb25jZXB0CiAgICAgICAgICAgICAgICAgIGFuZCBleGlzdHMgKAogICAgICAgICAgICAgICAgICAgICgoQ29tcC52YWx1ZSBhcyBGSElSLkNvZGVhYmxlQ29uY2VwdCkuY29kaW5nKSBWYWx1ZUNvZGluZwogICAgICAgICAgICAgICAgICAgICAgd2hlcmUgVmFsdWVDb2RpbmcgaW4gQ29kZUNvbmNlcHQuSW50ZXJwcmV0YXRpb25Db2RlcwogICAgICAgICAgICAgICAgICAgICAgICBhbmQgVmFsdWVDb2RpbmcuY29kZSBpbiBSZXN1bHRDb2RlcwogICAgICAgICAgICAgICAgICApCiAgICAgICAgICAgICAgICApCiAgICAgICAgICAgICAgICBvciAoQ29tcC52YWx1ZSBpcyBGSElSLnN0cmluZwogICAgICAgICAgICAgICAgICBhbmQgTWF0Y2hlcygoQ29tcC52YWx1ZSBhcyBGSElSLnN0cmluZykudmFsdWUsIFZhbHVlUGF0dGVybikKICAgICAgICAgICAgICAgICkKICAgICAgICAgICAgICApCiAgICAgICAgKQogICkKCmRlZmluZSBmdW5jdGlvbiAiSGFzVGVzdE9ic2VydmF0aW9uV2l0aEludGVycHJldGF0aW9uQW5kVmFsdWVQYXR0ZXJuIihNYXJrZXJDb2RlcyBMaXN0PFN0cmluZz4sIEludGVycHJldGF0aW9uQ29kZXMgTGlzdDxTdHJpbmc+LCBWYWx1ZVBhdHRlcm4gU3RyaW5nKToKICAiSGFzVGVzdE9ic2VydmF0aW9uUmVzdWx0IihNYXJrZXJDb2RlcywgSW50ZXJwcmV0YXRpb25Db2RlcywgVmFsdWVQYXR0ZXJuKQoKZGVmaW5lIGZ1bmN0aW9uICJIYXNHZW5lSW5mb09ic2VydmF0aW9uV2l0aEludGVycHJldGF0aW9uQW5kVGV4dFBhdHRlcm4iKE1hcmtlckNvZGVzIExpc3Q8U3RyaW5nPiwgSW50ZXJwcmV0YXRpb25Db2RlcyBMaXN0PFN0cmluZz4sIFRleHRQYXR0ZXJuIFN0cmluZyk6CiAgIkhhc0dlbmVJbmZvQ29tcG9uZW50UmVzdWx0IihNYXJrZXJDb2RlcywgSW50ZXJwcmV0YXRpb25Db2RlcywgVGV4dFBhdHRlcm4pCgpkZWZpbmUgZnVuY3Rpb24gIkhhc1Rlc3RPYnNlcnZhdGlvbldpdGhJbnRlcnByZXRhdGlvbkNvZGVzIihNYXJrZXJDb2RlcyBMaXN0PFN0cmluZz4sIEludGVycHJldGF0aW9uQ29kZXMgTGlzdDxTdHJpbmc+KToKICBleGlzdHMgKAogICAgW09ic2VydmF0aW9uXSBPQnMKICAgICAgd2hlcmUgIklzVGVzdE9ic2VydmF0aW9uIihPQnMpCiAgICAgICAgYW5kIGV4aXN0cyAoCiAgICAgICAgICBPQnMuY29kZS5jb2RpbmcgQ2RnCiAgICAgICAgICAgIHdoZXJlIENkZyBpbiBDb2RlQ29uY2VwdC5MT0lOQwogICAgICAgICAgICAgIGFuZCBDZGcuY29kZSBpbiBNYXJrZXJDb2RlcwogICAgICAgICkKICAgICAgICBhbmQgKAogICAgICAgICAgKE9Ccy52YWx1ZSBpcyBGSElSLkNvZGVhYmxlQ29uY2VwdAogICAgICAgICAgICBhbmQgZXhpc3RzICgKICAgICAgICAgICAgICAoKE9Ccy52YWx1ZSBhcyBGSElSLkNvZGVhYmxlQ29uY2VwdCkuY29kaW5nKSBWYWx1ZUNvZGluZwogICAgICAgICAgICAgICAgd2hlcmUgVmFsdWVDb2RpbmcgaW4gQ29kZUNvbmNlcHQuSW50ZXJwcmV0YXRpb25Db2RlcwogICAgICAgICAgICAgICAgICBhbmQgVmFsdWVDb2RpbmcuY29kZSBpbiBJbnRlcnByZXRhdGlvbkNvZGVzCiAgICAgICAgICAgICkKICAgICAgICAgICkKICAgICAgICAgIG9yIGV4aXN0cyAoCiAgICAgICAgICAgIE9Ccy5pbnRlcnByZXRhdGlvbi5jb2RpbmcgSU5UCiAgICAgICAgICAgICAgd2hlcmUgSU5UIGluIENvZGVDb25jZXB0LkludGVycHJldGF0aW9uQ29kZXMKICAgICAgICAgICAgICAgIGFuZCBJTlQuY29kZSBpbiBJbnRlcnByZXRhdGlvbkNvZGVzCiAgICAgICAgICApCiAgICAgICAgKQogICkKCmRlZmluZSBmdW5jdGlvbiAiSGFzR2VuZUluZm9PYnNlcnZhdGlvbldpdGhJbnRlcnByZXRhdGlvbkNvZGVzIihNYXJrZXJDb2RlcyBMaXN0PFN0cmluZz4sIEludGVycHJldGF0aW9uQ29kZXMgTGlzdDxTdHJpbmc+KToKICBleGlzdHMgKAogICAgW09ic2VydmF0aW9uXSBPQnMKICAgICAgd2hlcmUgIklzR2VuZUluZm9PYnNlcnZhdGlvbiIoT0JzKQogICAgICAgIGFuZCAiSXNHZW5lUGFuZWxPYnNlcnZhdGlvbiIoT0JzKQogICAgICAgIGFuZCBleGlzdHMgKAogICAgICAgICAgT0JzLmNvbXBvbmVudCBDb21wCiAgICAgICAgICAgIHdoZXJlIGV4aXN0cyAoCiAgICAgICAgICAgICAgQ29tcC5jb2RlLmNvZGluZyBDZGcKICAgICAgICAgICAgICAgIHdoZXJlIENkZyBpbiBDb2RlQ29uY2VwdC5MT0lOQwogICAgICAgICAgICAgICAgICBhbmQgQ2RnLmNvZGUgaW4gTWFya2VyQ29kZXMKICAgICAgICAgICAgKQogICAgICAgICAgICAgIGFuZCBDb21wLnZhbHVlIGlzIEZISVIuQ29kZWFibGVDb25jZXB0CiAgICAgICAgICAgICAgYW5kIGV4aXN0cyAoCiAgICAgICAgICAgICAgICAoKENvbXAudmFsdWUgYXMgRkhJUi5Db2RlYWJsZUNvbmNlcHQpLmNvZGluZykgSU5UCiAgICAgICAgICAgICAgICAgIHdoZXJlIElOVCBpbiBDb2RlQ29uY2VwdC5JbnRlcnByZXRhdGlvbkNvZGVzCiAgICAgICAgICAgICAgICAgICAgYW5kIElOVC5jb2RlIGluIEludGVycHJldGF0aW9uQ29kZXMKICAgICAgICAgICAgICApCiAgICAgICAgKQogICkKCmRlZmluZSBmdW5jdGlvbiAiSGFzVGVzdE9ic2VydmF0aW9uV2l0aFZhbHVlUGF0dGVybiIoTWFya2VyQ29kZXMgTGlzdDxTdHJpbmc+LCBWYWx1ZVBhdHRlcm4gU3RyaW5nKToKICBleGlzdHMgKAogICAgW09ic2VydmF0aW9uXSBPQnMKICAgICAgd2hlcmUgIklzVGVzdE9ic2VydmF0aW9uIihPQnMpCiAgICAgICAgYW5kIGV4aXN0cyAoCiAgICAgICAgICBPQnMuY29kZS5jb2RpbmcgQ2RnCiAgICAgICAgICAgIHdoZXJlIENkZyBpbiBDb2RlQ29uY2VwdC5MT0lOQwogICAgICAgICAgICAgIGFuZCBDZGcuY29kZSBpbiBNYXJrZXJDb2RlcwogICAgICAgICkKICAgICAgICBhbmQgT0JzLnZhbHVlIGlzIEZISVIuc3RyaW5nCiAgICAgICAgYW5kIE1hdGNoZXMoKE9Ccy52YWx1ZSBhcyBGSElSLnN0cmluZykudmFsdWUsIFZhbHVlUGF0dGVybikKICApCgpkZWZpbmUgZnVuY3Rpb24gIkhhc0dlbmVJbmZvT2JzZXJ2YXRpb25XaXRoVGV4dFBhdHRlcm4iKE1hcmtlckNvZGVzIExpc3Q8U3RyaW5nPiwgVGV4dFBhdHRlcm4gU3RyaW5nKToKICBleGlzdHMgKAogICAgW09ic2VydmF0aW9uXSBPQnMKICAgICAgd2hlcmUgIklzR2VuZUluZm9PYnNlcnZhdGlvbiIoT0JzKQogICAgICAgIGFuZCAiSXNHZW5lUGFuZWxPYnNlcnZhdGlvbiIoT0JzKQogICAgICAgIGFuZCBleGlzdHMgKAogICAgICAgICAgT0JzLmNvbXBvbmVudCBDb21wCiAgICAgICAgICAgIHdoZXJlIGV4aXN0cyAoCiAgICAgICAgICAgICAgQ29tcC5jb2RlLmNvZGluZyBDZGcKICAgICAgICAgICAgICAgIHdoZXJlIENkZyBpbiBDb2RlQ29uY2VwdC5MT0lOQwogICAgICAgICAgICAgICAgICBhbmQgQ2RnLmNvZGUgaW4gTWFya2VyQ29kZXMKICAgICAgICAgICAgKQogICAgICAgICAgICAgIGFuZCBDb21wLnZhbHVlIGlzIEZISVIuc3RyaW5nCiAgICAgICAgICAgICAgYW5kIE1hdGNoZXMoKENvbXAudmFsdWUgYXMgRkhJUi5zdHJpbmcpLnZhbHVlLCBUZXh0UGF0dGVybikKICAgICAgICApCiAgKQoKZGVmaW5lIGZ1bmN0aW9uICJIYXNNYXJrZXJOZWdhdGl2ZSIoTWFya2VyQ29kZXMgTGlzdDxTdHJpbmc+KToKICAiSGFzVGVzdE9ic2VydmF0aW9uV2l0aEludGVycHJldGF0aW9uQW5kVmFsdWVQYXR0ZXJuIihNYXJrZXJDb2RlcywgeyAnTkVHJyB9LCAnKD9pKS4qKOmZsOaAp3xuZWdhdGl2ZSkuKicpCiAgb3IgIkhhc0dlbmVJbmZvT2JzZXJ2YXRpb25XaXRoSW50ZXJwcmV0YXRpb25BbmRUZXh0UGF0dGVybiIoTWFya2VyQ29kZXMsIHsgJ05FRycgfSwgJyg/aSkuKijpmbDmgKd8bmVnYXRpdmUpLionKQoKZGVmaW5lIGZ1bmN0aW9uICJIYXNNYXJrZXJOZWdhdGl2ZVRlc3QiKE1hcmtlckNvZGVzIExpc3Q8U3RyaW5nPik6CiAgIkhhc1Rlc3RPYnNlcnZhdGlvbldpdGhJbnRlcnByZXRhdGlvbkFuZFZhbHVlUGF0dGVybiIoTWFya2VyQ29kZXMsIHsgJ05FRycgfSwgJyg/aSkuKijpmbDmgKd8bmVnYXRpdmUpLionKQoKZGVmaW5lIGZ1bmN0aW9uICJIYXNNYXJrZXJOZWdhdGl2ZUdlbmUiKE1hcmtlckNvZGVzIExpc3Q8U3RyaW5nPik6CiAgIkhhc0dlbmVJbmZvT2JzZXJ2YXRpb25XaXRoSW50ZXJwcmV0YXRpb25BbmRUZXh0UGF0dGVybiIoTWFya2VyQ29kZXMsIHsgJ05FRycgfSwgJyg/aSkuKijpmbDmgKd8bmVnYXRpdmUpLionKQoKZGVmaW5lIGZ1bmN0aW9uICJIYXNNYXJrZXJQb3NpdGl2ZSIoTWFya2VyQ29kZXMgTGlzdDxTdHJpbmc+KToKICAiSGFzVGVzdE9ic2VydmF0aW9uV2l0aEludGVycHJldGF0aW9uQW5kVmFsdWVQYXR0ZXJuIihNYXJrZXJDb2RlcywgeyAnUE9TJyB9LCAnKD9pKS4qKFwrfOmZveaAp3xwb3NpdGl2ZSkuKicpCiAgb3IgIkhhc0dlbmVJbmZvT2JzZXJ2YXRpb25XaXRoSW50ZXJwcmV0YXRpb25BbmRUZXh0UGF0dGVybiIoTWFya2VyQ29kZXMsIHsgJ1BPUycgfSwgJyg/aSkuKihcK3zpmb3mgKd8cG9zaXRpdmUpLionKQoKZGVmaW5lIGZ1bmN0aW9uICJIYXNNYXJrZXJQb3NpdGl2ZVRlc3QiKE1hcmtlckNvZGVzIExpc3Q8U3RyaW5nPik6CiAgIkhhc1Rlc3RPYnNlcnZhdGlvbldpdGhJbnRlcnByZXRhdGlvbkFuZFZhbHVlUGF0dGVybiIoTWFya2VyQ29kZXMsIHsgJ1BPUycgfSwgJyg/aSkuKihcK3zpmb3mgKd8cG9zaXRpdmUpLionKQoKZGVmaW5lIGZ1bmN0aW9uICJIYXNNYXJrZXJQb3NpdGl2ZUdlbmUiKE1hcmtlckNvZGVzIExpc3Q8U3RyaW5nPik6CiAgIkhhc0dlbmVJbmZvT2JzZXJ2YXRpb25XaXRoSW50ZXJwcmV0YXRpb25BbmRUZXh0UGF0dGVybiIoTWFya2VyQ29kZXMsIHsgJ1BPUycgfSwgJyg/aSkuKihcK3zpmb3mgKd8cG9zaXRpdmUpLionKQoKZGVmaW5lICJIYXNIRVIyTmVnYXRpdmVUZXN0IjoKICAiSGFzTWFya2VyTmVnYXRpdmVUZXN0IihDb2RlQ29uY2VwdC5IRVIyKQoKZGVmaW5lICJIYXNIRVIyTmVnYXRpdmVHZW5lIjoKICAiSGFzTWFya2VyTmVnYXRpdmVHZW5lIihDb2RlQ29uY2VwdC5IRVIyKQoKZGVmaW5lICJIYXNIRVIyTmVnYXRpdmUiOgogICJIYXNNYXJrZXJOZWdhdGl2ZSIoQ29kZUNvbmNlcHQuSEVSMikKCmRlZmluZSAiSGFzSEVSMk92ZXJleHByZXNzaW9uVGVzdCI6CiAgIkhhc1Rlc3RPYnNlcnZhdGlvbldpdGhWYWx1ZVBhdHRlcm4iKENvZGVDb25jZXB0LkhFUjIsICcoP2kpLiooSUhDM1wrfEZJU0hcKykuKicpCgpkZWZpbmUgIkhhc0hFUjJPdmVyZXhwcmVzc2lvbkdlbmUiOgogICJIYXNHZW5lSW5mb09ic2VydmF0aW9uV2l0aFRleHRQYXR0ZXJuIihDb2RlQ29uY2VwdC5IRVIyLCAnKD9pKS4qKElIQzNcK3xGSVNIXCspLionKQoKZGVmaW5lICJIYXNIRVIyTmVnYXRpdmVPck5EIjoKICAiSGFzVGVzdE9ic2VydmF0aW9uV2l0aEludGVycHJldGF0aW9uQ29kZXMiKENvZGVDb25jZXB0LkhFUjIsIHsgJ05FRycsICdORCcgfSkKICBvciAiSGFzR2VuZUluZm9PYnNlcnZhdGlvbldpdGhJbnRlcnByZXRhdGlvbkNvZGVzIihDb2RlQ29uY2VwdC5IRVIyLCB7ICdORUcnLCAnTkQnIH0pCgpkZWZpbmUgIkhhc0hFUjJOZWdhdGl2ZU9yTkRUZXN0IjoKICAiSGFzVGVzdE9ic2VydmF0aW9uV2l0aEludGVycHJldGF0aW9uQ29kZXMiKENvZGVDb25jZXB0LkhFUjIsIHsgJ05FRycsICdORCcgfSkKCmRlZmluZSAiSGFzSEVSMk5lZ2F0aXZlT3JOREdlbmUiOgogICJIYXNHZW5lSW5mb09ic2VydmF0aW9uV2l0aEludGVycHJldGF0aW9uQ29kZXMiKENvZGVDb25jZXB0LkhFUjIsIHsgJ05FRycsICdORCcgfSkKCmRlZmluZSAiSGFzSEVSMk92ZXJleHByZXNzaW9uIjoKICAiSGFzSEVSMk92ZXJleHByZXNzaW9uVGVzdCIKICBvciAiSGFzSEVSMk92ZXJleHByZXNzaW9uR2VuZSIKCmRlZmluZSAiSGFzSEVSMkxvd0V4cHJlc3Npb25UZXN0IjoKICAiSGFzVGVzdE9ic2VydmF0aW9uV2l0aFZhbHVlUGF0dGVybiIoQ29kZUNvbmNlcHQuSEVSMiwgJyg/aSkuKihJSENccyoxXCt8SUhDXHMqMlwrfElTSC0pLionKQoKZGVmaW5lICJIYXNIRVIyTG93RXhwcmVzc2lvbkdlbmUiOgogICJIYXNHZW5lSW5mb09ic2VydmF0aW9uV2l0aFRleHRQYXR0ZXJuIihDb2RlQ29uY2VwdC5IRVIyLCAnKD9pKS4qKElIQ1xzKjFcK3xJSENccyoyXCt8SVNILSkuKicpCgpkZWZpbmUgIkhhc0hFUjJMb3dFeHByZXNzaW9uIjoKICAiSGFzSEVSMkxvd0V4cHJlc3Npb25UZXN0IgogIG9yICJIYXNIRVIyTG93RXhwcmVzc2lvbkdlbmUiCgpkZWZpbmUgZnVuY3Rpb24gIkhhc0NhbmNlclN0YWdlVmFsdWUiKFZhbHVlUGF0dGVybiBTdHJpbmcpOgogIGV4aXN0cyAoCiAgICBbT2JzZXJ2YXRpb25dIE8KICAgICAgd2hlcmUgZXhpc3RzICgKICAgICAgICBPLmNvZGUuY29kaW5nIENkZwogICAgICAgICAgd2hlcmUgQ2RnLmNvZGUgPSAnMzk5MzkwMDA5JwogICAgICAgICAgICBhbmQgQ2RnIGluIENvZGVDb25jZXB0LlNOT01FRAogICAgICApCiAgICAgICAgYW5kIE8udmFsdWUgaXMgbm90IG51bGwKICAgICAgICBhbmQgTy52YWx1ZSBpcyBGSElSLnN0cmluZwogICAgICAgIGFuZCBNYXRjaGVzKChPLnZhbHVlIGFzIEZISVIuc3RyaW5nKS52YWx1ZSwgVmFsdWVQYXR0ZXJuKQogICkKCi8v55mM55eH5YiG5pyf5YiG5pW45oiW57WQ5p6c54K6IE0xLU05CmRlZmluZSAi55mM55eH5YiG5pyf5YiG5pW45oiW57WQ5p6c54K6TeKJoDAiOgogICJIYXNDYW5jZXJTdGFnZVZhbHVlIignLipNWzEtOV0uKicpCgovL+eZjOeXh+WIhuacn+WIhuaVuOaIlue1kOaenOeCuiBNMApkZWZpbmUgIueZjOeXh+WIhuacn+WIhuaVuOaIlue1kOaenOeCuk09MCI6CiAgIkhhc0NhbmNlclN0YWdlVmFsdWUiKCcuKk0wLionKQoKLy/nmYznl4fliIbmnJ/liIbmlbjmiJbntZDmnpzngrogTTEtTTkKZGVmaW5lICLnmYznl4fliIbmnJ/liIbmlbjmiJbntZDmnpzngrpNPj0xIjoKICAiSGFzQ2FuY2VyU3RhZ2VWYWx1ZSIoJy4qTVsxLTldLionKQoKLy/nmYznl4fliIbmnJ/liIbmlbjmiJbntZDmnpzngrogTjAKZGVmaW5lICLnmYznl4fliIbmnJ/liIbmlbjmiJbntZDmnpzngrpOPTAiOgogICJIYXNDYW5jZXJTdGFnZVZhbHVlIignLipOMC4qJykKCi8v55mM55eH5YiG5pyf5YiG5pW45oiW57WQ5p6c54K6IE4xLU45CmRlZmluZSAi55mM55eH5YiG5pyf5YiG5pW45oiW57WQ5p6c54K6Tj49MSI6CiAgIkhhc0NhbmNlclN0YWdlVmFsdWUiKCcuKk5bMS05XS4qJykKCi8v55mM55eH5YiG5pyf5YiG5pW45oiW57WQ5p6c54K6IE4xLU45CmRlZmluZSAi55mM55eH5YiG5pyf5YiG5pW45oiW57WQ5p6c54K6TuKJoDAiOgogICLnmYznl4fliIbmnJ/liIbmlbjmiJbntZDmnpzngrpOPj0xIgoKLy8g5qqi5p+lIE1lZGljYXRpb25SZXF1ZXN0IOaYr+WQpuacieacieaViOeahOaZgumWk+izh+ioigpkZWZpbmUgZnVuY3Rpb24gIkhhc1ZhbGlkVGltaW5nIihNUiBNZWRpY2F0aW9uUmVxdWVzdCk6CiAgTVIuZG9zYWdlSW5zdHJ1Y3Rpb24gaXMgbm90IG51bGwKICBhbmQgQ291bnQoTVIuZG9zYWdlSW5zdHJ1Y3Rpb24pID4gMAogIGFuZCBNUi5kb3NhZ2VJbnN0cnVjdGlvblswXS50aW1pbmcgaXMgbm90IG51bGwKICBhbmQgTVIuZG9zYWdlSW5zdHJ1Y3Rpb25bMF0udGltaW5nLnJlcGVhdCBpcyBub3QgbnVsbAogIGFuZCBNUi5kb3NhZ2VJbnN0cnVjdGlvblswXS50aW1pbmcucmVwZWF0LmJvdW5kcyBpcyBQZXJpb2QKICBhbmQgKE1SLmRvc2FnZUluc3RydWN0aW9uWzBdLnRpbWluZy5yZXBlYXQuYm91bmRzIGFzIFBlcmlvZCkuc3RhcnQgaXMgbm90IG51bGwKICBhbmQgKE1SLmRvc2FnZUluc3RydWN0aW9uWzBdLnRpbWluZy5yZXBlYXQuYm91bmRzIGFzIFBlcmlvZCkuZW5kIGlzIG5vdCBudWxsCgovLyDlj5blvpcgTWVkaWNhdGlvblJlcXVlc3Qg55qE6LW35aeL5pmC6ZaTCmRlZmluZSBmdW5jdGlvbiAiR2V0U3RhcnRUaW1lIihNUiBNZWRpY2F0aW9uUmVxdWVzdCk6CiAgRkhJUkhlbHBlcnMuVG9EYXRlVGltZSgoTVIuZG9zYWdlSW5zdHJ1Y3Rpb25bMF0udGltaW5nLnJlcGVhdC5ib3VuZHMgYXMgUGVyaW9kKS5zdGFydCkKCi8vIOWPluW+lyBNZWRpY2F0aW9uUmVxdWVzdCDnmoTntZDmnZ/mmYLplpMgIApkZWZpbmUgZnVuY3Rpb24gIkdldEVuZFRpbWUiKE1SIE1lZGljYXRpb25SZXF1ZXN0KToKICBGSElSSGVscGVycy5Ub0RhdGVUaW1lKChNUi5kb3NhZ2VJbnN0cnVjdGlvblswXS50aW1pbmcucmVwZWF0LmJvdW5kcyBhcyBQZXJpb2QpLmVuZCkKCi8vIOaqouafpSBQbGFuIOeahOaZgumWk+evhOWcjeaYr+WQpuWcqCBPcmRlciDnmoTmmYLplpPnr4TlnI3lhacKZGVmaW5lIGZ1bmN0aW9uICJQbGFuVGltZVdpdGhpbk9yZGVyVGltZSIoTVJQbGFuIE1lZGljYXRpb25SZXF1ZXN0LCBNUk9yZGVyIE1lZGljYXRpb25SZXF1ZXN0KToKICAiSGFzVmFsaWRUaW1pbmciKE1SUGxhbikgCiAgYW5kICJIYXNWYWxpZFRpbWluZyIoTVJPcmRlcikKICBhbmQgIkdldFN0YXJ0VGltZSIoTVJQbGFuKSA+PSAiR2V0U3RhcnRUaW1lIihNUk9yZGVyKQogIGFuZCAiR2V0U3RhcnRUaW1lIihNUlBsYW4pIDw9ICJHZXRFbmRUaW1lIihNUk9yZGVyKQogIGFuZCAiR2V0RW5kVGltZSIoTVJQbGFuKSA+PSAiR2V0U3RhcnRUaW1lIihNUk9yZGVyKQogIGFuZCAiR2V0RW5kVGltZSIoTVJQbGFuKSA8PSAiR2V0RW5kVGltZSIoTVJPcmRlcikKCi8vIOaqouafpeWFqeWAi+iXpeeJqeeahOaZgumWk+evhOWcjeaYr+WQpumHjeeWigpkZWZpbmUgZnVuY3Rpb24gIk1lZGljYXRpb25UaW1lc092ZXJsYXAiKE1SMSBNZWRpY2F0aW9uUmVxdWVzdCwgTVIyIE1lZGljYXRpb25SZXF1ZXN0KToKICAiSGFzVmFsaWRUaW1pbmciKE1SMSkgYW5kICJIYXNWYWxpZFRpbWluZyIoTVIyKQogIGFuZCAiR2V0U3RhcnRUaW1lIihNUjEpIDw9ICJHZXRFbmRUaW1lIihNUjIpCiAgYW5kICJHZXRFbmRUaW1lIihNUjEpID49ICJHZXRTdGFydFRpbWUiKE1SMikKCi8vIOaqouafpSBNZWRpY2F0aW9uUmVxdWVzdCDmmK/lkKbngrrmjIflrprol6XniannlLPoq4sKZGVmaW5lIGZ1bmN0aW9uICJIYXNNZWRpY2F0aW9uQ29kZSIoTVIgTWVkaWNhdGlvblJlcXVlc3QsIERydWdDb2RlcyBMaXN0PFN0cmluZz4pOgogIGV4aXN0cyAoCiAgICBNUi5tZWRpY2F0aW9uLmNvZGluZyBDZGcKICAgIHdoZXJlIENkZyBpbiBDb2RlQ29uY2VwdC5OSElNZWRpY2F0aW9uCiAgICAgIGFuZCBDZGcuY29kZSBpbiBEcnVnQ29kZXMKICApCgovLyDmmK/lkKblh7rnj77mjIflrprol6XniannlKjol6XntIDpjITvvIzkuI3mqqLmn6XnmYLnqIvmmYLplpMKZGVmaW5lIGZ1bmN0aW9uICJIYXNNZWRpY2F0aW9uVXNlIihEcnVnQ29kZXMgTGlzdDxTdHJpbmc+KToKICBleGlzdHMgKAogICAgW01lZGljYXRpb25SZXF1ZXN0XSBNUgogICAgd2hlcmUgIkhhc01lZGljYXRpb25Db2RlIihNUiwgRHJ1Z0NvZGVzKQogICkKCi8vIOaYr+WQpuacieaMh+WumuiXpeeJqeacrOasoeeUs+iri+e0gOmMhO+8jOS4jeaqouafpeeZgueoi+aZgumWk+OAggpkZWZpbmUgZnVuY3Rpb24gIkhhc01lZGljYXRpb25QbGFuUmVjb3JkIihEcnVnQ29kZXMgTGlzdDxTdHJpbmc+KToKICBleGlzdHMgKAogICAgW01lZGljYXRpb25SZXF1ZXN0XSBNUgogICAgd2hlcmUgTVIuaW50ZW50ID0gJ3BsYW4nCiAgICAgIGFuZCAiSGFzTWVkaWNhdGlvbkNvZGUiKE1SLCBEcnVnQ29kZXMpCiAgKQoKLy8g5piv5ZCm5pyJ5oyH5a6a6Jel54mp5q235Y+y6Yar5Luk57SA6YyE77yM5LiN5qqi5p+l55mC56iL5pmC6ZaT44CCCmRlZmluZSBmdW5jdGlvbiAiSGFzTWVkaWNhdGlvbk9yZGVyUmVjb3JkIihEcnVnQ29kZXMgTGlzdDxTdHJpbmc+KToKICBleGlzdHMgKAogICAgW01lZGljYXRpb25SZXF1ZXN0XSBNUgogICAgd2hlcmUgTVIuaW50ZW50ID0gJ29yZGVyJwogICAgICBhbmQgIkhhc01lZGljYXRpb25Db2RlIihNUiwgRHJ1Z0NvZGVzKQogICkKCi8vIOaYr+WQpuacieaMh+WumuiXpeeJqeacrOasoeeUs+iri+eZgueoi+i1t+i/hOaXpeacn+OAggpkZWZpbmUgZnVuY3Rpb24gIkhhc01lZGljYXRpb25QbGFuVGltaW5nIihEcnVnQ29kZXMgTGlzdDxTdHJpbmc+KToKICBleGlzdHMgKAogICAgW01lZGljYXRpb25SZXF1ZXN0XSBNUgogICAgd2hlcmUgTVIuaW50ZW50ID0gJ3BsYW4nCiAgICAgIGFuZCAiSGFzTWVkaWNhdGlvbkNvZGUiKE1SLCBEcnVnQ29kZXMpCiAgICAgIGFuZCAiSGFzVmFsaWRUaW1pbmciKE1SKQogICkKCi8vIOacrOasoeiXpeeJqeeUs+iri++8iHBsYW7vvIkKZGVmaW5lIGZ1bmN0aW9uICJJc01lZGljYXRpb25QbGFuIihNUiBNZWRpY2F0aW9uUmVxdWVzdCwgRHJ1Z0NvZGVzIExpc3Q8U3RyaW5nPik6CiAgTVIuaW50ZW50ID0gJ3BsYW4nCiAgYW5kICJIYXNNZWRpY2F0aW9uQ29kZSIoTVIsIERydWdDb2RlcykKICBhbmQgIkhhc1ZhbGlkVGltaW5nIihNUikKCi8vIOatt+WPsuiXpeeJqemGq+S7pO+8iG9yZGVy77yJCmRlZmluZSBmdW5jdGlvbiAiSXNNZWRpY2F0aW9uT3JkZXIiKE1SIE1lZGljYXRpb25SZXF1ZXN0LCBEcnVnQ29kZXMgTGlzdDxTdHJpbmc+KToKICBNUi5pbnRlbnQgPSAnb3JkZXInCiAgYW5kICJIYXNNZWRpY2F0aW9uQ29kZSIoTVIsIERydWdDb2RlcykKICBhbmQgIkhhc1ZhbGlkVGltaW5nIihNUikKCi8vIOaMh+WumuiXpeeJqeacgOi/keS4gOasoeacrOasoeeUs+iri++8iHBsYW7vvIkKZGVmaW5lIGZ1bmN0aW9uICJMYXRlc3RNZWRpY2F0aW9uUGxhbiIoRHJ1Z0NvZGVzIExpc3Q8U3RyaW5nPik6CiAgTGFzdCgKICAgIFtNZWRpY2F0aW9uUmVxdWVzdF0gTVIKICAgICAgd2hlcmUgIklzTWVkaWNhdGlvblBsYW4iKE1SLCBEcnVnQ29kZXMpCiAgICAgIHNvcnQgYnkgRkhJUkhlbHBlcnMuVG9EYXRlVGltZSgoZG9zYWdlSW5zdHJ1Y3Rpb25bMF0udGltaW5nLnJlcGVhdC5ib3VuZHMgYXMgUGVyaW9kKS5zdGFydCkKICApCgovLyDmjIflrprol6Xnianmlrzlj4PogIPml6XmnJ/liY3mnIDov5HkuIDmrKHmnKzmrKHnlLPoq4vvvIhwbGFu77yJCmRlZmluZSBmdW5jdGlvbiAiTGF0ZXN0TWVkaWNhdGlvblBsYW5CZWZvcmUiKERydWdDb2RlcyBMaXN0PFN0cmluZz4sIFJlZmVyZW5jZURhdGUgRGF0ZVRpbWUpOgogIExhc3QoCiAgICBbTWVkaWNhdGlvblJlcXVlc3RdIE1SCiAgICAgIHdoZXJlICJJc01lZGljYXRpb25QbGFuIihNUiwgRHJ1Z0NvZGVzKQogICAgICAgIGFuZCAiR2V0U3RhcnRUaW1lIihNUikgPCBSZWZlcmVuY2VEYXRlCiAgICAgIHNvcnQgYnkgRkhJUkhlbHBlcnMuVG9EYXRlVGltZSgoZG9zYWdlSW5zdHJ1Y3Rpb25bMF0udGltaW5nLnJlcGVhdC5ib3VuZHMgYXMgUGVyaW9kKS5zdGFydCkKICApCgovLyDmjIflrprol6Xnianmlrzlj4PogIPml6XmnJ/liY3mnIDov5HkuIDmrKHlt7LlrozmiJDphqvku6TvvIhvcmRlcu+8iQpkZWZpbmUgZnVuY3Rpb24gIkxhdGVzdENvbXBsZXRlZE1lZGljYXRpb25PcmRlckJlZm9yZSIoRHJ1Z0NvZGVzIExpc3Q8U3RyaW5nPiwgUmVmZXJlbmNlRGF0ZSBEYXRlVGltZSk6CiAgTGFzdCgKICAgIFtNZWRpY2F0aW9uUmVxdWVzdF0gTVIKICAgICAgd2hlcmUgIklzTWVkaWNhdGlvbk9yZGVyIihNUiwgRHJ1Z0NvZGVzKQogICAgICAgIGFuZCBNUi5zdGF0dXMgPSAnY29tcGxldGVkJwogICAgICAgIGFuZCAiR2V0U3RhcnRUaW1lIihNUikgPCBSZWZlcmVuY2VEYXRlCiAgICAgIHNvcnQgYnkgRkhJUkhlbHBlcnMuVG9EYXRlVGltZSgoZG9zYWdlSW5zdHJ1Y3Rpb25bMF0udGltaW5nLnJlcGVhdC5ib3VuZHMgYXMgUGVyaW9kKS5zdGFydCkKICApCgpkZWZpbmUgZnVuY3Rpb24gIkhhc0ltYWdlUmVwb3J0QmV0d2VlbiIoU3RhcnREYXRlIERhdGVUaW1lLCBFbmREYXRlIERhdGVUaW1lKToKICBleGlzdHMgKAogICAgW0RpYWdub3N0aWNSZXBvcnRdIFJlcG9ydAogICAgd2hlcmUgIklzSW1hZ2VSZXBvcnQiKFJlcG9ydCkKICAgICAgYW5kIFJlcG9ydC5lZmZlY3RpdmUgaXMgbm90IG51bGwKICAgICAgYW5kIEZISVJIZWxwZXJzLlRvRGF0ZVRpbWUoUmVwb3J0LmVmZmVjdGl2ZSkgPj0gU3RhcnREYXRlCiAgICAgIGFuZCBGSElSSGVscGVycy5Ub0RhdGVUaW1lKFJlcG9ydC5lZmZlY3RpdmUpIDwgRW5kRGF0ZQogICkKCmRlZmluZSBmdW5jdGlvbiAiSGFzSW1hZ2VSZXBvcnRCZXR3ZWVuUHJldmlvdXNUcmVhdG1lbnRBbmRDdXJyZW50QXBwbHkiKERydWdDb2RlcyBMaXN0PFN0cmluZz4pOgogIGV4aXN0cyAoCiAgICBbTWVkaWNhdGlvblJlcXVlc3RdIEN1cnJlbnRNUgogICAgd2hlcmUgIklzTWVkaWNhdGlvblBsYW4iKEN1cnJlbnRNUiwgRHJ1Z0NvZGVzKQogICAgICBhbmQgIkxhdGVzdENvbXBsZXRlZE1lZGljYXRpb25PcmRlckJlZm9yZSIoRHJ1Z0NvZGVzLCAiR2V0U3RhcnRUaW1lIihDdXJyZW50TVIpKSBpcyBub3QgbnVsbAogICAgICBhbmQgIkhhc0ltYWdlUmVwb3J0QmV0d2VlbiIoCiAgICAgICAgIkdldFN0YXJ0VGltZSIoIkxhdGVzdENvbXBsZXRlZE1lZGljYXRpb25PcmRlckJlZm9yZSIoRHJ1Z0NvZGVzLCAiR2V0U3RhcnRUaW1lIihDdXJyZW50TVIpKSksCiAgICAgICAgIkdldFN0YXJ0VGltZSIoQ3VycmVudE1SKQogICAgICApCiAgKQoKLy8g5q235Y+y6Jel54mp55mC56iL57WQ5p2f5pmC6ZaT5pep5pa85oiW562J5pa85pys5qyh55Sz6KuL55mC56iL6ZaL5aeL5pmC6ZaTCmRlZmluZSBmdW5jdGlvbiAiSXNCZWZvcmVNZWRpY2F0aW9uUGxhbiIoUHJpb3JNUiBNZWRpY2F0aW9uUmVxdWVzdCwgQ3VycmVudE1SIE1lZGljYXRpb25SZXF1ZXN0KToKICAiR2V0RW5kVGltZSIoUHJpb3JNUikgPD0gIkdldFN0YXJ0VGltZSIoQ3VycmVudE1SKQoKLy8g5YWp562G6Jel54mp55mC56iL5pyf6ZaT5pyJ6YeN55aKCmRlZmluZSBmdW5jdGlvbiAiTWVkaWNhdGlvblBlcmlvZHNPdmVybGFwIihMZWZ0TVIgTWVkaWNhdGlvblJlcXVlc3QsIFJpZ2h0TVIgTWVkaWNhdGlvblJlcXVlc3QpOgogICJHZXRTdGFydFRpbWUiKExlZnRNUikgPD0gIkdldEVuZFRpbWUiKFJpZ2h0TVIpCiAgYW5kICJHZXRFbmRUaW1lIihMZWZ0TVIpID49ICJHZXRTdGFydFRpbWUiKFJpZ2h0TVIpCgovLyDku7vlhannqK7mjIflrprol6XniannlKjol6XntIDpjITmnJ/plpPmmK/lkKbph43nlooKZGVmaW5lIGZ1bmN0aW9uICJIYXNNZWRpY2F0aW9uUGVyaW9kc092ZXJsYXAiKERydWdDb2Rlc0EgTGlzdDxTdHJpbmc+LCBEcnVnQ29kZXNCIExpc3Q8U3RyaW5nPik6CiAgZXhpc3RzICgKICAgIFtNZWRpY2F0aW9uUmVxdWVzdF0gTVJBCiAgICB3aGVyZSAiSGFzTWVkaWNhdGlvbkNvZGUiKE1SQSwgRHJ1Z0NvZGVzQSkKICAgICAgYW5kICJIYXNWYWxpZFRpbWluZyIoTVJBKQogICAgICBhbmQgZXhpc3RzICgKICAgICAgICBbTWVkaWNhdGlvblJlcXVlc3RdIE1SQgogICAgICAgIHdoZXJlIE1SQi5pZCAhPSBNUkEuaWQKICAgICAgICAgIGFuZCAiSGFzTWVkaWNhdGlvbkNvZGUiKE1SQiwgRHJ1Z0NvZGVzQikKICAgICAgICAgIGFuZCAiSGFzVmFsaWRUaW1pbmciKE1SQikKICAgICAgICAgIGFuZCAiTWVkaWNhdGlvblBlcmlvZHNPdmVybGFwIihNUkEsIE1SQikKICAgICAgKQogICkKCi8vIOaYr+WQpuaWvOacrOasoeaMh+WumuiXpeeJqeeUs+iri+WJje+8jOabvuS9v+eUqOmBjuaMh+Wumuatt+WPsuiXpeeJqQpkZWZpbmUgZnVuY3Rpb24gIkhhc1ByaW9yTWVkaWNhdGlvblVzZSIoQ3VycmVudERydWdDb2RlcyBMaXN0PFN0cmluZz4sIFByaW9yRHJ1Z0NvZGVzIExpc3Q8U3RyaW5nPik6CiAgZXhpc3RzICgKICAgIFtNZWRpY2F0aW9uUmVxdWVzdF0gQ3VycmVudE1SCiAgICB3aGVyZSAiSXNNZWRpY2F0aW9uUGxhbiIoQ3VycmVudE1SLCBDdXJyZW50RHJ1Z0NvZGVzKQogICAgICBhbmQgZXhpc3RzICgKICAgICAgICBbTWVkaWNhdGlvblJlcXVlc3RdIFByaW9yTVIKICAgICAgICB3aGVyZSAiSXNNZWRpY2F0aW9uT3JkZXIiKFByaW9yTVIsIFByaW9yRHJ1Z0NvZGVzKQogICAgICAgICAgYW5kICJJc0JlZm9yZU1lZGljYXRpb25QbGFuIihQcmlvck1SLCBDdXJyZW50TVIpCiAgICAgICkKICApCgovLyDmmK/lkKbmlrzmnKzmrKHmjIflrprol6XniannlLPoq4vliY3vvIzmm77kvbXnlKjlhannqK7mjIflrprmrbflj7Lol6XniakKZGVmaW5lIGZ1bmN0aW9uICJIYXNQcmlvckNvbmN1cnJlbnRNZWRpY2F0aW9uVXNlIihDdXJyZW50RHJ1Z0NvZGVzIExpc3Q8U3RyaW5nPiwgUHJpb3JEcnVnQ29kZXNBIExpc3Q8U3RyaW5nPiwgUHJpb3JEcnVnQ29kZXNCIExpc3Q8U3RyaW5nPik6CiAgZXhpc3RzICgKICAgIFtNZWRpY2F0aW9uUmVxdWVzdF0gQ3VycmVudE1SCiAgICB3aGVyZSAiSXNNZWRpY2F0aW9uUGxhbiIoQ3VycmVudE1SLCBDdXJyZW50RHJ1Z0NvZGVzKQogICAgICBhbmQgZXhpc3RzICgKICAgICAgICBbTWVkaWNhdGlvblJlcXVlc3RdIFByaW9yQQogICAgICAgIHdoZXJlICJJc01lZGljYXRpb25PcmRlciIoUHJpb3JBLCBQcmlvckRydWdDb2Rlc0EpCiAgICAgICAgICBhbmQgIklzQmVmb3JlTWVkaWNhdGlvblBsYW4iKFByaW9yQSwgQ3VycmVudE1SKQogICAgICAgICAgYW5kIGV4aXN0cyAoCiAgICAgICAgICAgIFtNZWRpY2F0aW9uUmVxdWVzdF0gUHJpb3JCCiAgICAgICAgICAgIHdoZXJlICJJc01lZGljYXRpb25PcmRlciIoUHJpb3JCLCBQcmlvckRydWdDb2Rlc0IpCiAgICAgICAgICAgICAgYW5kICJNZWRpY2F0aW9uUGVyaW9kc092ZXJsYXAiKFByaW9yQSwgUHJpb3JCKQogICAgICAgICAgICAgIGFuZCAiSXNCZWZvcmVNZWRpY2F0aW9uUGxhbiIoUHJpb3JCLCBDdXJyZW50TVIpCiAgICAgICAgICApCiAgICAgICkKICApCgovLyDmnKzmrKHmjIflrprol6XniannlLPoq4vmnJ/plpPvvIzmmK/lkKboiIflj6bkuIDmjIflrprol6XniannlLPoq4vmnJ/plpPph43nlooKZGVmaW5lIGZ1bmN0aW9uICJIYXNDb25jdXJyZW50TWVkaWNhdGlvblBsYW4iKEN1cnJlbnREcnVnQ29kZXMgTGlzdDxTdHJpbmc+LCBDb25jdXJyZW50RHJ1Z0NvZGVzIExpc3Q8U3RyaW5nPik6CiAgZXhpc3RzICgKICAgIFtNZWRpY2F0aW9uUmVxdWVzdF0gQ3VycmVudE1SCiAgICB3aGVyZSAiSXNNZWRpY2F0aW9uUGxhbiIoQ3VycmVudE1SLCBDdXJyZW50RHJ1Z0NvZGVzKQogICAgICBhbmQgZXhpc3RzICgKICAgICAgICBbTWVkaWNhdGlvblJlcXVlc3RdIENvbmN1cnJlbnRNUgogICAgICAgIHdoZXJlIENvbmN1cnJlbnRNUi5pZCAhPSBDdXJyZW50TVIuaWQKICAgICAgICAgIGFuZCAiSXNNZWRpY2F0aW9uUGxhbiIoQ29uY3VycmVudE1SLCBDb25jdXJyZW50RHJ1Z0NvZGVzKQogICAgICAgICAgYW5kICJNZWRpY2F0aW9uUGVyaW9kc092ZXJsYXAiKEN1cnJlbnRNUiwgQ29uY3VycmVudE1SKQogICAgICApCiAgKQoKLy8g5pys5qyh5oyH5a6a6Jel54mp55Sz6KuL5pyf6ZaT77yM5piv5ZCm6IiH5oyH5a6a6Jel54mp55So6Jel57SA6YyE5pyf6ZaT6YeN55aKCmRlZmluZSBmdW5jdGlvbiAiSGFzQ29uY3VycmVudE1lZGljYXRpb25Vc2UiKEN1cnJlbnREcnVnQ29kZXMgTGlzdDxTdHJpbmc+LCBDb25jdXJyZW50RHJ1Z0NvZGVzIExpc3Q8U3RyaW5nPik6CiAgZXhpc3RzICgKICAgIFtNZWRpY2F0aW9uUmVxdWVzdF0gQ3VycmVudE1SCiAgICB3aGVyZSAiSXNNZWRpY2F0aW9uUGxhbiIoQ3VycmVudE1SLCBDdXJyZW50RHJ1Z0NvZGVzKQogICAgICBhbmQgZXhpc3RzICgKICAgICAgICBbTWVkaWNhdGlvblJlcXVlc3RdIENvbmN1cnJlbnRNUgogICAgICAgIHdoZXJlIENvbmN1cnJlbnRNUi5pZCAhPSBDdXJyZW50TVIuaWQKICAgICAgICAgIGFuZCAiSGFzTWVkaWNhdGlvbkNvZGUiKENvbmN1cnJlbnRNUiwgQ29uY3VycmVudERydWdDb2RlcykKICAgICAgICAgIGFuZCAiSGFzVmFsaWRUaW1pbmciKENvbmN1cnJlbnRNUikKICAgICAgICAgIGFuZCAiTWVkaWNhdGlvblBlcmlvZHNPdmVybGFwIihDdXJyZW50TVIsIENvbmN1cnJlbnRNUikKICAgICAgKQogICkKCi8vIOacrOasoeaMh+WumuiXpeeJqeeUs+iri+acn+mWk++8jOaYr+WQpuiIh+aMh+WumuiXpeeJqemGq+S7pOacn+mWk+mHjeeWigpkZWZpbmUgZnVuY3Rpb24gIkhhc0NvbmN1cnJlbnRNZWRpY2F0aW9uT3JkZXIiKEN1cnJlbnREcnVnQ29kZXMgTGlzdDxTdHJpbmc+LCBDb25jdXJyZW50RHJ1Z0NvZGVzIExpc3Q8U3RyaW5nPik6CiAgZXhpc3RzICgKICAgIFtNZWRpY2F0aW9uUmVxdWVzdF0gQ3VycmVudE1SCiAgICB3aGVyZSAiSXNNZWRpY2F0aW9uUGxhbiIoQ3VycmVudE1SLCBDdXJyZW50RHJ1Z0NvZGVzKQogICAgICBhbmQgZXhpc3RzICgKICAgICAgICBbTWVkaWNhdGlvblJlcXVlc3RdIENvbmN1cnJlbnRNUgogICAgICAgIHdoZXJlICJJc01lZGljYXRpb25PcmRlciIoQ29uY3VycmVudE1SLCBDb25jdXJyZW50RHJ1Z0NvZGVzKQogICAgICAgICAgYW5kICJNZWRpY2F0aW9uUGVyaW9kc092ZXJsYXAiKEN1cnJlbnRNUiwgQ29uY3VycmVudE1SKQogICAgICApCiAgKQoKLy8g5pys5qyh5oyH5a6a6Jel54mp55Sz6KuL5pyf6ZaT77yM5piv5ZCm5ZCM5pmC6IiH5YWp56iu5oyH5a6a6Jel54mp6Yar5Luk5pyf6ZaT6YeN55aKCmRlZmluZSBmdW5jdGlvbiAiSGFzQ29uY3VycmVudE1lZGljYXRpb25PcmRlcnMyIihDdXJyZW50RHJ1Z0NvZGVzIExpc3Q8U3RyaW5nPiwgQ29uY3VycmVudERydWdDb2Rlc0EgTGlzdDxTdHJpbmc+LCBDb25jdXJyZW50RHJ1Z0NvZGVzQiBMaXN0PFN0cmluZz4pOgogIGV4aXN0cyAoCiAgICBbTWVkaWNhdGlvblJlcXVlc3RdIEN1cnJlbnRNUgogICAgd2hlcmUgIklzTWVkaWNhdGlvblBsYW4iKEN1cnJlbnRNUiwgQ3VycmVudERydWdDb2RlcykKICAgICAgYW5kIGV4aXN0cyAoCiAgICAgICAgW01lZGljYXRpb25SZXF1ZXN0XSBDb25jdXJyZW50QQogICAgICAgIHdoZXJlICJJc01lZGljYXRpb25PcmRlciIoQ29uY3VycmVudEEsIENvbmN1cnJlbnREcnVnQ29kZXNBKQogICAgICAgICAgYW5kICJNZWRpY2F0aW9uUGVyaW9kc092ZXJsYXAiKEN1cnJlbnRNUiwgQ29uY3VycmVudEEpCiAgICAgICkKICAgICAgYW5kIGV4aXN0cyAoCiAgICAgICAgW01lZGljYXRpb25SZXF1ZXN0XSBDb25jdXJyZW50QgogICAgICAgIHdoZXJlICJJc01lZGljYXRpb25PcmRlciIoQ29uY3VycmVudEIsIENvbmN1cnJlbnREcnVnQ29kZXNCKQogICAgICAgICAgYW5kICJNZWRpY2F0aW9uUGVyaW9kc092ZXJsYXAiKEN1cnJlbnRNUiwgQ29uY3VycmVudEIpCiAgICAgICkKICApCgovLyDmnKzmrKHmjIflrprol6XniannlLPoq4vmnJ/plpPvvIzmmK/lkKblkIzmmYLoiIfkuInnqK7mjIflrprol6Xnianphqvku6TmnJ/plpPph43nlooKZGVmaW5lIGZ1bmN0aW9uICJIYXNDb25jdXJyZW50TWVkaWNhdGlvbk9yZGVyczMiKEN1cnJlbnREcnVnQ29kZXMgTGlzdDxTdHJpbmc+LCBDb25jdXJyZW50RHJ1Z0NvZGVzQSBMaXN0PFN0cmluZz4sIENvbmN1cnJlbnREcnVnQ29kZXNCIExpc3Q8U3RyaW5nPiwgQ29uY3VycmVudERydWdDb2Rlc0MgTGlzdDxTdHJpbmc+KToKICBleGlzdHMgKAogICAgW01lZGljYXRpb25SZXF1ZXN0XSBDdXJyZW50TVIKICAgIHdoZXJlICJJc01lZGljYXRpb25QbGFuIihDdXJyZW50TVIsIEN1cnJlbnREcnVnQ29kZXMpCiAgICAgIGFuZCBleGlzdHMgKAogICAgICAgIFtNZWRpY2F0aW9uUmVxdWVzdF0gQ29uY3VycmVudEEKICAgICAgICB3aGVyZSAiSXNNZWRpY2F0aW9uT3JkZXIiKENvbmN1cnJlbnRBLCBDb25jdXJyZW50RHJ1Z0NvZGVzQSkKICAgICAgICAgIGFuZCAiTWVkaWNhdGlvblBlcmlvZHNPdmVybGFwIihDdXJyZW50TVIsIENvbmN1cnJlbnRBKQogICAgICApCiAgICAgIGFuZCBleGlzdHMgKAogICAgICAgIFtNZWRpY2F0aW9uUmVxdWVzdF0gQ29uY3VycmVudEIKICAgICAgICB3aGVyZSAiSXNNZWRpY2F0aW9uT3JkZXIiKENvbmN1cnJlbnRCLCBDb25jdXJyZW50RHJ1Z0NvZGVzQikKICAgICAgICAgIGFuZCAiTWVkaWNhdGlvblBlcmlvZHNPdmVybGFwIihDdXJyZW50TVIsIENvbmN1cnJlbnRCKQogICAgICApCiAgICAgIGFuZCBleGlzdHMgKAogICAgICAgIFtNZWRpY2F0aW9uUmVxdWVzdF0gQ29uY3VycmVudEMKICAgICAgICB3aGVyZSAiSXNNZWRpY2F0aW9uT3JkZXIiKENvbmN1cnJlbnRDLCBDb25jdXJyZW50RHJ1Z0NvZGVzQykKICAgICAgICAgIGFuZCAiTWVkaWNhdGlvblBlcmlvZHNPdmVybGFwIihDdXJyZW50TVIsIENvbmN1cnJlbnRDKQogICAgICApCiAgKQoKLy8g5oyH5a6a6Jel54mp5pys5qyh55Sz6KuL55mC56iL5aSp5pW45piv5ZCm5pyq6LaF6YGO5LiK6ZmQCmRlZmluZSBmdW5jdGlvbiAiSGFzTWVkaWNhdGlvblBsYW5EdXJhdGlvbldpdGhpbiIoQ3VycmVudERydWdDb2RlcyBMaXN0PFN0cmluZz4sIE1heERheXMgSW50ZWdlcik6CiAgZXhpc3RzICgKICAgIFtNZWRpY2F0aW9uUmVxdWVzdF0gQ3VycmVudE1SCiAgICB3aGVyZSAiSXNNZWRpY2F0aW9uUGxhbiIoQ3VycmVudE1SLCBDdXJyZW50RHJ1Z0NvZGVzKQogICAgICBhbmQgZGlmZmVyZW5jZSBpbiBkYXlzIGJldHdlZW4gIkdldFN0YXJ0VGltZSIoQ3VycmVudE1SKQogICAgICAgICAgYW5kICJHZXRFbmRUaW1lIihDdXJyZW50TVIpIDw9IE1heERheXMKICApCgpkZWZpbmUgZnVuY3Rpb24gIkhhc01lZGljYXRpb25QbGFuUGVyaW9kV2l0aGluRGF5cyIoRHJ1Z0NvZGVzIExpc3Q8U3RyaW5nPiwgTWF4RGF5cyBJbnRlZ2VyKToKICAiSGFzTWVkaWNhdGlvblBsYW5EdXJhdGlvbldpdGhpbiIoRHJ1Z0NvZGVzLCBNYXhEYXlzKQoKZGVmaW5lIGZ1bmN0aW9uICJIYXNEYWlseURvc2VBdE1vc3QiKERydWdDb2RlcyBMaXN0PFN0cmluZz4sIE1heFZhbHVlIERlY2ltYWwsIFVuaXRDb2RlIFN0cmluZywgVGltaW5nQ29kZSBTdHJpbmcpOgogIGV4aXN0cyAoCiAgICBbTWVkaWNhdGlvblJlcXVlc3RdIE1SCiAgICB3aGVyZSAiSXNNZWRpY2F0aW9uUGxhbiIoTVIsIERydWdDb2RlcykKICAgICAgYW5kIGV4aXN0cyAoCiAgICAgICAgTVIuZG9zYWdlSW5zdHJ1Y3Rpb24gREkKICAgICAgICB3aGVyZSBleGlzdHMgKAogICAgICAgICAgREkudGltaW5nLmNvZGUuY29kaW5nIEMKICAgICAgICAgIHdoZXJlIEMuY29kZSA9IFRpbWluZ0NvZGUKICAgICAgICApCiAgICAgICAgYW5kIGV4aXN0cyAoCiAgICAgICAgICBESS5kb3NlQW5kUmF0ZSBEUgogICAgICAgICAgd2hlcmUgKERSLmRvc2UgYXMgRkhJUi5TaW1wbGVRdWFudGl0eSkgaXMgbm90IG51bGwKICAgICAgICAgICAgYW5kIChEUi5kb3NlIGFzIEZISVIuU2ltcGxlUXVhbnRpdHkpLnZhbHVlIDw9IE1heFZhbHVlCiAgICAgICAgICAgIGFuZCAoRFIuZG9zZSBhcyBGSElSLlNpbXBsZVF1YW50aXR5KS5jb2RlID0gVW5pdENvZGUKICAgICAgICApCiAgICAgICkKICApCgovLyDmjIflrprol6XnianmiYDmnInnlLPoq4vnmYLnqIvlpKnmlbjliqDnuL3mmK/lkKbmnKrotoXpgY7kuIrpmZAKZGVmaW5lIGZ1bmN0aW9uICJIYXNNZWRpY2F0aW9uVG90YWxEdXJhdGlvbldpdGhpbiIoRHJ1Z0NvZGVzIExpc3Q8U3RyaW5nPiwgTWF4RGF5cyBJbnRlZ2VyKToKICBDb2FsZXNjZSgKICAgIFN1bSgKICAgICAgW01lZGljYXRpb25SZXF1ZXN0XSBNUgogICAgICB3aGVyZSBNUi5pbnRlbnQgPSAncGxhbicKICAgICAgICBhbmQgKE1SLnN0YXR1cyBpcyBudWxsIG9yIE1SLnN0YXR1cyBpbiB7ICdhY3RpdmUnLCAnY29tcGxldGVkJywgJ29uLWhvbGQnIH0pCiAgICAgICAgYW5kICJIYXNNZWRpY2F0aW9uQ29kZSIoTVIsIERydWdDb2RlcykKICAgICAgICBhbmQgIkhhc1ZhbGlkVGltaW5nIihNUikKICAgICAgcmV0dXJuCiAgICAgICAgZGlmZmVyZW5jZSBpbiBkYXlzIGJldHdlZW4gIkdldFN0YXJ0VGltZSIoTVIpCiAgICAgICAgICBhbmQgIkdldEVuZFRpbWUiKE1SKQogICAgKSwKICAgIDAKICApIDw9IE1heERheXMKCi8vIOaYr+WQpuacieWQjOiXpeeJqeWFiOWJjeeZgueoi+iIh+acrOasoeeZgueoi+mWk+malOi2hemBjuaMh+WumuWkqeaVuApkZWZpbmUgZnVuY3Rpb24gIkhhc1ByaW9yTWVkaWNhdGlvbkdhcExvbmdlclRoYW4iKEN1cnJlbnREcnVnQ29kZXMgTGlzdDxTdHJpbmc+LCBHYXBEYXlzIEludGVnZXIpOgogIGV4aXN0cyAoCiAgICBbTWVkaWNhdGlvblJlcXVlc3RdIEN1cnJlbnRNUgogICAgd2hlcmUgIklzTWVkaWNhdGlvblBsYW4iKEN1cnJlbnRNUiwgQ3VycmVudERydWdDb2RlcykKICAgICAgYW5kIGV4aXN0cyAoCiAgICAgICAgW01lZGljYXRpb25SZXF1ZXN0XSBQcmV2aW91c01SCiAgICAgICAgd2hlcmUgUHJldmlvdXNNUi5pZCAhPSBDdXJyZW50TVIuaWQKICAgICAgICAgIGFuZCAiSXNNZWRpY2F0aW9uUGxhbiIoUHJldmlvdXNNUiwgQ3VycmVudERydWdDb2RlcykKICAgICAgICAgIGFuZCAiR2V0RW5kVGltZSIoUHJldmlvdXNNUikgPCAiR2V0U3RhcnRUaW1lIihDdXJyZW50TVIpCiAgICAgICAgICBhbmQgZGlmZmVyZW5jZSBpbiBkYXlzIGJldHdlZW4gIkdldEVuZFRpbWUiKFByZXZpb3VzTVIpCiAgICAgICAgICAgICAgYW5kICJHZXRTdGFydFRpbWUiKEN1cnJlbnRNUikgPiBHYXBEYXlzCiAgICAgICkKICApCg=="
+  }
+ ]
+}

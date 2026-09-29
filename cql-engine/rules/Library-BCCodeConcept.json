@@ -1,0 +1,859 @@
+{
+ "resourceType": "Library",
+ "id": "BCCodeConcept",
+ "text": {
+  "status": "extensions",
+  "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">\n  <table class=\"narrative-table\">\n    <tbody>\n<tr>\n\n\n<th colspan=\"2\" scope=\"row\" class=\"row-header\">Metadata</th>\n\n\n</tr>\n\n<tr>\n\n\n<th scope=\"row\" class=\"row-header\">Title</th>\n\n\n\n<td class=\"content-container\">乳癌代碼集-BCCodeConcept</td>\n\n\n</tr>\n\n\n\n<tr>\n\n\n<th scope=\"row\" class=\"row-header\">Version</th>\n\n\n\n<td class=\"content-container\">1.0.0</td>\n\n\n</tr>\n\n\n\n\n\n\n\n\n\n\n\n\n<tr>\n\n\n<th scope=\"row\" class=\"row-header\">Status</th>\n\n\n\n<td class=\"content-container\">Draft</td>\n\n\n</tr>\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n<tr>\n\n\n<th scope=\"row\" class=\"row-header\">Description</th>\n\n\n\n<td class=\"content-container\"><div><p>此 Library 為乳癌藥事前審查使用之代碼集。</p>\n</div></td>\n\n\n</tr>\n\n\n\n\n\n\n<tr>\n\n\n<th scope=\"row\" class=\"row-header\">Type</th>\n\n\n\n<td class=\"content-container\">\n    logic-library from <a href=\"http://terminology.hl7.org/7.4.0/CodeSystem-library-type.html\">http://terminology.hl7.org/CodeSystem/library-type</a> \n\n\n</td>\n\n\n</tr>\n\n\n\n<tr>\n  \n  \n  \n  \n  \n\n<th scope=\"row\" class=\"row-header\">Dependency</th>\n\n\n  \n  \n  <td class=\"content-container\">\n    \n    <em>Description</em>: Code System SNOMED\n    \n    <br/>\n    \n    \n    \n    \n    \n    \n    \n    \n    <em>Resource</em>: <a href=\"http://snomed.info/sct\">http://snomed.info/sct</a>\n    \n    <br/>\n    <em>Canonical URL</em>: <tt>http://snomed.info/sct</tt>\n    \n    \n    \n  </td>\n</tr>\n\n<tr>\n  \n  \n  \n  \n  \n\n<th scope=\"row\" class=\"row-header\">Dependency</th>\n\n\n  \n  \n  <td class=\"content-container\">\n    \n    <em>Description</em>: Code System LOINC\n    \n    <br/>\n    \n    \n    \n    \n    \n    \n    \n    \n    <em>Resource</em>: <a href=\"http://loinc.org\">http://loinc.org</a>\n    \n    <br/>\n    <em>Canonical URL</em>: <tt>http://loinc.org</tt>\n    \n    \n    \n  </td>\n</tr>\n\n<tr>\n  \n  \n  \n  \n  \n\n<th scope=\"row\" class=\"row-header\">Dependency</th>\n\n\n  \n  \n  <td class=\"content-container\">\n    \n    <em>Description</em>: Code System InterpretationCodes\n    \n    <br/>\n    \n    \n    \n    \n    \n    \n    \n    \n    <em>Resource</em>: <a href=\"http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation\">http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation</a>\n    \n    <br/>\n    <em>Canonical URL</em>: <tt>http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation</tt>\n    \n    \n    \n  </td>\n</tr>\n\n<tr>\n  \n  \n  \n  \n  \n\n<th scope=\"row\" class=\"row-header\">Dependency</th>\n\n\n  \n  \n  <td class=\"content-container\">\n    \n    <em>Description</em>: Code System NHILOT\n    \n    <br/>\n    \n    \n    \n    \n    \n    \n    \n    \n    <em>Resource</em>: <a href=\"https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-line-of-therapy\">https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-line-of-therapy</a>\n    \n    <br/>\n    <em>Canonical URL</em>: <tt>https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-line-of-therapy</tt>\n    \n    \n    \n  </td>\n</tr>\n\n<tr>\n  \n  \n  \n  \n  \n\n<th scope=\"row\" class=\"row-header\">Dependency</th>\n\n\n  \n  \n  <td class=\"content-container\">\n    \n    <em>Description</em>: Code System NHIMedication\n    \n    <br/>\n    \n    \n    \n    \n    \n    \n    \n    \n    <em>Resource</em>: <a href=\"https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-medication\">https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-medication</a>\n    \n    <br/>\n    <em>Canonical URL</em>: <tt>https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-medication</tt>\n    \n    \n    \n  </td>\n</tr>\n\n<tr>\n  \n  \n  \n  \n  \n\n<th scope=\"row\" class=\"row-header\">Dependency</th>\n\n\n  \n  \n  <td class=\"content-container\">\n    \n    <em>Description</em>: Code System NHIOrderType\n    \n    <br/>\n    \n    \n    \n    \n    \n    \n    \n    \n    <em>Resource</em>: <a href=\"https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-order-type\">https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-order-type</a>\n    \n    <br/>\n    <em>Canonical URL</em>: <tt>https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-order-type</tt>\n    \n    \n    \n  </td>\n</tr>\n\n<tr>\n  \n  \n  \n  \n  \n\n<th scope=\"row\" class=\"row-header\">Dependency</th>\n\n\n  \n  \n  <td class=\"content-container\">\n    \n    <em>Description</em>: Code System NHIContinuationStatus\n    \n    <br/>\n    \n    \n    \n    \n    \n    \n    \n    \n    <em>Resource</em>: <a href=\"https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-continuation-status\">https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-continuation-status</a>\n    \n    <br/>\n    <em>Canonical URL</em>: <tt>https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-continuation-status</tt>\n    \n    \n    \n  </td>\n</tr>\n\n<tr>\n  \n  \n  \n  \n  \n\n<th scope=\"row\" class=\"row-header\">Dependency</th>\n\n\n  \n  \n  <td class=\"content-container\">\n    \n    <em>Description</em>: Code System NHITreatmentAst\n    \n    <br/>\n    \n    \n    \n    \n    \n    \n    \n    \n    <em>Resource</em>: <a href=\"https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-tx-ast\">https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-tx-ast</a>\n    \n    <br/>\n    <em>Canonical URL</em>: <tt>https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-tx-ast</tt>\n    \n    \n    \n  </td>\n</tr>\n\n<tr>\n  \n  \n  \n  \n  \n\n<th scope=\"row\" class=\"row-header\">Dependency</th>\n\n\n  \n  \n  <td class=\"content-container\">\n    \n    <em>Description</em>: Code System NHIPASSupportingInfoType\n    \n    <br/>\n    \n    \n    \n    \n    \n    \n    \n    \n    <em>Resource</em>: <a href=\"https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-supporting-info-type\">https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-supporting-info-type</a>\n    \n    <br/>\n    <em>Canonical URL</em>: <tt>https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-supporting-info-type</tt>\n    \n    \n    \n  </td>\n</tr>\n\n<tr>\n  \n  \n  \n  \n  \n\n<th scope=\"row\" class=\"row-header\">Dependency</th>\n\n\n  \n  \n  <td class=\"content-container\">\n    \n    <em>Description</em>: Code System NHIApplyReason\n    \n    <br/>\n    \n    \n    \n    \n    \n    \n    \n    \n    <em>Resource</em>: <a href=\"https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-apply-reason\">https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-apply-reason</a>\n    \n    <br/>\n    <em>Canonical URL</em>: <tt>https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-apply-reason</tt>\n    \n    \n    \n  </td>\n</tr>\n\n<tr>\n  \n  \n  \n  \n  \n\n<th scope=\"row\" class=\"row-header\">Dependency</th>\n\n\n  \n  \n  <td class=\"content-container\">\n    \n    <em>Description</em>: Code System ICD10CM2023\n    \n    <br/>\n    \n    \n    \n    \n    \n    \n    \n    \n    <em>Resource</em>: <a href=\"https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-cm-2023-tw\">https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-cm-2023-tw</a>\n    \n    <br/>\n    <em>Canonical URL</em>: <tt>https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-cm-2023-tw</tt>\n    \n    \n    \n  </td>\n</tr>\n\n<tr>\n  \n  \n  \n  \n  \n\n<th scope=\"row\" class=\"row-header\">Dependency</th>\n\n\n  \n  \n  <td class=\"content-container\">\n    \n    <em>Description</em>: Code System ICD10CM2014\n    \n    <br/>\n    \n    \n    \n    \n    \n    \n    \n    \n    <em>Resource</em>: <a href=\"https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-cm-2014-tw\">https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-cm-2014-tw</a>\n    \n    <br/>\n    <em>Canonical URL</em>: <tt>https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-cm-2014-tw</tt>\n    \n    \n    \n  </td>\n</tr>\n\n<tr>\n  \n  \n  \n  \n  \n\n<th scope=\"row\" class=\"row-header\">Dependency</th>\n\n\n  \n  \n  <td class=\"content-container\">\n    \n    <em>Description</em>: Code System ICD10PCS2023Image\n    \n    <br/>\n    \n    \n    \n    \n    \n    \n    \n    \n    <em>Resource</em>: <a href=\"https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-pcs-2023-tw\">https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-pcs-2023-tw</a>\n    \n    <br/>\n    <em>Canonical URL</em>: <tt>https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-pcs-2023-tw</tt>\n    \n    \n    \n  </td>\n</tr>\n\n<tr>\n  \n  \n  \n  \n  \n\n<th scope=\"row\" class=\"row-header\">Dependency</th>\n\n\n  \n  \n  <td class=\"content-container\">\n    \n    <em>Description</em>: Code System ICD10PCS2014Image\n    \n    <br/>\n    \n    \n    \n    \n    \n    \n    \n    \n    <em>Resource</em>: <a href=\"https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-pcs-2014-tw\">https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-pcs-2014-tw</a>\n    \n    <br/>\n    <em>Canonical URL</em>: <tt>https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-pcs-2014-tw</tt>\n    \n    \n    \n  </td>\n</tr>\n\n\n\n\n\n\n\n\n\n\n  <tr>\n\n\n<th colspan=\"2\" scope=\"row\" class=\"row-header\">Library Content</th>\n\n\n</tr>\n  \n    \n    <tr>\n      <th scope=\"row\" class=\"row-header\">CQL Content</th>\n      <td>\n        <a name=\"cql-content\"> </a>\n        <pre style=\"border: none;\" class=\"content-container highlight language-cql\"><code class=\"language-cql\">library BCCodeConcept version '1.0.0'\n\nusing FHIR version '4.0.1'\n\n//專門術語--------------------\n\n/*國際標準碼*/\ncodesystem &quot;SNOMED&quot;: 'http://snomed.info/sct'\ncodesystem &quot;LOINC&quot;: 'http://loinc.org'\ncodesystem &quot;InterpretationCodes&quot;: 'http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation'\n\n\n/*TWNHI Pas*/\ncodesystem &quot;NHILOT&quot;: 'https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-line-of-therapy'\ncodesystem &quot;NHIMedication&quot;: 'https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-medication'\ncodesystem &quot;NHIOrderType&quot;: 'https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-order-type'\ncodesystem &quot;NHIContinuationStatus&quot;: 'https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-continuation-status'\ncodesystem &quot;NHITreatmentAst&quot;: 'https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-tx-ast'\ncodesystem &quot;NHIPASSupportingInfoType&quot;: 'https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-supporting-info-type'\ncodesystem &quot;NHIApplyReason&quot;: 'https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-apply-reason'\n\n\n\n/*TW Core*/\ncodesystem &quot;ICD10CM2023&quot;: 'https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-cm-2023-tw'\ncodesystem &quot;ICD10CM2014&quot;: 'https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-cm-2014-tw'\ncodesystem &quot;ICD10PCS2023Image&quot;: 'https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-pcs-2023-tw'\ncodesystem &quot;ICD10PCS2014Image&quot;: 'https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-pcs-2014-tw'\n\n\n//代碼列表定義--------------------\n\n//ICD_BC\ndefine &quot;ICDBC&quot;: { 'C50' }\n\ndefine &quot;ICDBCandTumor&quot;: { 'C77', 'C78', 'C79' }\n\n//註記\ndefine &quot;續用註記為1&quot;: { '1' } \n\ndefine &quot;續用註記為2&quot;: { '2' } \n\ndefine &quot;醫令類別&quot;: { '1' } \n\n/*檢驗檢查LOINC碼*/\n\n//Estrogen Receptor，ER (雌激素受體)檢驗LOINC碼\ndefine &quot;ER&quot;: { '14130-9', '16112-5', '40556-3', '85310-1', '85337-4' }\n\n//Progesterone Receptor，PR (黃體素受體)檢驗LOINC碼\ndefine &quot;PR&quot;: { '10861-3', '16113-3', '31207-4', '40557-1', '85331-7', '85339-0' }\n\n// Molecular ER（8 codes）\ndefine &quot;MolecularER&quot;: {\n  '14130-9', '14228-1', '16112-5', '40556-3',\n  '85310-1', '85329-1', '85337-4', '10480-2'\n}\n\n// Molecular PR（9 codes）\ndefine &quot;MolecularPR&quot;: {\n  '10480-2', '10861-3', '14230-7', '16113-3', '31207-4',\n  '40557-1', '85325-9', '85331-7', '85339-0'\n}\n\n//HER2\ndefine &quot;HER2&quot;: { '18474-7', '32996-1', '42914-2', '48676-1', '51981-9', '72382-5', '72383-3', '85319-2', '85328-3' }\n\n\n//HER2弱陽性\ndefine &quot;HER2弱陽性&quot;: { '31150-6', '42783-1', '49683-6', '74860-8', '74885-5', '85318-4', '85328-3', '96893-3' }\n\n\n//BRCA 1/2\ndefine &quot;BRCA1or2&quot;: {\n  '21636-6', '21637-4', '21638-2', '21639-0', '21640-8',\n  '38530-2', '38531-0', '50995-0', '59041-4',\n  '79207-7', '79208-5', '94191-4'\n}\n\n//檢查報告\ndefine &quot;DiagnosticReportCode&quot;: { '66112-4' }\n\ndefine &quot;pALNReport&quot;: { '66110-8', '66121-5', '47530-1', '47521-0' }\n\ndefine &quot;MolecularReport&quot;: { '66110-8', '47530-1', '47521-0' }\n\n// FSH（Follicle Stimulating Hormone）（9 codes）\ndefine &quot;FSH&quot;: {\n  '83098-4', '100794-7', '15067-2', '15068-0', '20433-9',\n  '25639-6', '27203-9', '34306-1', '34549-6'\n}\n\n// Estradiol（9 codes）\ndefine &quot;Estradiol&quot;: {\n  '12595-5', '14715-7', '21263-9',\n  '123544', '123850', '125370', '126254',\n  '25401-1', '31176-1'\n}\n\n// GOT（21 codes）\ndefine &quot;GOT&quot;: {\n  '100739-2', '14409-7', '14410-5', '14411-3', '14412-1', '14413-9', '14414-7',\n  '16412-9', '5997', '6301', '6607', '1919-0', '7519', '27344-1', '30239-8',\n  '43822-6', '44786-2', '48136-6', '54500-4', '88112-8', '96587-1'\n}\n\n// GPT（16 codes）\ndefine &quot;GPT&quot;: {\n  '100738-4', '16324-6', '16325-3', '1741-8', '1742-6', '1743-4', '1744-2',\n  '25302-1', '44785-4', '48134-1', '50168-4', '54491-6', '54492-4',\n  '76625-3', '77144-4', '96586-3'\n}\n\n// Tbilirubin (48 codes）\ndefine &quot;Tbilirubin&quot;: {\n  '12476-8', '13877-6', '14420-4', '14421-2', '14422-0', '14423-8', '14424-6',\n  '14631-6', '25324', '26543', '26846', '27150', '27426', '1976-0', '28338',\n  '28642', '20505-4', '27198-1', '29767-1', '32303-0', '33870-7', '39461-9',\n  '41016-7', '42719-5', '43824-2', '43887-9', '44033-9', '47225-8', '47994-9',\n  '48624-1', '49763-6', '50551-1', '53327-3', '53415-6', '54362-9', '54363-7',\n  '1413550', '59166-9', '59827-6', '59828-4', '68367-2', '70199-5', '72925-1',\n  '74434-2', '74906-9', '77137-8', '89871-8', '89872-6', '97770-2'\n}\n\n// Creatinine（71 codes）\ndefine &quot;Creatinine&quot;: {\n  '101475-2', '14682-9', '21232-4', '2160-0', '38483-4', '44784-7', '59826-8',\n  '77140-2', '96590-5', '33914-3', '45066-8', '12190-5', '12191-3', '12584-9',\n  '12585-6', '12586-4', '12587-2', '12588-0', '12589-8', '14398-2', '14399-0',\n  '14401-4', '14402-2', '14681-1', '14683-7', '14684-5', '15050-8', '15051-6',\n  '16689-2', '16690-0', '20511-2', '20624-3', '94631', '95543', '95847',\n  '22726-4', '25386-4', '25886-3', '30002-0', '30004-6', '31101-9', '32543-1',\n  '33798-0', '35262-5', '35674-1', '39471-8', '39472-6', '39473-4', '39474-2',\n  '40356-8', '40357-6', '47610-1', '48790-0', '49004-5', '51592-4', '53120-2',\n  '53499-0', '54375-1', '55593-8', '57344-4', '57346-9', '57726-2', '58998-6',\n  '1468062', '60518-8', '72821-2', '75363-2', '93733-4', '93734-2', '93735-9',\n  '94844-8', '99384-0'\n}\n\n\ndefine &quot;eGFR&quot;:{'33914-3', '45066-8'}\n\n\n//GeneTest\ndefine &quot;LarotrectinibGeneTest&quot;: { '93813-4', '105596-1' }\n\n\n/*影像代碼*/\n\n//影像檢查\ndefine &quot;ImageCodes&quot;: {\n  'BH00ZZZ', 'BH01ZZZ', 'BH02ZZZ', 'BH03ZZZ', 'BH04ZZZ', 'BH05ZZZ', 'BH06ZZZ',\n  'BH30ZZZ', 'BH31ZZZ', 'BH32ZZZ', 'BH40ZZZ', 'BH41ZZZ', 'BH42ZZZ', '26029B', \n  'B020ZZZ', 'BF25ZZZ', 'BF2CZZZ', 'BF26ZZZ', 'BB24ZZZ', 'BB14ZZZ', 'BW24ZZZ', \n  'BW25ZZZ', 'BW20ZZZ', 'BW21ZZZ', 'BW30ZZZ', 'B030ZZZ', 'BF35ZZZ', 'BF36ZZZ',\n  'BW00ZZZ', 'BW01ZZZ', 'BW40ZZZ', 'BW41ZZZ', 'BW03ZZZ','BW28ZZZ', 'BW29ZZZ',\n  'BW2FZZZ', 'BW2GZZZ', 'BW38ZZZ', 'BW3FZZZ', 'BW3GZZZ', 'BW3HZZZ', 'BW3PZZZ',\n  'B00BZZZ', 'B01BZZZ', 'B027ZZZ', 'B028ZZZ', 'B029ZZZ', 'B02BZZZ', 'B039ZZZ', \n  'B03BZZZ', 'B03CZZZ', 'BH30Y0Z', 'BH30YZZ', 'BH31Y0Z', 'BH31YZZ', 'BH32Y0Z',\n  'BH32YZZ', 'CH101ZZ', 'CH10SZZ', 'CH10YZZ', 'CH111ZZ', 'CH11SZZ', 'CH11YZZ',\n  'CH121ZZ', 'CH12SZZ', 'CH12YZZ', 'CH1YYZZ', 'CH201ZZ', 'CH20SZZ', 'CH20YZZ',\n  'CH211ZZ', 'CH21SZZ', 'CH21YZZ', 'CH221ZZ', 'CH22SZZ', 'CH22YZZ', 'CH2YYZZ',\n  'BH030ZZ', 'BH031ZZ', 'BH03YZZ', 'BH040ZZ', 'BH041ZZ', 'BH04YZZ', 'BH050ZZ', \n  'BH051ZZ', 'BH05YZZ', 'BH060ZZ', 'BH061ZZ', 'BH06YZZ'\n}\n\ndefine &quot;ProcedureCodes&quot;: {\n  '07B50ZX', '07B50ZZ', '07B60ZX', '07B60ZZ', '07T50ZZ', '07T60ZZ',\n  '07T70ZZ', '07T80ZZ', '07T90ZZ', '0H5W0ZZ', '0H5W3ZZ', '0H5W7ZZ',\n  '0H5W8ZZ', '0H5WXZZ', '0H5X0ZZ', '0H5X3ZZ', '0H5X7ZZ', '0H5X8ZZ',\n  '0H5XXZZ', '0H9T0ZX', '0H9U0ZX', '0H9V0ZX', '0H9W0ZX', '0H9X0ZX',\n  '0HBT0ZX', '0HBT0ZZ', '0HBT3ZZ', '0HBT7ZZ', '0HBT8ZZ', '0HBU0ZX',\n  '0HBU0ZZ', '0HBU3ZZ', '0HBU7ZZ', '0HBU8ZZ', '0HBV0ZX', '0HBV0ZZ',\n  '0HBV3ZZ', '0HBV7ZZ', '0HBV8ZZ', '0HBW0ZX', '0HBW0ZZ', '0HBW3ZZ',\n  '0HBW7ZZ', '0HBW8ZZ', '0HBWXZZ', '0HBX0ZX', '0HBX0ZZ', '0HBX3ZZ',\n  '0HBX7ZZ', '0HBX8ZZ', '0HBXXZZ', '0HBY0ZX', '0HBY0ZZ', '0HBY3ZZ',\n  '0HBY7ZZ', '0HBY8ZZ', '0HRT0JZ', '0HTT0ZZ', '0HTU0ZZ', '0HTV0ZZ',\n  '0HTWXZZ', '0HTXXZZ', '0KTH0ZZ', '0KTJ0ZZ', '0HB5XZZ', '0HBT3ZX',\n  '0HBT7ZX', '0HBT8ZX', '0HBU3ZX', '0HBU7ZX', '0HBU8ZX', '0HBV3ZX', \n  '0HBV7ZX', '0HBV8ZX', '0HBW3ZX', '0HBW7ZX', '0HBW8ZX', '07B64ZX',\n  '0HBWXZX', '0HBX3ZX', '0HBX7ZX', '0HBX8ZX', '0HBXXZX', '0HDT0ZZ',\n  '0HDU0ZZ', '0HDV0ZZ', '0HDY0ZZ', '0HTY0ZZ', '07B63ZX', '07B63ZZ',\n  '07B53ZX', '07B53ZZ', '07B54ZX', '07B54ZZ', '07B64ZZ'\n}\n\n// Imaging_Procedure_Group\ndefine &quot;ProcedureCodes2&quot;: {\n  'BH30Y0Z', 'BH30YZZ', 'BH31Y0Z', 'BH31YZZ', 'BH32Y0Z', 'BH32YZZ',\n  'CH101ZZ', 'CH10SZZ', 'CH10YZZ', 'CH111ZZ', 'CH11SZZ', 'CH11YZZ',\n  'CH121ZZ', 'CH12SZZ', 'CH12YZZ', 'CH1YYZZ', 'CH201ZZ', 'CH20SZZ',\n  'CH20YZZ', 'CH211ZZ', 'CH21SZZ', 'CH21YZZ', 'CH221ZZ', 'CH22SZZ',\n  'CH22YZZ', 'CH2YYZZ', 'BH030ZZ', 'BH031ZZ', 'BH03YZZ', 'BH03ZZZ',\n  'BH040ZZ', 'BH041ZZ', 'BH04YZZ', 'BH050ZZ', 'BH051ZZ', 'BH05YZZ',\n  'BH060ZZ', 'BH061ZZ', 'BH06YZZ', 'BH00ZZZ', 'BH01ZZZ', 'BH02ZZZ', \n  'BH04ZZZ', 'BH05ZZZ', 'BH06ZZZ', 'BH30ZZZ', 'BH31ZZZ', 'BH32ZZZ',\n  'BH40ZZZ', 'BH41ZZZ', 'BH42ZZZ'\n}\n\n\n// Right Ovary（5 codes）\ndefine &quot;RightOvary&quot;: {\n  '0UT00ZZ', '0UT04ZZ', '0UT07ZZ', '0UT08ZZ', '0UT0FZZ'\n}\n\n// Left Ovary（5 codes）\ndefine &quot;LeftOvary&quot;: {\n  '0UT10ZZ', '0UT14ZZ', '0UT17ZZ', '0UT18ZZ', '0UT1FZZ'\n}\n\n// Bilateral Ovaries（5 codes）\ndefine &quot;BilateralOvaries&quot;: {\n  '0UT20ZZ', '0UT24ZZ', '0UT27ZZ', '0UT28ZZ', '0UT2FZZ'\n}\n\ndefine &quot;TrastuzumabDeruxtecanIMG&quot;:\n{'BH00ZZZ', 'BH01ZZZ', 'BH02ZZZ', 'BH03ZZZ', 'BH04ZZZ', 'BH05ZZZ', 'BH06ZZZ', 'BH30ZZZ', 'BH31ZZZ', 'BH32ZZZ', 'BH40ZZZ', 'BH41ZZZ', 'BH42ZZZ'}\n\n\n/// 26029B 此欄位不能填寫健保代碼\ndefine &quot;EverolimusImage&quot;: { \n  'B00BZZZ', 'B01BZZZ', 'B020ZZZ', 'B02BZZZ', 'B030ZZZ', 'B03BZZZ', 'BD13ZZZ', 'BD14ZZZ', 'BD16ZZZ', \n  'BD19ZZZ', 'BD24ZZZ', 'BD47ZZZ', 'BD49ZZZ', 'BD4CZZZ', 'BW00ZZZ', 'BW01ZZZ', 'BW03ZZZ', 'BW20ZZZ', \n  'BW21ZZZ', 'BW24ZZZ', 'BW25ZZZ', 'BW28ZZZ', 'BW29ZZZ', 'BW2FZZZ', 'BW2GZZZ', 'BW30ZZZ', 'BW38ZZZ', \n  'BW3FZZZ', 'BW3GZZZ', 'BW3HZZZ', 'BW3PZZZ', 'BW40ZZZ', 'CD171ZZ', 'CD17DZZ', 'CD17YZZ', 'CD271ZZ', \n  'CD27DZZ', 'CD27YZZ' }\n\ndefine &quot;IREC疾病狀態評估&quot;: { 'IREC' } \n\n\n/*藥物成份*/\n\n/*ATC Code to NHI Code*/\n\n//乳癌============================\n\n// Abemaciclib（4 codes）\ndefine &quot;L01EF03&quot;: {'BC27640100', 'BC27641100', 'BC27642100', 'BC27643100'}\n\n// Fulvestrant（1 code）\ndefine &quot;L02BA03&quot;: {'AC61825221'}\n\n// Tamoxifen（24 codes）\ndefine &quot;L02BA01&quot;: {\n  'AC44672100', 'A044672100', 'B015429100', 'B015682100', 'B011323100',\n  'B018791100', 'B018567100', 'B018568100', 'A036400100', 'B022154100',\n  'B016717100', 'B015880100', 'B016153100', 'B024085100', 'B024086100',\n  'B022123100', 'B021761100', 'B021762100', 'B005588100', 'BC15880100',\n  'BC22154100', 'BC16717100', 'B021230100', 'B021229100'\n}\n\n// Anastrozole（20 codes）\ndefine &quot;L02BG03&quot;: {\n  'AC48909100', 'AC55555100', 'AB47539100', 'AB48909100', 'AB55555100',\n  'AC56730100', 'A047539100', 'AA55555100', 'A048909100', 'AC47539100',\n  'BC25251100', 'BC25288100', 'BB25535100', 'BB26515100', 'B022282100',\n  'BC27015100', 'BC22282100', 'B025251100', 'B025288100', 'B025535100'\n}\n\n// Letrozole（17 codes）\ndefine &quot;L02BG04&quot;: {\n  'AC57732100', 'B025143100', 'AC58819100', 'B026127100', 'BA26108100',\n  'BA26206100', 'B022462100', 'BC22462100', 'BC25143100', 'BC28712100',\n  'BC26206100', 'BC26564100', 'BC26313100', 'BC26581100', 'BC26127100',\n  'BD26108100', 'BC27448100'\n  }\n\n// Exemestane（5 codes）\ndefine &quot;L02BG06&quot;: {'BC26224100', 'BC26641100', 'BC26791100', 'B023097100', 'BC23097100'}\n\ndefine &quot;L02BG&quot;:\nL02BG03\nunion L02BG04\nunion L02BG06\n\n// doxorubicin（36 codes）\ndefine &quot;L01DB01&quot;: {\n  'B020335240', 'B019117248', 'A036418229', 'A041037229', 'BB26026229',\n  'B018174248', 'AA36418229', 'AB41037229', 'AC41037229', 'B021718229',\n  'B018580229', 'B018580299', 'B019117221', 'BB26026221', 'B025840221',\n  'BB26026240', 'BB26026248', 'AC61125229', 'B021718221', 'B022175229',\n  'B021718240', 'AC61132229', 'B019443248', 'B019444229', \n  'B025840240', 'B020335221', 'B020335229', 'B022174248', \n  'BC22712221', 'B021576221', 'B022207229', 'BC18580229',\n  'B021576240', 'B021576248', 'B018174229', 'B012027229'\n}\n\n// cyclophosphamide（19 codes）\ndefine &quot;L01AA01&quot;: {\n  'B013563277', 'B013680263', 'B013687255', 'B012601100', 'B016501263',\n  'B016517255', 'B016754100', 'B006463255', 'B006465277', 'B016870277',\n  'B017105209', 'B006915100', 'BC16754100', 'B021304209', 'B021304263',\n  'B021304277', 'BC12601100', 'BC21304263', 'BC21304277'\n}\n\n// docetaxel（50 codes）\ndefine &quot;L01CD02&quot;: {\n  'AC57240209', 'AC57240219', 'A047882206', 'A047882212', 'AA55113206',\n  'AA55113212', 'AA56672206', 'AB58065209', 'AB47882206', 'AC58581209',\n  'AC58581219', 'AB47882212', 'AC58065209', 'AC58066209', 'AC57971209',\n  'AC58066219', 'AA56672212', 'AC61087209', 'AB55113206', 'AC57971219',\n  'AB55113212', 'AB56672206', 'AB56672212', 'AB57240209', 'AB57240219',\n  'AC58581223', 'B025055206', 'B025055212', 'B025558212', 'B022048206',\n  'B022048212', 'B025558226', 'BB25600212', 'BC25289209', 'BC25289219',\n  'BB25600226', 'B025289209', 'B025289219', 'BC27525209', 'BC27525219',\n  'BC26334219', 'BC27138206', 'BC27138212', 'BC25558212', 'BC25558226',\n  'BC27786209', 'BC27786219', 'BC27712209', 'BC27712219', 'BC26334209'\n}\n\n// methotrexate（9 codes）\ndefine &quot;L04AX03&quot;: {\n  'A009101100', 'A025520100', 'B020440100', 'B022726100', 'B016194100',\n  'B016195100', 'BC16194100', 'BC22726100', 'BC26334209'\n}\n\n// methotrexate（55 codes）\ndefine &quot;L01BA01&quot;: {\n  'A008260212', 'B020564212', 'B020643229', 'B020643248', 'B009144209',\n  'B013232299', 'B011734212', 'B011734248', 'B018876221', 'B011770212',\n  'B018876229', 'B018876248', 'B020808212', 'B018878221', 'B020808238',\n  'B013232229', 'B021696212', 'B019712238', 'B021713229', 'B015981212',\n  'B015981226', 'B015983212', 'AC59414212', 'AC59414226', 'AC59414238',\n  'B008678214', 'B008859212', 'B008859238', 'B017549212', 'B017549245',\n  'B021722212', 'B017551245', 'AC59414245', 'B016410248', 'B008859240',\n  'B008859245', 'B008859263', 'B021722238', 'B022132229', 'B016419240',\n  'B019707229', 'B019707299', 'B019712212', 'BC22132229', 'B021688212',\n  'B021051248', 'BC21713229', 'BC18876221', 'BC18876229', 'BC18876248',\n  'BC18878221', 'BC21696212', 'X000236212', 'X000115221', 'X000119238'\n}\n\n// fluorouracil（49 codes）\ndefine &quot;L01BC02&quot;: {\n  'A009964221', 'AC58033238', 'AC58033248', 'AC58033255', 'B020406229',\n  'B020406238', 'B020406255', 'AA58033238', 'AA58033248', 'AA58033255',\n  'B013291221', 'B013603221', 'B020793229', 'B020807221', 'B020807229',\n  'B020807238', 'B011924200', 'B019186221', 'B019186229', 'B021720229',\n  'B021720238', 'B021720255', 'AC58842238', 'B023404221', 'B023404229',\n  'B023404238', 'B021689221', 'B021689229', 'B021689248', 'B021121221',\n  'BC26372221', 'BC26372229', 'BC21689221', 'BC21689229', 'BC21689248',\n  'BC23404221', 'BC23404229', 'BC23404238', 'BC26676229', 'BC26676238',\n  'BC26676255', 'BC27435221', 'BC27435229', 'BC27435238', 'BC27435248',\n  'BC27435255', 'X000124255', 'B017460338', 'B023514338'\n}\n\n// tegafur（12 codes）\ndefine &quot;L01BC53&quot;: {\n  'A043698100', 'A049563100', 'AC43698100', 'AC49563100', 'B023484100',\n  'BC23484100', 'AC60480100', 'AC60482100', 'B025242100', 'B025243100',\n  'BC25242100', 'BC25243100'\n}\n\n\n// epirubicin（51 codes）\ndefine &quot;L01DB03&quot;: {\n  'A047552229', 'A047552240', 'A047557229', 'AB47003221', 'A048329248',\n  'AB47003229', 'AB47003240', 'AC47003221', 'AC47003240', 'A047003221',\n  'A047003229', 'A047003240', 'AB47557229', 'AC57985240', 'B019119248',\n  'B019120229', 'B019120248', 'AB48329248', 'AC57985221', 'B014605248',\n  'B014606229', 'AC57985229', 'B020982229', 'B020982240', 'B019120299',\n  'AC61126229', 'AC61129221', 'B025515221', 'B025515240', 'BC24427221',\n  'B025504221', 'B025504240', 'BB25968221', 'BC24427240', 'BB25968240',\n  'BC22695221', 'B024762221', 'B024762240', 'BC22695240', 'B024427221',\n  'B024427240', 'BC19119248', 'BC19120229', 'BC24762221', 'BC24762240',\n  'BC25515221', 'BC25515240', 'BC25968221', 'BC25968240', 'BC26699221',\n  'BC26699240'\n}\n\n// carboplatin（40 codes）\ndefine &quot;L01XA02&quot;: {\n  'AC57314235', 'AC573142AP', 'B020725235', 'B0207252AP', 'B018768248',\n  'B018768261', 'B018768272', 'B020966248', 'B020966261', 'B020966272',\n  'B018696248', 'B018696261', 'B018696272', 'B021701235', 'B024804235',\n  'B0248042AP', 'B0217012AP', 'B024074235', 'B0240742AP', 'B025626235',\n  'B0256262AP', 'B017782248', 'B017782261', 'B017782272', 'B021047221',\n  'B021047235', 'B0210472AP', 'BC25626235', 'BC256262AP', 'BC21701235',\n  'BC217012AP', 'B024591235', 'B0245912AP', 'BC240742AP', 'BC26387235',\n  'BC24074235', 'BC24804235', 'BC27083235', 'BC248042AP', 'BC270832AP'\n}\n\n// paclitaxel（81 codes）\ndefine &quot;L01CD01&quot;: { \n  'AC45331229', 'AC45331235', 'AC45331240', 'AC45331248', 'A044611221',\n  'AC453312E2', 'A044601221', 'A044601229', 'A0446012E2', 'A0446012FG', \n  'AB44466235', 'AB44466240', 'AB44466248', 'AC446012FG', 'A045331221',\n  'A045331229', 'A045331235', 'A045331240', 'A045331248', 'A0453312E2',\n  'A046429221', 'AB444662E2', 'AB444662FG', 'AC45331221', 'AC44601221',\n  'A044466221', 'AB44466221', 'AB44466229', 'AC44601229', 'A044466229',\n  'A044466235', 'A044466240', 'A044466248', 'AC44601240', 'A0444662E2',\n  'A0444662FG', 'B023396221', 'B023396240', 'B022400221', 'B022400240',\n  'B024463240', 'B024463248', 'B0244632E2', 'B024476221', 'BC24738221',\n  'BB21157221', 'B024476240', 'B024476248', 'B0244762E2', 'B024738221',\n  'B024738248', 'BB211572E2', 'B0247382BE', 'B0247382FG', 'B024463221',\n  'B021157221', 'B0211572E2', 'BC21157221', 'BC211572E2', 'BC24738248',\n  'BC247382BE', 'BC247382FG', 'BC28013221', 'BC280132E2', 'BC26484255',\n  'BC23396221', 'BC23396240', 'BC23396248', 'BC27504248', 'BC275042E2',\n  'BC233962E2', 'X000221255', 'BC27434240', 'BC27504221', 'X000222255',\n  'BC27434248', 'BC27434255', 'BC27434296', 'X000229255', 'BC274342E2',\n  'BC27434221'\n}\n\n\n// Goserelin（6 codes）\ndefine &quot;L02AE03&quot;: {\n  'B0221372CS', 'B019805209', 'B0198052CS',\n  'BC221372CS', 'B0222332D1', 'BC222332D1'\n}\n\n// Leuprorelin（15 codes）\ndefine &quot;L02AE02&quot;: {\n  'B018321215', 'A049838215', 'B0194932AA', 'B023360215', 'B0251932CN',\n  'B0259342AA', 'BC251932CN', 'BC26304225', 'BC283392AA', 'BC283402FQ',\n  'BC263052FQ', 'BC263062AP', 'BC25612243', 'BC194932AA', 'BC259342AA'\n}\n\n// Triptorelin（11 codes）\ndefine &quot;L02AE04&quot;: {\n  'B0233082AA', 'B0243822AA', 'BC208272AA', 'BC243822AA', 'B0208272AA',\n  'BC267042AA', 'BC267052CN', 'BC267062FQ', 'B0202062AA', 'B0245282CN',\n  'BC245282CN'\n}\n\n// CDK46抑制劑\n//Ribociclib（1 codes）\ndefine &quot;L01EF02&quot;: {'BC27320100'}\n\n//Palbociclib（3 codes）\ndefine &quot;L01EF01&quot;: {'BC27102100', 'BC27103100', 'BC27104100'}\n\n//Eribulin\ndefine &quot;L01XX41&quot;: { 'AC61399212', 'BC26140212' }\n\n//ixabepilone\ndefine &quot;L01DC04&quot;: { 'BC25053235', 'X000266235' }\n\n\n//Everolimus\ndefine &quot;L01EG02&quot;: {\n  'B025165100', 'B025166100', 'BC25165100', 'BC25166100',\n  'V000020100', 'V000021100', 'VC00020100', 'VC00021100'\n}\n\n//Everolimus\ndefine &quot;L04AH02&quot;: {\n  'B024770100', 'B024771100', 'B024772100',\n  'BC24770100', 'BC24771100', 'BC24772100'\n}\n\ndefine &quot;Everolimus&quot;:\nL01EG02 \nunion L04AH02\n\n\n//olaparib\ndefine &quot;L01XK01&quot;: {'BC27445100', 'BC27446100'}\n\n// L01BC06（11 codes）\ndefine &quot;L01BC06&quot;: {\n  'B022408100', 'B022409100', 'BC22408100', 'BC22409100', 'BC27165100',\n  'BC27166100', 'BC26960100', 'BC27195100', 'BC27229100', 'BC26914100',\n  'BC26757100'\n}\n\n// L01BC05（50 codes）\ndefine &quot;L01BC05&quot;: {\n  'A047872223', 'A047872243', 'A048080263', 'AB47872223', 'AC59784209',\n  'AC59784263', 'AB47872243', 'B025681209', 'B025681263', 'B021841209',\n  'AC58646209', 'AC58646263', 'B024846209', 'B024846263', 'B021841263',\n  'B023298263', 'AC61175263', 'B025183209', 'B025183212', 'B025183263',\n  'B025899221', 'B025899240', 'B025899248', 'B026065212', 'B026065263',\n  'BC25183209', 'BC25183263', 'BC25681209', 'BC25681263', 'B026065209',\n  'BB25183212', 'BB25183263', 'BC266272FS', 'BC23298263', 'BC24846263',\n  'BC27808221', 'BC27808240', 'BC27808248', 'BC266272AF', 'BC24846209',\n  'BC26065209', 'BC26065212', 'BC26065263', 'BC27106209', 'BC27106263',\n  'BC27468209', 'BC25899221', 'BC27468263', 'BC25899240', 'BC25899248'\n}\n\n// L01CA04（26 codes）\ndefine &quot;L01CA04&quot;: {\n  'AC60608100', 'AC60841100', 'AC60849100', 'B025898209', 'B025898221',\n  'B024268100', 'B024269100', 'BC24268100', 'BC24269100', 'B024472209',\n  'B024472221', 'B025489209', 'B025489221', 'BC22215209', 'BC22215221',\n  'B022215209', 'B022215221', 'BC24472209', 'BC24472221', 'BC25489209',\n  'BC25489221', 'X000217209', 'X000218100', 'X000225209', 'BC25898209',\n  'BC25898221'\n}\n\n//L01FD04\ndefine &quot;L01FD04&quot;: {'KC01179255'}\n\n// L01XA01（36 codes）\ndefine &quot;L01XA01&quot;: {\n  'B020937238', 'B018869238', 'B018873238', 'B018873255', 'B020937255',\n  'B020937263', 'B012020248', 'B012184229', 'B017805255', 'B021782248',\n  'B021782255', 'B022602238', 'B022602255', 'B024970255', 'B025744229',\n  'B025744248', 'B019333229', 'B019333248', 'B020193229', 'B020193263',\n  'B016417229', 'B017805238', 'B017805248', 'B021782229', 'B020221248',\n  'B024970238', 'BC24970238', 'BC24970255', 'BC25744229', 'BC25744248',\n  'BC21782248', 'BC21782255', 'BC18873238', 'BC18873255', 'BC27762229',\n  'BC27762248'\n}\n\n\n//talazoparib\ndefine &quot;L01XK04&quot;: {'BC27801100', 'BC27802100'}\n\ndefine &quot;L01XK&quot;:\nL01XK01\nunion L01XK04\nunion {'BC27764100', 'BC28651100'}\n\n//Pertuzumab\ndefine &quot;L01FD02&quot;: {'KC00942233'}\n\n//Pertuzumab與 trastuzumab 皮下注射複方製劑\ndefine &quot;L01FY01&quot;: {'KC01172235', 'KC01173229'}\n\n//Sacituzumab govitecan\ndefine &quot;L01FX17&quot;: {'KC01206262'}\n\n//Trastuzumab（12 codes）\ndefine &quot;L01FD01&quot;: {'K0006252B5', 'K000790261', 'K0009612B5', 'JC00154261',\n  'KC01065221', 'KC006252B5', 'KC009612B5', 'KC010892B5',\n  'KC011112DE', 'KC011162B5', 'KC011362B5', 'KC011592DE'\n}\n\ndefine &quot;L01FD01andL01FD02exceptKC011362B5&quot;: {'K0006252B5', 'K000790261', 'K0009612B5', 'JC00154261',\n  'KC01065221', 'KC006252B5', 'KC009612B5', 'KC010892B5','KC00942233',\n  'KC011112DE', 'KC011162B5', 'KC011592DE'\n}\n\n//Ogivri、Herzuma、Eirgasun、Herceptin、Kanjinti\ndefine &quot;Trastuzumab併用藥物&quot;: {'KC010892B5', 'KC011162B5', 'JC00154261', 'KC009612B5', 'KC01065221', 'KC011112DE'}\n\n//Trastuzumab emtansine\ndefine &quot;L01FD03&quot;: {'KC00949255', 'KC009492AX'}\n\n//Larotrectinib\ndefine &quot;L01EX12&quot;: {'BC27746148', 'BC27746155', 'BC27747100', 'BC27748100'}\n\ndefine &quot;L01EH01&quot;: {'B024878100', 'BC24878100'}\n\n// L01DB (123 codes）\ndefine &quot;L01DB&quot;: {\n  'AB47003240', 'A033445229', 'AB47557229', 'A048329248', 'A033445299',\n  'A047003221', 'AA36418229', 'AB47003221', 'AC47003221', 'AC47003240',\n  'A047003229', 'A036418229', 'A047003240', 'A047552229', 'A047552240',\n  'AB41037229', 'AC33445229', 'AC41037229', 'AB47003229', 'AB48329248',\n  'A047557229', 'A041037229', 'B018580229', 'B018580299', 'AC57985221',\n  'AC61125229', 'AC61126229', 'AC61129221', 'B019117248', 'B019119248',\n  'B019120229', 'B019120248', 'B024762221', 'B024762240', 'AC61132229',\n  'B017991229', 'B017991299', 'AC57985229', 'B019120299', 'B012027229',\n  'B018174229', 'B018174248', 'AC57985240', 'B013039238', 'B013059238',\n  'B014605248', 'B014606229', 'B014606299', 'B019117221', 'B011596238',\n  'B025504221', 'B025504240', 'B020883229', 'B022174248', 'B019443248',\n  'B019444229', 'B022175229', 'B024427221', 'B024427240', 'B022207229',\n  'B020335221', 'B020335229', 'B020335240', 'B020982229', 'B020982240',\n  'B021576221', 'B021790100', 'B021791100', 'B019845221', 'B021576240',\n  'B021576248', 'B021718221', 'B021718229', 'B021718240', 'BB25968221',\n  'BB26026221', 'BC21576221', 'BC21576240', 'BB26026229', 'BC19119248',\n  'BC19120229', 'BB26026240', 'BB26026248', 'BC22695221', 'BC13059238',\n  'BC22695240', 'BC22712221', 'BC21790100', 'B025515221', 'B025515240',\n  'BC19845221', 'BC24427221', 'BC25840221', 'BC24762221', 'BC24762240',\n  'B025840221', 'B025840240', 'BC24427240', 'BC18580229', 'BB25968240',\n  'BC23313221', 'BC26572221', 'BC26572240', 'BC25515221', 'BC25515240',\n  'BC25808221', 'BC25808229', 'BC25808240', 'BC26699221', 'BC26699240',\n  'BC27704221', 'BC27886229', 'BC25968221', 'BC25968240', 'BC26026221',\n  'BC26026229', 'BC26026240', 'BC26026248', 'X000300229', 'X000340229',\n  'BC27886240', 'X000146229', 'X000184229'\n}\n\n\n// L01CD（131 codes）\ndefine &quot;L01CD&quot;: {\n  'AB44466229', 'AB44466235', 'AB55113206', 'AB55113212',\n  'AB56672206', 'AB56672212', 'AB444662E2', 'AB444662FG',\n  'AC45331229', 'AC45331235', 'A045331221', 'A045331229',\n  'A045331235', 'A045331240', 'A044466221', 'A044466229',\n  'A044466235', 'A045331248', 'AB44466240', 'AB57240209',\n  'AA55113206', 'AA55113212', 'AB57240219', 'AC44601229',\n  'AC45331240', 'AC44601240', 'AC45331248', 'AC453312E2',\n  'A044466240', 'A0453312E2', 'A046429221', 'A044466248',\n  'A0444662E2', 'A0444662FG', 'AB58065209', 'AA56672206',\n  'AA56672212', 'AB47882206', 'AC446012FG', 'A044601221',\n  'A044601229', 'A0446012E2', 'AB44466248', 'AB44466221',\n  'AB47882212', 'AC45331221', 'A0446012FG', 'A044611221',\n  'A047882206', 'A047882212', 'AC44601221', 'AC57971219',\n  'AC58066209', 'AC58066219', 'AC61087209', 'AC58065209',\n  'AC57240209', 'B0247382BE', 'B0247382FG', 'AC57240219',\n  'AC57971209', 'AC58581209', 'AC58581219', 'AC58581223',\n  'B022048206', 'B022048212', 'B022400221', 'B022400240',\n  'B024463221', 'B025289209', 'B025055206', 'B025055212',\n  'B021157221', 'B0211572E2', 'B025289219', 'B024463240',\n  'B024463248', 'B0244632E2', 'B024476221', 'B024476240',\n  'B024476248', 'B0244762E2', 'B024738221', 'B024738248',\n  'B023396221', 'BB25600212', 'BB25600226', 'B023396240',\n  'BC27504248', 'BC275042E2', 'BC27525209', 'BC25289209',\n  'BC25289219', 'BC27525219', 'BC24738221', 'BC23396221',\n  'BC23396240', 'BC23396248', 'BC24738248', 'BC247382BE',\n  'BB21157221', 'BC247382FG', 'B025558212', 'BC233962E2',\n  'BC27504221', 'BB211572E2', 'B025558226', 'BC21157221',\n  'BC211572E2', 'BC27786209', 'BC27786219', 'BC26484255',\n  'BC27138206', 'BC27712219', 'BC27434221', 'BC27434240',\n  'BC27138212', 'BC26334209', 'BC26334219', 'BC27434248',\n  'BC27434255', 'BC27434296', 'BC274342E2', 'BC27712209',\n  'BC25558212', 'BC25558226', 'BC28013221', 'BC280132E2',\n  'X000221255', 'X000222255', 'X000229255'\n}\n\n// L01XA codes）\ndefine &quot;L01XA&quot;: {\n  'AB44508229', 'AB44508238', 'AC48561229', 'A048561229',\n  'A048561238', 'A048838229', 'AC48838229', 'A044508229',\n  'A044508238', 'AA44508229', 'AA44508238', 'AC44508229',\n  'AC44508238', 'AC58094229', 'B017782248', 'B017782261',\n  'B017782272', 'B017805238', 'B017805248', 'B016417229',\n  'B017805255', 'AC55934245', 'B020725235', 'B0207252AP',\n  'AC58094238', 'B021047235', 'B0210472AP', 'AC57314235',\n  'AC573142AP', 'AC58094245', 'B012020248', 'B012184229',\n  'AC60907229', 'AC60907238', 'B018696248', 'B018696261',\n  'B018696272', 'AC60917229', 'AC60917238', 'AC55934229',\n  'B018768248', 'B018768261', 'B018768272', 'B018869238',\n  'B018873238', 'B018873255', 'AC55934238', 'B020937238',\n  'B024906229', 'B024906238', 'B024906245', 'B024970238',\n  'B024970255', 'B019333229', 'B019333248', 'B020193229',\n  'B020193263', 'B024591235', 'B0245912AP', 'B020937255',\n  'B024804235', 'B0248042AP', 'B020937263', 'B024850248',\n  'B021782229', 'B021782248', 'B020221248', 'B021701235',\n  'B020966248', 'B020966261', 'B024850255', 'B024074235',\n  'B024981229', 'B020966272', 'B024981238', 'B0217012AP',\n  'B021782255', 'B024701248', 'B024701255', 'B0240742AP',\n  'B024897248', 'B024897255', 'B024906219', 'B021047221',\n  'BC24563229', 'BC24563238', 'BC24563245', 'B022568248',\n  'B022602238', 'B022602255', 'B024563229', 'B024563238',\n  'B024563245', 'BC24804235', 'BC248042AP', 'B025631238',\n  'B025654248', 'BC24701248', 'B025654255', 'BC24074235',\n  'BC240742AP', 'BC24701255', 'B025744229', 'B025744248',\n  'BC21701235', 'BC24850248', 'BC24850255', 'BC217012AP',\n  'BC21782248', 'BC21782255', 'BC25631229', 'BC25631238',\n  'BC25654248', 'BC25654255', 'B025626235', 'B0256262AP',\n  'B025631229', 'BC18873238', 'BC18873255', 'BC24970238',\n  'BC24970255', 'BC25626235', 'BC256262AP', 'BC26050229',\n  'BC26050238', 'BC27762229', 'BC27762248', 'BC25551229',\n  'BC25551238', 'BC27082229', 'BC27082238', 'BC27082245',\n  'BC25744229', 'BC25744248', 'BC26387235', 'BC27083235',\n  'BC270832AP'\n}\n\ndefine &quot;L01FFexceptL01FF02&quot;: { 'KC01013229', 'KC01050238', 'KC01013230', 'KC01085229', 'KC01088229', 'KC01258235' }\n\n\ndefine &quot;L01FF02&quot;: { 'KC01025219' }\n\ndefine &quot;內分泌療法藥物(tamoxifen或芳香環酶抑制劑)&quot;:\nL02BA01 \nunion L02BA03 \nunion L02BG03 \nunion L02BG04\nunion L02BG06\n\ndefine &quot;芳香環轉化酶抑制劑&quot;:\nL02BG03\nunion L02BG04\nunion L02BG06\n\ndefine &quot;GnRH analogue&quot;:\nL02AE03\nunion L02AE02\nunion L02AE04\n\ndefine &quot;標準之化學及放射輔助治療藥物&quot;:\nL01DB01\nunion L01AA01\nunion L01CD02\nunion L04AX03\nunion L01BA01\nunion L01BC02\nunion L01BC53\nunion L01DB03\nunion L01XA02\nunion L01CD01\n\ndefine &quot;內分泌治療藥物&quot;:\nL02BA01\nunion L02BA03\nunion L02BG03\nunion L02BG04\nunion L02BG06\nunion L02AE03\nunion L02AE02\nunion L02AE04\n\ndefine &quot;CDK46抑制劑&quot;:\nL01EF02 \nunion L01EF01\n\ndefine &quot;卵巢功能抑制治療&quot;:\nL02AE02\nunion L02AE03\nunion L02AE04\n\ndefine &quot;前導性化療或術後輔助性化療&quot;:\nL01DB \nunion L01CD \nunion L01XA\n\ndefine &quot;手術或化療或放療&quot;:\nL01DB \nunion L01CD \nunion L01XA\nunion L01XA02\nunion L01AA01\nunion L01BC06\n\ndefine &quot;乳癌藥品&quot;:\nL01EF03\nunion L01EF02\nunion L01EF01\nunion L01XX41\nunion L01EG02\nunion L04AH02\nunion L01XK04\nunion L01FD02\nunion L01FY01\nunion L01FX17\nunion L01FD01\nunion L01FD03\nunion L01EX12\n\ndefine &quot;前導性化療&quot;:\nL01DB01\nunion L01DB03\nunion L01CD01\nunion L01CD02\nunion L01XA02\n\ndefine &quot;術後輔助性化療&quot;:\nL01DB01\nunion L01AA01\nunion L01CD02\nunion L01BC06\n\n//L01FD05無\ndefine &quot;轉移性化療&quot;:\nL01FX17\nunion L01BC06\nunion L01BC05\nunion L01CA04\nunion L01FD01\nunion L01FD03\nunion L01FD04\nunion L01FY01\nunion L01XA02\nunion L01XA01\n\n//L01BC52無\ndefine &quot;化學療法&quot;:\nL01XA02\nunion L01CD02\nunion L01CD01\nunion L01DB01\nunion L01DB03\nunion L01AA01\nunion L01BC02\n\n\n//L01FD05無\ndefine &quot;Pertuzumab併用藥物&quot;:\nL01FD02 \nunion L01FY01\nunion L01FD01\nunion L01FD03\nunion L01FD04\n\n//L01FD05、L01EH03、L01EH02無\ndefine &quot;抗HER2治療&quot;:\nL01FY01\nunion L01FD01\nunion L01FD04\nunion L01FD03\nunion L01FD02\n\ndefine &quot;併用化學治療法&quot;:\nL01CD02\nunion L01CD01\nunion L01DB01\nunion L01DB03\nunion L01AA01\n\ndefine &quot;PertuzumabTrastuzumabSC之抗HER2治療&quot;:\nL01FD01\nunion L01FD02\nunion L01EH01\nunion L01FD03\nunion L01FD04\n\n//L01FD05、L01EH03、L01EH02無\ndefine &quot;Pertuzumab之抗HER2治療&quot;:\nL01FY01\nunion L01FD01\nunion L01FD04\nunion L01FD03\nunion L01FD02\n\n\ndefine &quot;Pertuzumab之化學療法治療&quot;:\nL01BC06\nunion L01BC05\nunion L01CA04\nunion L01FD01\nunion L01FD03\nunion L01FD04\nunion L01FY01\n\n\ndefine &quot;非taxane化學治療&quot;:\nL01DB03\nunion L01AA01\nunion L01DB01\n\n\ndefine &quot;抗HER2藥物併用&quot;:\nL01FD01\nunion L01EH01\nunion L01FD04\nunion L01FD02\nunion L01FY01\n\n// L01EM03無健保碼\ndefine &quot;適應症之標靶藥物&quot;:\nL01FD01\nunion L01FD02\nunion L01FD03\nunion L01FD04\nunion L01EH01\nunion L01EF01\nunion L01EF02\nunion L01EF03\nunion L01EG02\nunion L01XK01\nunion L01XK04\nunion L01FX17\n\n//L01FD05無\n//L01BC52無\ndefine &quot;Larotrectinib前導性化學治療&quot;:\nL01DB01\nunion L01AA01\nunion L01CD01\nunion L01CD02\nunion L01DB03\nunion L01BA01\nunion L04AX03\nunion L01BC02\n\n//L01FD05無\ndefine &quot;Larotrectinib一線治療&quot;:\nL01EF01\nunion L01EF02\nunion L01EF03\nunion L02BA03\nunion L02BG\nunion L01CD02\nunion L01CD01\nunion L01FD02\nunion L01FY01\nunion L01FD01\nunion L01FD03\nunion L01FD04\nunion L01BC05\nunion L01XA02\nunion L01XA01\nunion L01XK\n\n\ndefine &quot;Larotrectinib術後輔助性化學治療&quot;:\nL02BA01\nunion L01DB01\nunion L01AA01\nunion L01CD01\nunion L01CD02\nunion L02BG\nunion L01XK\n\n//L01FD05無\ndefine &quot;Larotrectinib轉移性化學治療&quot;:\nL01BC06\nunion L01BC05\nunion L01CA04\nunion L01FD01\nunion L01FD03\nunion L01FD04\nunion L01FY01\n</code></pre>\n      </td>\n    </tr>\n    \n  \n    \n    <tr>\n      <th scope=\"row\" class=\"row-header\">ELM XML Content</th>\n      <td>\n        <pre style=\"border: none;\" class=\"content-container highlight language-cql\"><code>Encoded data </code></pre>\n      </td>\n    </tr>\n    \n  \n    \n    <tr>\n      <th scope=\"row\" class=\"row-header\">ELM JSON Content</th>\n      <td>\n        <pre style=\"border: none;\" class=\"content-container highlight language-cql\"><code>Encoded data </code></pre>\n      </td>\n    </tr>\n    \n  \n\n\n<tr>\n  <th colspan=\"2\" scope=\"row\" class=\"row-header\">Generated using version 0.5.3-cibuild of the sample-content-ig Liquid templates</th>\n</tr>\n\n    </tbody>\n  </table>\n</div>"
+ },
+ "url": "https://nhicore.nhi.gov.tw/cql/Library/BCCodeConcept",
+ "version": "1.0.0",
+ "name": "BCCodeConcept",
+ "title": "乳癌代碼集-BCCodeConcept",
+ "status": "draft",
+ "type": {
+  "coding": [
+   {
+    "system": "http://terminology.hl7.org/CodeSystem/library-type",
+    "code": "logic-library"
+   }
+  ]
+ },
+ "date": "2026-04-12",
+ "description": "此 Library 為乳癌藥事前審查使用之代碼集。",
+ "relatedArtifact": [
+  {
+   "type": "depends-on",
+   "display": "Code System SNOMED",
+   "resource": "http://snomed.info/sct"
+  },
+  {
+   "type": "depends-on",
+   "display": "Code System LOINC",
+   "resource": "http://loinc.org"
+  },
+  {
+   "type": "depends-on",
+   "display": "Code System InterpretationCodes",
+   "resource": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+  },
+  {
+   "type": "depends-on",
+   "display": "Code System NHILOT",
+   "resource": "https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-line-of-therapy"
+  },
+  {
+   "type": "depends-on",
+   "display": "Code System NHIMedication",
+   "resource": "https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-medication"
+  },
+  {
+   "type": "depends-on",
+   "display": "Code System NHIOrderType",
+   "resource": "https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-order-type"
+  },
+  {
+   "type": "depends-on",
+   "display": "Code System NHIContinuationStatus",
+   "resource": "https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-continuation-status"
+  },
+  {
+   "type": "depends-on",
+   "display": "Code System NHITreatmentAst",
+   "resource": "https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-tx-ast"
+  },
+  {
+   "type": "depends-on",
+   "display": "Code System NHIPASSupportingInfoType",
+   "resource": "https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-supporting-info-type"
+  },
+  {
+   "type": "depends-on",
+   "display": "Code System NHIApplyReason",
+   "resource": "https://nhicore.nhi.gov.tw/pas/CodeSystem/nhi-apply-reason"
+  },
+  {
+   "type": "depends-on",
+   "display": "Code System ICD10CM2023",
+   "resource": "https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-cm-2023-tw"
+  },
+  {
+   "type": "depends-on",
+   "display": "Code System ICD10CM2014",
+   "resource": "https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-cm-2014-tw"
+  },
+  {
+   "type": "depends-on",
+   "display": "Code System ICD10PCS2023Image",
+   "resource": "https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-pcs-2023-tw"
+  },
+  {
+   "type": "depends-on",
+   "display": "Code System ICD10PCS2014Image",
+   "resource": "https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-pcs-2014-tw"
+  }
+ ],
+ "parameter": [
+  {
+   "name": "ICDBC",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "ICDBCandTumor",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "續用註記為1",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "續用註記為2",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "醫令類別",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "ER",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "PR",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "MolecularER",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "MolecularPR",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "HER2",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "HER2弱陽性",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "BRCA1or2",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "DiagnosticReportCode",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "pALNReport",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "MolecularReport",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "FSH",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "Estradiol",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "GOT",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "GPT",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "Tbilirubin",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "Creatinine",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "eGFR",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "LarotrectinibGeneTest",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "ImageCodes",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "ProcedureCodes",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "ProcedureCodes2",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "RightOvary",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "LeftOvary",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "BilateralOvaries",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "TrastuzumabDeruxtecanIMG",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "EverolimusImage",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "IREC疾病狀態評估",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01EF03",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L02BA03",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L02BA01",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L02BG03",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L02BG04",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L02BG06",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L02BG",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01DB01",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01AA01",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01CD02",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L04AX03",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01BA01",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01BC02",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01BC53",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01DB03",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01XA02",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01CD01",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L02AE03",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L02AE02",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L02AE04",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01EF02",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01EF01",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01XX41",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01DC04",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01EG02",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L04AH02",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "Everolimus",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01XK01",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01BC06",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01BC05",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01CA04",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01FD04",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01XA01",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01XK04",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01XK",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01FD02",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01FY01",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01FX17",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01FD01",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01FD01andL01FD02exceptKC011362B5",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "Trastuzumab併用藥物",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01FD03",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01EX12",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01EH01",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01DB",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01CD",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01XA",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01FFexceptL01FF02",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "L01FF02",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "內分泌療法藥物(tamoxifen或芳香環酶抑制劑)",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "芳香環轉化酶抑制劑",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "GnRH analogue",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "標準之化學及放射輔助治療藥物",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "內分泌治療藥物",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "CDK46抑制劑",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "卵巢功能抑制治療",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "前導性化療或術後輔助性化療",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "手術或化療或放療",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "乳癌藥品",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "前導性化療",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "術後輔助性化療",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "轉移性化療",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "化學療法",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "Pertuzumab併用藥物",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "抗HER2治療",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "併用化學治療法",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "PertuzumabTrastuzumabSC之抗HER2治療",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "Pertuzumab之抗HER2治療",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "Pertuzumab之化學療法治療",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "非taxane化學治療",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "抗HER2藥物併用",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "適應症之標靶藥物",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "Larotrectinib前導性化學治療",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "Larotrectinib一線治療",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "Larotrectinib術後輔助性化學治療",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  },
+  {
+   "name": "Larotrectinib轉移性化學治療",
+   "use": "out",
+   "min": 0,
+   "max": "*",
+   "type": "string"
+  }
+ ],
+ "content": [
+  {
+   "contentType": "text/cql",
+   "data": "bGlicmFyeSBCQ0NvZGVDb25jZXB0IHZlcnNpb24gJzEuMC4wJwoKdXNpbmcgRkhJUiB2ZXJzaW9uICc0LjAuMScKCi8v5bCI6ZaA6KGT6KqeLS0tLS0tLS0tLS0tLS0tLS0tLS0KCi8q5ZyL6Zqb5qiZ5rqW56K8Ki8KY29kZXN5c3RlbSAiU05PTUVEIjogJ2h0dHA6Ly9zbm9tZWQuaW5mby9zY3QnCmNvZGVzeXN0ZW0gIkxPSU5DIjogJ2h0dHA6Ly9sb2luYy5vcmcnCmNvZGVzeXN0ZW0gIkludGVycHJldGF0aW9uQ29kZXMiOiAnaHR0cDovL3Rlcm1pbm9sb2d5LmhsNy5vcmcvQ29kZVN5c3RlbS92My1PYnNlcnZhdGlvbkludGVycHJldGF0aW9uJwoKCi8qVFdOSEkgUGFzKi8KY29kZXN5c3RlbSAiTkhJTE9UIjogJ2h0dHBzOi8vbmhpY29yZS5uaGkuZ292LnR3L3Bhcy9Db2RlU3lzdGVtL25oaS1saW5lLW9mLXRoZXJhcHknCmNvZGVzeXN0ZW0gIk5ISU1lZGljYXRpb24iOiAnaHR0cHM6Ly9uaGljb3JlLm5oaS5nb3YudHcvcGFzL0NvZGVTeXN0ZW0vbmhpLW1lZGljYXRpb24nCmNvZGVzeXN0ZW0gIk5ISU9yZGVyVHlwZSI6ICdodHRwczovL25oaWNvcmUubmhpLmdvdi50dy9wYXMvQ29kZVN5c3RlbS9uaGktb3JkZXItdHlwZScKY29kZXN5c3RlbSAiTkhJQ29udGludWF0aW9uU3RhdHVzIjogJ2h0dHBzOi8vbmhpY29yZS5uaGkuZ292LnR3L3Bhcy9Db2RlU3lzdGVtL25oaS1jb250aW51YXRpb24tc3RhdHVzJwpjb2Rlc3lzdGVtICJOSElUcmVhdG1lbnRBc3QiOiAnaHR0cHM6Ly9uaGljb3JlLm5oaS5nb3YudHcvcGFzL0NvZGVTeXN0ZW0vbmhpLXR4LWFzdCcKY29kZXN5c3RlbSAiTkhJUEFTU3VwcG9ydGluZ0luZm9UeXBlIjogJ2h0dHBzOi8vbmhpY29yZS5uaGkuZ292LnR3L3Bhcy9Db2RlU3lzdGVtL25oaS1zdXBwb3J0aW5nLWluZm8tdHlwZScKY29kZXN5c3RlbSAiTkhJQXBwbHlSZWFzb24iOiAnaHR0cHM6Ly9uaGljb3JlLm5oaS5nb3YudHcvcGFzL0NvZGVTeXN0ZW0vbmhpLWFwcGx5LXJlYXNvbicKCgoKLypUVyBDb3JlKi8KY29kZXN5c3RlbSAiSUNEMTBDTTIwMjMiOiAnaHR0cHM6Ly90d2NvcmUubW9ody5nb3YudHcvaWcvdHdjb3JlL0NvZGVTeXN0ZW0vaWNkLTEwLWNtLTIwMjMtdHcnCmNvZGVzeXN0ZW0gIklDRDEwQ00yMDE0IjogJ2h0dHBzOi8vdHdjb3JlLm1vaHcuZ292LnR3L2lnL3R3Y29yZS9Db2RlU3lzdGVtL2ljZC0xMC1jbS0yMDE0LXR3Jwpjb2Rlc3lzdGVtICJJQ0QxMFBDUzIwMjNJbWFnZSI6ICdodHRwczovL3R3Y29yZS5tb2h3Lmdvdi50dy9pZy90d2NvcmUvQ29kZVN5c3RlbS9pY2QtMTAtcGNzLTIwMjMtdHcnCmNvZGVzeXN0ZW0gIklDRDEwUENTMjAxNEltYWdlIjogJ2h0dHBzOi8vdHdjb3JlLm1vaHcuZ292LnR3L2lnL3R3Y29yZS9Db2RlU3lzdGVtL2ljZC0xMC1wY3MtMjAxNC10dycKCgovL+S7o+eivOWIl+ihqOWumue+qS0tLS0tLS0tLS0tLS0tLS0tLS0tCgovL0lDRF9CQwpkZWZpbmUgIklDREJDIjogeyAnQzUwJyB9CgpkZWZpbmUgIklDREJDYW5kVHVtb3IiOiB7ICdDNzcnLCAnQzc4JywgJ0M3OScgfQoKLy/oqLvoqJgKZGVmaW5lICLnuoznlKjoqLvoqJjngroxIjogeyAnMScgfSAKCmRlZmluZSAi57qM55So6Ki76KiY54K6MiI6IHsgJzInIH0gCgpkZWZpbmUgIumGq+S7pOmhnuWIpSI6IHsgJzEnIH0gCgovKuaqoumpl+aqouafpUxPSU5D56K8Ki8KCi8vRXN0cm9nZW4gUmVjZXB0b3LvvIxFUiAo6ZuM5r+A57Sg5Y+X6auUKeaqoumpl0xPSU5D56K8CmRlZmluZSAiRVIiOiB7ICcxNDEzMC05JywgJzE2MTEyLTUnLCAnNDA1NTYtMycsICc4NTMxMC0xJywgJzg1MzM3LTQnIH0KCi8vUHJvZ2VzdGVyb25lIFJlY2VwdG9y77yMUFIgKOm7g+mrlOe0oOWPl+mrlCnmqqLpqZdMT0lOQ+eivApkZWZpbmUgIlBSIjogeyAnMTA4NjEtMycsICcxNjExMy0zJywgJzMxMjA3LTQnLCAnNDA1NTctMScsICc4NTMzMS03JywgJzg1MzM5LTAnIH0KCi8vIE1vbGVjdWxhciBFUu+8iDggY29kZXPvvIkKZGVmaW5lICJNb2xlY3VsYXJFUiI6IHsKICAnMTQxMzAtOScsICcxNDIyOC0xJywgJzE2MTEyLTUnLCAnNDA1NTYtMycsCiAgJzg1MzEwLTEnLCAnODUzMjktMScsICc4NTMzNy00JywgJzEwNDgwLTInCn0KCi8vIE1vbGVjdWxhciBQUu+8iDkgY29kZXPvvIkKZGVmaW5lICJNb2xlY3VsYXJQUiI6IHsKICAnMTA0ODAtMicsICcxMDg2MS0zJywgJzE0MjMwLTcnLCAnMTYxMTMtMycsICczMTIwNy00JywKICAnNDA1NTctMScsICc4NTMyNS05JywgJzg1MzMxLTcnLCAnODUzMzktMCcKfQoKLy9IRVIyCmRlZmluZSAiSEVSMiI6IHsgJzE4NDc0LTcnLCAnMzI5OTYtMScsICc0MjkxNC0yJywgJzQ4Njc2LTEnLCAnNTE5ODEtOScsICc3MjM4Mi01JywgJzcyMzgzLTMnLCAnODUzMTktMicsICc4NTMyOC0zJyB9CgoKLy9IRVIy5byx6Zm95oCnCmRlZmluZSAiSEVSMuW8semZveaApyI6IHsgJzMxMTUwLTYnLCAnNDI3ODMtMScsICc0OTY4My02JywgJzc0ODYwLTgnLCAnNzQ4ODUtNScsICc4NTMxOC00JywgJzg1MzI4LTMnLCAnOTY4OTMtMycgfQoKCi8vQlJDQSAxLzIKZGVmaW5lICJCUkNBMW9yMiI6IHsKICAnMjE2MzYtNicsICcyMTYzNy00JywgJzIxNjM4LTInLCAnMjE2MzktMCcsICcyMTY0MC04JywKICAnMzg1MzAtMicsICczODUzMS0wJywgJzUwOTk1LTAnLCAnNTkwNDEtNCcsCiAgJzc5MjA3LTcnLCAnNzkyMDgtNScsICc5NDE5MS00Jwp9CgovL+aqouafpeWgseWRigpkZWZpbmUgIkRpYWdub3N0aWNSZXBvcnRDb2RlIjogeyAnNjYxMTItNCcgfQoKZGVmaW5lICJwQUxOUmVwb3J0IjogeyAnNjYxMTAtOCcsICc2NjEyMS01JywgJzQ3NTMwLTEnLCAnNDc1MjEtMCcgfQoKZGVmaW5lICJNb2xlY3VsYXJSZXBvcnQiOiB7ICc2NjExMC04JywgJzQ3NTMwLTEnLCAnNDc1MjEtMCcgfQoKLy8gRlNI77yIRm9sbGljbGUgU3RpbXVsYXRpbmcgSG9ybW9uZe+8ie+8iDkgY29kZXPvvIkKZGVmaW5lICJGU0giOiB7CiAgJzgzMDk4LTQnLCAnMTAwNzk0LTcnLCAnMTUwNjctMicsICcxNTA2OC0wJywgJzIwNDMzLTknLAogICcyNTYzOS02JywgJzI3MjAzLTknLCAnMzQzMDYtMScsICczNDU0OS02Jwp9CgovLyBFc3RyYWRpb2zvvIg5IGNvZGVz77yJCmRlZmluZSAiRXN0cmFkaW9sIjogewogICcxMjU5NS01JywgJzE0NzE1LTcnLCAnMjEyNjMtOScsCiAgJzEyMzU0NCcsICcxMjM4NTAnLCAnMTI1MzcwJywgJzEyNjI1NCcsCiAgJzI1NDAxLTEnLCAnMzExNzYtMScKfQoKLy8gR09U77yIMjEgY29kZXPvvIkKZGVmaW5lICJHT1QiOiB7CiAgJzEwMDczOS0yJywgJzE0NDA5LTcnLCAnMTQ0MTAtNScsICcxNDQxMS0zJywgJzE0NDEyLTEnLCAnMTQ0MTMtOScsICcxNDQxNC03JywKICAnMTY0MTItOScsICc1OTk3JywgJzYzMDEnLCAnNjYwNycsICcxOTE5LTAnLCAnNzUxOScsICcyNzM0NC0xJywgJzMwMjM5LTgnLAogICc0MzgyMi02JywgJzQ0Nzg2LTInLCAnNDgxMzYtNicsICc1NDUwMC00JywgJzg4MTEyLTgnLCAnOTY1ODctMScKfQoKLy8gR1BU77yIMTYgY29kZXPvvIkKZGVmaW5lICJHUFQiOiB7CiAgJzEwMDczOC00JywgJzE2MzI0LTYnLCAnMTYzMjUtMycsICcxNzQxLTgnLCAnMTc0Mi02JywgJzE3NDMtNCcsICcxNzQ0LTInLAogICcyNTMwMi0xJywgJzQ0Nzg1LTQnLCAnNDgxMzQtMScsICc1MDE2OC00JywgJzU0NDkxLTYnLCAnNTQ0OTItNCcsCiAgJzc2NjI1LTMnLCAnNzcxNDQtNCcsICc5NjU4Ni0zJwp9CgovLyBUYmlsaXJ1YmluICg0OCBjb2Rlc++8iQpkZWZpbmUgIlRiaWxpcnViaW4iOiB7CiAgJzEyNDc2LTgnLCAnMTM4NzctNicsICcxNDQyMC00JywgJzE0NDIxLTInLCAnMTQ0MjItMCcsICcxNDQyMy04JywgJzE0NDI0LTYnLAogICcxNDYzMS02JywgJzI1MzI0JywgJzI2NTQzJywgJzI2ODQ2JywgJzI3MTUwJywgJzI3NDI2JywgJzE5NzYtMCcsICcyODMzOCcsCiAgJzI4NjQyJywgJzIwNTA1LTQnLCAnMjcxOTgtMScsICcyOTc2Ny0xJywgJzMyMzAzLTAnLCAnMzM4NzAtNycsICczOTQ2MS05JywKICAnNDEwMTYtNycsICc0MjcxOS01JywgJzQzODI0LTInLCAnNDM4ODctOScsICc0NDAzMy05JywgJzQ3MjI1LTgnLCAnNDc5OTQtOScsCiAgJzQ4NjI0LTEnLCAnNDk3NjMtNicsICc1MDU1MS0xJywgJzUzMzI3LTMnLCAnNTM0MTUtNicsICc1NDM2Mi05JywgJzU0MzYzLTcnLAogICcxNDEzNTUwJywgJzU5MTY2LTknLCAnNTk4MjctNicsICc1OTgyOC00JywgJzY4MzY3LTInLCAnNzAxOTktNScsICc3MjkyNS0xJywKICAnNzQ0MzQtMicsICc3NDkwNi05JywgJzc3MTM3LTgnLCAnODk4NzEtOCcsICc4OTg3Mi02JywgJzk3NzcwLTInCn0KCi8vIENyZWF0aW5pbmXvvIg3MSBjb2Rlc++8iQpkZWZpbmUgIkNyZWF0aW5pbmUiOiB7CiAgJzEwMTQ3NS0yJywgJzE0NjgyLTknLCAnMjEyMzItNCcsICcyMTYwLTAnLCAnMzg0ODMtNCcsICc0NDc4NC03JywgJzU5ODI2LTgnLAogICc3NzE0MC0yJywgJzk2NTkwLTUnLCAnMzM5MTQtMycsICc0NTA2Ni04JywgJzEyMTkwLTUnLCAnMTIxOTEtMycsICcxMjU4NC05JywKICAnMTI1ODUtNicsICcxMjU4Ni00JywgJzEyNTg3LTInLCAnMTI1ODgtMCcsICcxMjU4OS04JywgJzE0Mzk4LTInLCAnMTQzOTktMCcsCiAgJzE0NDAxLTQnLCAnMTQ0MDItMicsICcxNDY4MS0xJywgJzE0NjgzLTcnLCAnMTQ2ODQtNScsICcxNTA1MC04JywgJzE1MDUxLTYnLAogICcxNjY4OS0yJywgJzE2NjkwLTAnLCAnMjA1MTEtMicsICcyMDYyNC0zJywgJzk0NjMxJywgJzk1NTQzJywgJzk1ODQ3JywKICAnMjI3MjYtNCcsICcyNTM4Ni00JywgJzI1ODg2LTMnLCAnMzAwMDItMCcsICczMDAwNC02JywgJzMxMTAxLTknLCAnMzI1NDMtMScsCiAgJzMzNzk4LTAnLCAnMzUyNjItNScsICczNTY3NC0xJywgJzM5NDcxLTgnLCAnMzk0NzItNicsICczOTQ3My00JywgJzM5NDc0LTInLAogICc0MDM1Ni04JywgJzQwMzU3LTYnLCAnNDc2MTAtMScsICc0ODc5MC0wJywgJzQ5MDA0LTUnLCAnNTE1OTItNCcsICc1MzEyMC0yJywKICAnNTM0OTktMCcsICc1NDM3NS0xJywgJzU1NTkzLTgnLCAnNTczNDQtNCcsICc1NzM0Ni05JywgJzU3NzI2LTInLCAnNTg5OTgtNicsCiAgJzE0NjgwNjInLCAnNjA1MTgtOCcsICc3MjgyMS0yJywgJzc1MzYzLTInLCAnOTM3MzMtNCcsICc5MzczNC0yJywgJzkzNzM1LTknLAogICc5NDg0NC04JywgJzk5Mzg0LTAnCn0KCgpkZWZpbmUgImVHRlIiOnsnMzM5MTQtMycsICc0NTA2Ni04J30KCgovL0dlbmVUZXN0CmRlZmluZSAiTGFyb3RyZWN0aW5pYkdlbmVUZXN0IjogeyAnOTM4MTMtNCcsICcxMDU1OTYtMScgfQoKCi8q5b2x5YOP5Luj56K8Ki8KCi8v5b2x5YOP5qqi5p+lCmRlZmluZSAiSW1hZ2VDb2RlcyI6IHsKICAnQkgwMFpaWicsICdCSDAxWlpaJywgJ0JIMDJaWlonLCAnQkgwM1paWicsICdCSDA0WlpaJywgJ0JIMDVaWlonLCAnQkgwNlpaWicsCiAgJ0JIMzBaWlonLCAnQkgzMVpaWicsICdCSDMyWlpaJywgJ0JINDBaWlonLCAnQkg0MVpaWicsICdCSDQyWlpaJywgJzI2MDI5QicsIAogICdCMDIwWlpaJywgJ0JGMjVaWlonLCAnQkYyQ1paWicsICdCRjI2WlpaJywgJ0JCMjRaWlonLCAnQkIxNFpaWicsICdCVzI0WlpaJywgCiAgJ0JXMjVaWlonLCAnQlcyMFpaWicsICdCVzIxWlpaJywgJ0JXMzBaWlonLCAnQjAzMFpaWicsICdCRjM1WlpaJywgJ0JGMzZaWlonLAogICdCVzAwWlpaJywgJ0JXMDFaWlonLCAnQlc0MFpaWicsICdCVzQxWlpaJywgJ0JXMDNaWlonLCdCVzI4WlpaJywgJ0JXMjlaWlonLAogICdCVzJGWlpaJywgJ0JXMkdaWlonLCAnQlczOFpaWicsICdCVzNGWlpaJywgJ0JXM0daWlonLCAnQlczSFpaWicsICdCVzNQWlpaJywKICAnQjAwQlpaWicsICdCMDFCWlpaJywgJ0IwMjdaWlonLCAnQjAyOFpaWicsICdCMDI5WlpaJywgJ0IwMkJaWlonLCAnQjAzOVpaWicsIAogICdCMDNCWlpaJywgJ0IwM0NaWlonLCAnQkgzMFkwWicsICdCSDMwWVpaJywgJ0JIMzFZMFonLCAnQkgzMVlaWicsICdCSDMyWTBaJywKICAnQkgzMllaWicsICdDSDEwMVpaJywgJ0NIMTBTWlonLCAnQ0gxMFlaWicsICdDSDExMVpaJywgJ0NIMTFTWlonLCAnQ0gxMVlaWicsCiAgJ0NIMTIxWlonLCAnQ0gxMlNaWicsICdDSDEyWVpaJywgJ0NIMVlZWlonLCAnQ0gyMDFaWicsICdDSDIwU1paJywgJ0NIMjBZWlonLAogICdDSDIxMVpaJywgJ0NIMjFTWlonLCAnQ0gyMVlaWicsICdDSDIyMVpaJywgJ0NIMjJTWlonLCAnQ0gyMllaWicsICdDSDJZWVpaJywKICAnQkgwMzBaWicsICdCSDAzMVpaJywgJ0JIMDNZWlonLCAnQkgwNDBaWicsICdCSDA0MVpaJywgJ0JIMDRZWlonLCAnQkgwNTBaWicsIAogICdCSDA1MVpaJywgJ0JIMDVZWlonLCAnQkgwNjBaWicsICdCSDA2MVpaJywgJ0JIMDZZWlonCn0KCmRlZmluZSAiUHJvY2VkdXJlQ29kZXMiOiB7CiAgJzA3QjUwWlgnLCAnMDdCNTBaWicsICcwN0I2MFpYJywgJzA3QjYwWlonLCAnMDdUNTBaWicsICcwN1Q2MFpaJywKICAnMDdUNzBaWicsICcwN1Q4MFpaJywgJzA3VDkwWlonLCAnMEg1VzBaWicsICcwSDVXM1paJywgJzBINVc3WlonLAogICcwSDVXOFpaJywgJzBINVdYWlonLCAnMEg1WDBaWicsICcwSDVYM1paJywgJzBINVg3WlonLCAnMEg1WDhaWicsCiAgJzBINVhYWlonLCAnMEg5VDBaWCcsICcwSDlVMFpYJywgJzBIOVYwWlgnLCAnMEg5VzBaWCcsICcwSDlYMFpYJywKICAnMEhCVDBaWCcsICcwSEJUMFpaJywgJzBIQlQzWlonLCAnMEhCVDdaWicsICcwSEJUOFpaJywgJzBIQlUwWlgnLAogICcwSEJVMFpaJywgJzBIQlUzWlonLCAnMEhCVTdaWicsICcwSEJVOFpaJywgJzBIQlYwWlgnLCAnMEhCVjBaWicsCiAgJzBIQlYzWlonLCAnMEhCVjdaWicsICcwSEJWOFpaJywgJzBIQlcwWlgnLCAnMEhCVzBaWicsICcwSEJXM1paJywKICAnMEhCVzdaWicsICcwSEJXOFpaJywgJzBIQldYWlonLCAnMEhCWDBaWCcsICcwSEJYMFpaJywgJzBIQlgzWlonLAogICcwSEJYN1paJywgJzBIQlg4WlonLCAnMEhCWFhaWicsICcwSEJZMFpYJywgJzBIQlkwWlonLCAnMEhCWTNaWicsCiAgJzBIQlk3WlonLCAnMEhCWThaWicsICcwSFJUMEpaJywgJzBIVFQwWlonLCAnMEhUVTBaWicsICcwSFRWMFpaJywKICAnMEhUV1haWicsICcwSFRYWFpaJywgJzBLVEgwWlonLCAnMEtUSjBaWicsICcwSEI1WFpaJywgJzBIQlQzWlgnLAogICcwSEJUN1pYJywgJzBIQlQ4WlgnLCAnMEhCVTNaWCcsICcwSEJVN1pYJywgJzBIQlU4WlgnLCAnMEhCVjNaWCcsIAogICcwSEJWN1pYJywgJzBIQlY4WlgnLCAnMEhCVzNaWCcsICcwSEJXN1pYJywgJzBIQlc4WlgnLCAnMDdCNjRaWCcsCiAgJzBIQldYWlgnLCAnMEhCWDNaWCcsICcwSEJYN1pYJywgJzBIQlg4WlgnLCAnMEhCWFhaWCcsICcwSERUMFpaJywKICAnMEhEVTBaWicsICcwSERWMFpaJywgJzBIRFkwWlonLCAnMEhUWTBaWicsICcwN0I2M1pYJywgJzA3QjYzWlonLAogICcwN0I1M1pYJywgJzA3QjUzWlonLCAnMDdCNTRaWCcsICcwN0I1NFpaJywgJzA3QjY0WlonCn0KCi8vIEltYWdpbmdfUHJvY2VkdXJlX0dyb3VwCmRlZmluZSAiUHJvY2VkdXJlQ29kZXMyIjogewogICdCSDMwWTBaJywgJ0JIMzBZWlonLCAnQkgzMVkwWicsICdCSDMxWVpaJywgJ0JIMzJZMFonLCAnQkgzMllaWicsCiAgJ0NIMTAxWlonLCAnQ0gxMFNaWicsICdDSDEwWVpaJywgJ0NIMTExWlonLCAnQ0gxMVNaWicsICdDSDExWVpaJywKICAnQ0gxMjFaWicsICdDSDEyU1paJywgJ0NIMTJZWlonLCAnQ0gxWVlaWicsICdDSDIwMVpaJywgJ0NIMjBTWlonLAogICdDSDIwWVpaJywgJ0NIMjExWlonLCAnQ0gyMVNaWicsICdDSDIxWVpaJywgJ0NIMjIxWlonLCAnQ0gyMlNaWicsCiAgJ0NIMjJZWlonLCAnQ0gyWVlaWicsICdCSDAzMFpaJywgJ0JIMDMxWlonLCAnQkgwM1laWicsICdCSDAzWlpaJywKICAnQkgwNDBaWicsICdCSDA0MVpaJywgJ0JIMDRZWlonLCAnQkgwNTBaWicsICdCSDA1MVpaJywgJ0JIMDVZWlonLAogICdCSDA2MFpaJywgJ0JIMDYxWlonLCAnQkgwNllaWicsICdCSDAwWlpaJywgJ0JIMDFaWlonLCAnQkgwMlpaWicsIAogICdCSDA0WlpaJywgJ0JIMDVaWlonLCAnQkgwNlpaWicsICdCSDMwWlpaJywgJ0JIMzFaWlonLCAnQkgzMlpaWicsCiAgJ0JINDBaWlonLCAnQkg0MVpaWicsICdCSDQyWlpaJwp9CgoKLy8gUmlnaHQgT3ZhcnnvvIg1IGNvZGVz77yJCmRlZmluZSAiUmlnaHRPdmFyeSI6IHsKICAnMFVUMDBaWicsICcwVVQwNFpaJywgJzBVVDA3WlonLCAnMFVUMDhaWicsICcwVVQwRlpaJwp9CgovLyBMZWZ0IE92YXJ577yINSBjb2Rlc++8iQpkZWZpbmUgIkxlZnRPdmFyeSI6IHsKICAnMFVUMTBaWicsICcwVVQxNFpaJywgJzBVVDE3WlonLCAnMFVUMThaWicsICcwVVQxRlpaJwp9CgovLyBCaWxhdGVyYWwgT3Zhcmllc++8iDUgY29kZXPvvIkKZGVmaW5lICJCaWxhdGVyYWxPdmFyaWVzIjogewogICcwVVQyMFpaJywgJzBVVDI0WlonLCAnMFVUMjdaWicsICcwVVQyOFpaJywgJzBVVDJGWlonCn0KCmRlZmluZSAiVHJhc3R1enVtYWJEZXJ1eHRlY2FuSU1HIjoKeydCSDAwWlpaJywgJ0JIMDFaWlonLCAnQkgwMlpaWicsICdCSDAzWlpaJywgJ0JIMDRaWlonLCAnQkgwNVpaWicsICdCSDA2WlpaJywgJ0JIMzBaWlonLCAnQkgzMVpaWicsICdCSDMyWlpaJywgJ0JINDBaWlonLCAnQkg0MVpaWicsICdCSDQyWlpaJ30KCgovLy8gMjYwMjlCIOatpOashOS9jeS4jeiDveWhq+Wvq+WBpeS/neS7o+eivApkZWZpbmUgIkV2ZXJvbGltdXNJbWFnZSI6IHsgCiAgJ0IwMEJaWlonLCAnQjAxQlpaWicsICdCMDIwWlpaJywgJ0IwMkJaWlonLCAnQjAzMFpaWicsICdCMDNCWlpaJywgJ0JEMTNaWlonLCAnQkQxNFpaWicsICdCRDE2WlpaJywgCiAgJ0JEMTlaWlonLCAnQkQyNFpaWicsICdCRDQ3WlpaJywgJ0JENDlaWlonLCAnQkQ0Q1paWicsICdCVzAwWlpaJywgJ0JXMDFaWlonLCAnQlcwM1paWicsICdCVzIwWlpaJywgCiAgJ0JXMjFaWlonLCAnQlcyNFpaWicsICdCVzI1WlpaJywgJ0JXMjhaWlonLCAnQlcyOVpaWicsICdCVzJGWlpaJywgJ0JXMkdaWlonLCAnQlczMFpaWicsICdCVzM4WlpaJywgCiAgJ0JXM0ZaWlonLCAnQlczR1paWicsICdCVzNIWlpaJywgJ0JXM1BaWlonLCAnQlc0MFpaWicsICdDRDE3MVpaJywgJ0NEMTdEWlonLCAnQ0QxN1laWicsICdDRDI3MVpaJywgCiAgJ0NEMjdEWlonLCAnQ0QyN1laWicgfQoKZGVmaW5lICJJUkVD55a+55eF54uA5oWL6KmV5LywIjogeyAnSVJFQycgfSAKCgovKuiXpeeJqeaIkOS7vSovCgovKkFUQyBDb2RlIHRvIE5ISSBDb2RlKi8KCi8v5Lmz55mMPT09PT09PT09PT09PT09PT09PT09PT09PT09PQoKLy8gQWJlbWFjaWNsaWLvvIg0IGNvZGVz77yJCmRlZmluZSAiTDAxRUYwMyI6IHsnQkMyNzY0MDEwMCcsICdCQzI3NjQxMTAwJywgJ0JDMjc2NDIxMDAnLCAnQkMyNzY0MzEwMCd9CgovLyBGdWx2ZXN0cmFudO+8iDEgY29kZe+8iQpkZWZpbmUgIkwwMkJBMDMiOiB7J0FDNjE4MjUyMjEnfQoKLy8gVGFtb3hpZmVu77yIMjQgY29kZXPvvIkKZGVmaW5lICJMMDJCQTAxIjogewogICdBQzQ0NjcyMTAwJywgJ0EwNDQ2NzIxMDAnLCAnQjAxNTQyOTEwMCcsICdCMDE1NjgyMTAwJywgJ0IwMTEzMjMxMDAnLAogICdCMDE4NzkxMTAwJywgJ0IwMTg1NjcxMDAnLCAnQjAxODU2ODEwMCcsICdBMDM2NDAwMTAwJywgJ0IwMjIxNTQxMDAnLAogICdCMDE2NzE3MTAwJywgJ0IwMTU4ODAxMDAnLCAnQjAxNjE1MzEwMCcsICdCMDI0MDg1MTAwJywgJ0IwMjQwODYxMDAnLAogICdCMDIyMTIzMTAwJywgJ0IwMjE3NjExMDAnLCAnQjAyMTc2MjEwMCcsICdCMDA1NTg4MTAwJywgJ0JDMTU4ODAxMDAnLAogICdCQzIyMTU0MTAwJywgJ0JDMTY3MTcxMDAnLCAnQjAyMTIzMDEwMCcsICdCMDIxMjI5MTAwJwp9CgovLyBBbmFzdHJvem9sZe+8iDIwIGNvZGVz77yJCmRlZmluZSAiTDAyQkcwMyI6IHsKICAnQUM0ODkwOTEwMCcsICdBQzU1NTU1MTAwJywgJ0FCNDc1MzkxMDAnLCAnQUI0ODkwOTEwMCcsICdBQjU1NTU1MTAwJywKICAnQUM1NjczMDEwMCcsICdBMDQ3NTM5MTAwJywgJ0FBNTU1NTUxMDAnLCAnQTA0ODkwOTEwMCcsICdBQzQ3NTM5MTAwJywKICAnQkMyNTI1MTEwMCcsICdCQzI1Mjg4MTAwJywgJ0JCMjU1MzUxMDAnLCAnQkIyNjUxNTEwMCcsICdCMDIyMjgyMTAwJywKICAnQkMyNzAxNTEwMCcsICdCQzIyMjgyMTAwJywgJ0IwMjUyNTExMDAnLCAnQjAyNTI4ODEwMCcsICdCMDI1NTM1MTAwJwp9CgovLyBMZXRyb3pvbGXvvIgxNyBjb2Rlc++8iQpkZWZpbmUgIkwwMkJHMDQiOiB7CiAgJ0FDNTc3MzIxMDAnLCAnQjAyNTE0MzEwMCcsICdBQzU4ODE5MTAwJywgJ0IwMjYxMjcxMDAnLCAnQkEyNjEwODEwMCcsCiAgJ0JBMjYyMDYxMDAnLCAnQjAyMjQ2MjEwMCcsICdCQzIyNDYyMTAwJywgJ0JDMjUxNDMxMDAnLCAnQkMyODcxMjEwMCcsCiAgJ0JDMjYyMDYxMDAnLCAnQkMyNjU2NDEwMCcsICdCQzI2MzEzMTAwJywgJ0JDMjY1ODExMDAnLCAnQkMyNjEyNzEwMCcsCiAgJ0JEMjYxMDgxMDAnLCAnQkMyNzQ0ODEwMCcKICB9CgovLyBFeGVtZXN0YW5l77yINSBjb2Rlc++8iQpkZWZpbmUgIkwwMkJHMDYiOiB7J0JDMjYyMjQxMDAnLCAnQkMyNjY0MTEwMCcsICdCQzI2NzkxMTAwJywgJ0IwMjMwOTcxMDAnLCAnQkMyMzA5NzEwMCd9CgpkZWZpbmUgIkwwMkJHIjoKTDAyQkcwMwp1bmlvbiBMMDJCRzA0CnVuaW9uIEwwMkJHMDYKCi8vIGRveG9ydWJpY2lu77yIMzYgY29kZXPvvIkKZGVmaW5lICJMMDFEQjAxIjogewogICdCMDIwMzM1MjQwJywgJ0IwMTkxMTcyNDgnLCAnQTAzNjQxODIyOScsICdBMDQxMDM3MjI5JywgJ0JCMjYwMjYyMjknLAogICdCMDE4MTc0MjQ4JywgJ0FBMzY0MTgyMjknLCAnQUI0MTAzNzIyOScsICdBQzQxMDM3MjI5JywgJ0IwMjE3MTgyMjknLAogICdCMDE4NTgwMjI5JywgJ0IwMTg1ODAyOTknLCAnQjAxOTExNzIyMScsICdCQjI2MDI2MjIxJywgJ0IwMjU4NDAyMjEnLAogICdCQjI2MDI2MjQwJywgJ0JCMjYwMjYyNDgnLCAnQUM2MTEyNTIyOScsICdCMDIxNzE4MjIxJywgJ0IwMjIxNzUyMjknLAogICdCMDIxNzE4MjQwJywgJ0FDNjExMzIyMjknLCAnQjAxOTQ0MzI0OCcsICdCMDE5NDQ0MjI5JywgCiAgJ0IwMjU4NDAyNDAnLCAnQjAyMDMzNTIyMScsICdCMDIwMzM1MjI5JywgJ0IwMjIxNzQyNDgnLCAKICAnQkMyMjcxMjIyMScsICdCMDIxNTc2MjIxJywgJ0IwMjIyMDcyMjknLCAnQkMxODU4MDIyOScsCiAgJ0IwMjE1NzYyNDAnLCAnQjAyMTU3NjI0OCcsICdCMDE4MTc0MjI5JywgJ0IwMTIwMjcyMjknCn0KCi8vIGN5Y2xvcGhvc3BoYW1pZGXvvIgxOSBjb2Rlc++8iQpkZWZpbmUgIkwwMUFBMDEiOiB7CiAgJ0IwMTM1NjMyNzcnLCAnQjAxMzY4MDI2MycsICdCMDEzNjg3MjU1JywgJ0IwMTI2MDExMDAnLCAnQjAxNjUwMTI2MycsCiAgJ0IwMTY1MTcyNTUnLCAnQjAxNjc1NDEwMCcsICdCMDA2NDYzMjU1JywgJ0IwMDY0NjUyNzcnLCAnQjAxNjg3MDI3NycsCiAgJ0IwMTcxMDUyMDknLCAnQjAwNjkxNTEwMCcsICdCQzE2NzU0MTAwJywgJ0IwMjEzMDQyMDknLCAnQjAyMTMwNDI2MycsCiAgJ0IwMjEzMDQyNzcnLCAnQkMxMjYwMTEwMCcsICdCQzIxMzA0MjYzJywgJ0JDMjEzMDQyNzcnCn0KCi8vIGRvY2V0YXhlbO+8iDUwIGNvZGVz77yJCmRlZmluZSAiTDAxQ0QwMiI6IHsKICAnQUM1NzI0MDIwOScsICdBQzU3MjQwMjE5JywgJ0EwNDc4ODIyMDYnLCAnQTA0Nzg4MjIxMicsICdBQTU1MTEzMjA2JywKICAnQUE1NTExMzIxMicsICdBQTU2NjcyMjA2JywgJ0FCNTgwNjUyMDknLCAnQUI0Nzg4MjIwNicsICdBQzU4NTgxMjA5JywKICAnQUM1ODU4MTIxOScsICdBQjQ3ODgyMjEyJywgJ0FDNTgwNjUyMDknLCAnQUM1ODA2NjIwOScsICdBQzU3OTcxMjA5JywKICAnQUM1ODA2NjIxOScsICdBQTU2NjcyMjEyJywgJ0FDNjEwODcyMDknLCAnQUI1NTExMzIwNicsICdBQzU3OTcxMjE5JywKICAnQUI1NTExMzIxMicsICdBQjU2NjcyMjA2JywgJ0FCNTY2NzIyMTInLCAnQUI1NzI0MDIwOScsICdBQjU3MjQwMjE5JywKICAnQUM1ODU4MTIyMycsICdCMDI1MDU1MjA2JywgJ0IwMjUwNTUyMTInLCAnQjAyNTU1ODIxMicsICdCMDIyMDQ4MjA2JywKICAnQjAyMjA0ODIxMicsICdCMDI1NTU4MjI2JywgJ0JCMjU2MDAyMTInLCAnQkMyNTI4OTIwOScsICdCQzI1Mjg5MjE5JywKICAnQkIyNTYwMDIyNicsICdCMDI1Mjg5MjA5JywgJ0IwMjUyODkyMTknLCAnQkMyNzUyNTIwOScsICdCQzI3NTI1MjE5JywKICAnQkMyNjMzNDIxOScsICdCQzI3MTM4MjA2JywgJ0JDMjcxMzgyMTInLCAnQkMyNTU1ODIxMicsICdCQzI1NTU4MjI2JywKICAnQkMyNzc4NjIwOScsICdCQzI3Nzg2MjE5JywgJ0JDMjc3MTIyMDknLCAnQkMyNzcxMjIxOScsICdCQzI2MzM0MjA5Jwp9CgovLyBtZXRob3RyZXhhdGXvvIg5IGNvZGVz77yJCmRlZmluZSAiTDA0QVgwMyI6IHsKICAnQTAwOTEwMTEwMCcsICdBMDI1NTIwMTAwJywgJ0IwMjA0NDAxMDAnLCAnQjAyMjcyNjEwMCcsICdCMDE2MTk0MTAwJywKICAnQjAxNjE5NTEwMCcsICdCQzE2MTk0MTAwJywgJ0JDMjI3MjYxMDAnLCAnQkMyNjMzNDIwOScKfQoKLy8gbWV0aG90cmV4YXRl77yINTUgY29kZXPvvIkKZGVmaW5lICJMMDFCQTAxIjogewogICdBMDA4MjYwMjEyJywgJ0IwMjA1NjQyMTInLCAnQjAyMDY0MzIyOScsICdCMDIwNjQzMjQ4JywgJ0IwMDkxNDQyMDknLAogICdCMDEzMjMyMjk5JywgJ0IwMTE3MzQyMTInLCAnQjAxMTczNDI0OCcsICdCMDE4ODc2MjIxJywgJ0IwMTE3NzAyMTInLAogICdCMDE4ODc2MjI5JywgJ0IwMTg4NzYyNDgnLCAnQjAyMDgwODIxMicsICdCMDE4ODc4MjIxJywgJ0IwMjA4MDgyMzgnLAogICdCMDEzMjMyMjI5JywgJ0IwMjE2OTYyMTInLCAnQjAxOTcxMjIzOCcsICdCMDIxNzEzMjI5JywgJ0IwMTU5ODEyMTInLAogICdCMDE1OTgxMjI2JywgJ0IwMTU5ODMyMTInLCAnQUM1OTQxNDIxMicsICdBQzU5NDE0MjI2JywgJ0FDNTk0MTQyMzgnLAogICdCMDA4Njc4MjE0JywgJ0IwMDg4NTkyMTInLCAnQjAwODg1OTIzOCcsICdCMDE3NTQ5MjEyJywgJ0IwMTc1NDkyNDUnLAogICdCMDIxNzIyMjEyJywgJ0IwMTc1NTEyNDUnLCAnQUM1OTQxNDI0NScsICdCMDE2NDEwMjQ4JywgJ0IwMDg4NTkyNDAnLAogICdCMDA4ODU5MjQ1JywgJ0IwMDg4NTkyNjMnLCAnQjAyMTcyMjIzOCcsICdCMDIyMTMyMjI5JywgJ0IwMTY0MTkyNDAnLAogICdCMDE5NzA3MjI5JywgJ0IwMTk3MDcyOTknLCAnQjAxOTcxMjIxMicsICdCQzIyMTMyMjI5JywgJ0IwMjE2ODgyMTInLAogICdCMDIxMDUxMjQ4JywgJ0JDMjE3MTMyMjknLCAnQkMxODg3NjIyMScsICdCQzE4ODc2MjI5JywgJ0JDMTg4NzYyNDgnLAogICdCQzE4ODc4MjIxJywgJ0JDMjE2OTYyMTInLCAnWDAwMDIzNjIxMicsICdYMDAwMTE1MjIxJywgJ1gwMDAxMTkyMzgnCn0KCi8vIGZsdW9yb3VyYWNpbO+8iDQ5IGNvZGVz77yJCmRlZmluZSAiTDAxQkMwMiI6IHsKICAnQTAwOTk2NDIyMScsICdBQzU4MDMzMjM4JywgJ0FDNTgwMzMyNDgnLCAnQUM1ODAzMzI1NScsICdCMDIwNDA2MjI5JywKICAnQjAyMDQwNjIzOCcsICdCMDIwNDA2MjU1JywgJ0FBNTgwMzMyMzgnLCAnQUE1ODAzMzI0OCcsICdBQTU4MDMzMjU1JywKICAnQjAxMzI5MTIyMScsICdCMDEzNjAzMjIxJywgJ0IwMjA3OTMyMjknLCAnQjAyMDgwNzIyMScsICdCMDIwODA3MjI5JywKICAnQjAyMDgwNzIzOCcsICdCMDExOTI0MjAwJywgJ0IwMTkxODYyMjEnLCAnQjAxOTE4NjIyOScsICdCMDIxNzIwMjI5JywKICAnQjAyMTcyMDIzOCcsICdCMDIxNzIwMjU1JywgJ0FDNTg4NDIyMzgnLCAnQjAyMzQwNDIyMScsICdCMDIzNDA0MjI5JywKICAnQjAyMzQwNDIzOCcsICdCMDIxNjg5MjIxJywgJ0IwMjE2ODkyMjknLCAnQjAyMTY4OTI0OCcsICdCMDIxMTIxMjIxJywKICAnQkMyNjM3MjIyMScsICdCQzI2MzcyMjI5JywgJ0JDMjE2ODkyMjEnLCAnQkMyMTY4OTIyOScsICdCQzIxNjg5MjQ4JywKICAnQkMyMzQwNDIyMScsICdCQzIzNDA0MjI5JywgJ0JDMjM0MDQyMzgnLCAnQkMyNjY3NjIyOScsICdCQzI2Njc2MjM4JywKICAnQkMyNjY3NjI1NScsICdCQzI3NDM1MjIxJywgJ0JDMjc0MzUyMjknLCAnQkMyNzQzNTIzOCcsICdCQzI3NDM1MjQ4JywKICAnQkMyNzQzNTI1NScsICdYMDAwMTI0MjU1JywgJ0IwMTc0NjAzMzgnLCAnQjAyMzUxNDMzOCcKfQoKLy8gdGVnYWZ1cu+8iDEyIGNvZGVz77yJCmRlZmluZSAiTDAxQkM1MyI6IHsKICAnQTA0MzY5ODEwMCcsICdBMDQ5NTYzMTAwJywgJ0FDNDM2OTgxMDAnLCAnQUM0OTU2MzEwMCcsICdCMDIzNDg0MTAwJywKICAnQkMyMzQ4NDEwMCcsICdBQzYwNDgwMTAwJywgJ0FDNjA0ODIxMDAnLCAnQjAyNTI0MjEwMCcsICdCMDI1MjQzMTAwJywKICAnQkMyNTI0MjEwMCcsICdCQzI1MjQzMTAwJwp9CgoKLy8gZXBpcnViaWNpbu+8iDUxIGNvZGVz77yJCmRlZmluZSAiTDAxREIwMyI6IHsKICAnQTA0NzU1MjIyOScsICdBMDQ3NTUyMjQwJywgJ0EwNDc1NTcyMjknLCAnQUI0NzAwMzIyMScsICdBMDQ4MzI5MjQ4JywKICAnQUI0NzAwMzIyOScsICdBQjQ3MDAzMjQwJywgJ0FDNDcwMDMyMjEnLCAnQUM0NzAwMzI0MCcsICdBMDQ3MDAzMjIxJywKICAnQTA0NzAwMzIyOScsICdBMDQ3MDAzMjQwJywgJ0FCNDc1NTcyMjknLCAnQUM1Nzk4NTI0MCcsICdCMDE5MTE5MjQ4JywKICAnQjAxOTEyMDIyOScsICdCMDE5MTIwMjQ4JywgJ0FCNDgzMjkyNDgnLCAnQUM1Nzk4NTIyMScsICdCMDE0NjA1MjQ4JywKICAnQjAxNDYwNjIyOScsICdBQzU3OTg1MjI5JywgJ0IwMjA5ODIyMjknLCAnQjAyMDk4MjI0MCcsICdCMDE5MTIwMjk5JywKICAnQUM2MTEyNjIyOScsICdBQzYxMTI5MjIxJywgJ0IwMjU1MTUyMjEnLCAnQjAyNTUxNTI0MCcsICdCQzI0NDI3MjIxJywKICAnQjAyNTUwNDIyMScsICdCMDI1NTA0MjQwJywgJ0JCMjU5NjgyMjEnLCAnQkMyNDQyNzI0MCcsICdCQjI1OTY4MjQwJywKICAnQkMyMjY5NTIyMScsICdCMDI0NzYyMjIxJywgJ0IwMjQ3NjIyNDAnLCAnQkMyMjY5NTI0MCcsICdCMDI0NDI3MjIxJywKICAnQjAyNDQyNzI0MCcsICdCQzE5MTE5MjQ4JywgJ0JDMTkxMjAyMjknLCAnQkMyNDc2MjIyMScsICdCQzI0NzYyMjQwJywKICAnQkMyNTUxNTIyMScsICdCQzI1NTE1MjQwJywgJ0JDMjU5NjgyMjEnLCAnQkMyNTk2ODI0MCcsICdCQzI2Njk5MjIxJywKICAnQkMyNjY5OTI0MCcKfQoKLy8gY2FyYm9wbGF0aW7vvIg0MCBjb2Rlc++8iQpkZWZpbmUgIkwwMVhBMDIiOiB7CiAgJ0FDNTczMTQyMzUnLCAnQUM1NzMxNDJBUCcsICdCMDIwNzI1MjM1JywgJ0IwMjA3MjUyQVAnLCAnQjAxODc2ODI0OCcsCiAgJ0IwMTg3NjgyNjEnLCAnQjAxODc2ODI3MicsICdCMDIwOTY2MjQ4JywgJ0IwMjA5NjYyNjEnLCAnQjAyMDk2NjI3MicsCiAgJ0IwMTg2OTYyNDgnLCAnQjAxODY5NjI2MScsICdCMDE4Njk2MjcyJywgJ0IwMjE3MDEyMzUnLCAnQjAyNDgwNDIzNScsCiAgJ0IwMjQ4MDQyQVAnLCAnQjAyMTcwMTJBUCcsICdCMDI0MDc0MjM1JywgJ0IwMjQwNzQyQVAnLCAnQjAyNTYyNjIzNScsCiAgJ0IwMjU2MjYyQVAnLCAnQjAxNzc4MjI0OCcsICdCMDE3NzgyMjYxJywgJ0IwMTc3ODIyNzInLCAnQjAyMTA0NzIyMScsCiAgJ0IwMjEwNDcyMzUnLCAnQjAyMTA0NzJBUCcsICdCQzI1NjI2MjM1JywgJ0JDMjU2MjYyQVAnLCAnQkMyMTcwMTIzNScsCiAgJ0JDMjE3MDEyQVAnLCAnQjAyNDU5MTIzNScsICdCMDI0NTkxMkFQJywgJ0JDMjQwNzQyQVAnLCAnQkMyNjM4NzIzNScsCiAgJ0JDMjQwNzQyMzUnLCAnQkMyNDgwNDIzNScsICdCQzI3MDgzMjM1JywgJ0JDMjQ4MDQyQVAnLCAnQkMyNzA4MzJBUCcKfQoKLy8gcGFjbGl0YXhlbO+8iDgxIGNvZGVz77yJCmRlZmluZSAiTDAxQ0QwMSI6IHsgCiAgJ0FDNDUzMzEyMjknLCAnQUM0NTMzMTIzNScsICdBQzQ1MzMxMjQwJywgJ0FDNDUzMzEyNDgnLCAnQTA0NDYxMTIyMScsCiAgJ0FDNDUzMzEyRTInLCAnQTA0NDYwMTIyMScsICdBMDQ0NjAxMjI5JywgJ0EwNDQ2MDEyRTInLCAnQTA0NDYwMTJGRycsIAogICdBQjQ0NDY2MjM1JywgJ0FCNDQ0NjYyNDAnLCAnQUI0NDQ2NjI0OCcsICdBQzQ0NjAxMkZHJywgJ0EwNDUzMzEyMjEnLAogICdBMDQ1MzMxMjI5JywgJ0EwNDUzMzEyMzUnLCAnQTA0NTMzMTI0MCcsICdBMDQ1MzMxMjQ4JywgJ0EwNDUzMzEyRTInLAogICdBMDQ2NDI5MjIxJywgJ0FCNDQ0NjYyRTInLCAnQUI0NDQ2NjJGRycsICdBQzQ1MzMxMjIxJywgJ0FDNDQ2MDEyMjEnLAogICdBMDQ0NDY2MjIxJywgJ0FCNDQ0NjYyMjEnLCAnQUI0NDQ2NjIyOScsICdBQzQ0NjAxMjI5JywgJ0EwNDQ0NjYyMjknLAogICdBMDQ0NDY2MjM1JywgJ0EwNDQ0NjYyNDAnLCAnQTA0NDQ2NjI0OCcsICdBQzQ0NjAxMjQwJywgJ0EwNDQ0NjYyRTInLAogICdBMDQ0NDY2MkZHJywgJ0IwMjMzOTYyMjEnLCAnQjAyMzM5NjI0MCcsICdCMDIyNDAwMjIxJywgJ0IwMjI0MDAyNDAnLAogICdCMDI0NDYzMjQwJywgJ0IwMjQ0NjMyNDgnLCAnQjAyNDQ2MzJFMicsICdCMDI0NDc2MjIxJywgJ0JDMjQ3MzgyMjEnLAogICdCQjIxMTU3MjIxJywgJ0IwMjQ0NzYyNDAnLCAnQjAyNDQ3NjI0OCcsICdCMDI0NDc2MkUyJywgJ0IwMjQ3MzgyMjEnLAogICdCMDI0NzM4MjQ4JywgJ0JCMjExNTcyRTInLCAnQjAyNDczODJCRScsICdCMDI0NzM4MkZHJywgJ0IwMjQ0NjMyMjEnLAogICdCMDIxMTU3MjIxJywgJ0IwMjExNTcyRTInLCAnQkMyMTE1NzIyMScsICdCQzIxMTU3MkUyJywgJ0JDMjQ3MzgyNDgnLAogICdCQzI0NzM4MkJFJywgJ0JDMjQ3MzgyRkcnLCAnQkMyODAxMzIyMScsICdCQzI4MDEzMkUyJywgJ0JDMjY0ODQyNTUnLAogICdCQzIzMzk2MjIxJywgJ0JDMjMzOTYyNDAnLCAnQkMyMzM5NjI0OCcsICdCQzI3NTA0MjQ4JywgJ0JDMjc1MDQyRTInLAogICdCQzIzMzk2MkUyJywgJ1gwMDAyMjEyNTUnLCAnQkMyNzQzNDI0MCcsICdCQzI3NTA0MjIxJywgJ1gwMDAyMjIyNTUnLAogICdCQzI3NDM0MjQ4JywgJ0JDMjc0MzQyNTUnLCAnQkMyNzQzNDI5NicsICdYMDAwMjI5MjU1JywgJ0JDMjc0MzQyRTInLAogICdCQzI3NDM0MjIxJwp9CgoKLy8gR29zZXJlbGlu77yINiBjb2Rlc++8iQpkZWZpbmUgIkwwMkFFMDMiOiB7CiAgJ0IwMjIxMzcyQ1MnLCAnQjAxOTgwNTIwOScsICdCMDE5ODA1MkNTJywKICAnQkMyMjEzNzJDUycsICdCMDIyMjMzMkQxJywgJ0JDMjIyMzMyRDEnCn0KCi8vIExldXByb3JlbGlu77yIMTUgY29kZXPvvIkKZGVmaW5lICJMMDJBRTAyIjogewogICdCMDE4MzIxMjE1JywgJ0EwNDk4MzgyMTUnLCAnQjAxOTQ5MzJBQScsICdCMDIzMzYwMjE1JywgJ0IwMjUxOTMyQ04nLAogICdCMDI1OTM0MkFBJywgJ0JDMjUxOTMyQ04nLCAnQkMyNjMwNDIyNScsICdCQzI4MzM5MkFBJywgJ0JDMjgzNDAyRlEnLAogICdCQzI2MzA1MkZRJywgJ0JDMjYzMDYyQVAnLCAnQkMyNTYxMjI0MycsICdCQzE5NDkzMkFBJywgJ0JDMjU5MzQyQUEnCn0KCi8vIFRyaXB0b3JlbGlu77yIMTEgY29kZXPvvIkKZGVmaW5lICJMMDJBRTA0IjogewogICdCMDIzMzA4MkFBJywgJ0IwMjQzODIyQUEnLCAnQkMyMDgyNzJBQScsICdCQzI0MzgyMkFBJywgJ0IwMjA4MjcyQUEnLAogICdCQzI2NzA0MkFBJywgJ0JDMjY3MDUyQ04nLCAnQkMyNjcwNjJGUScsICdCMDIwMjA2MkFBJywgJ0IwMjQ1MjgyQ04nLAogICdCQzI0NTI4MkNOJwp9CgovLyBDREs0NuaKkeWItuWKkQovL1JpYm9jaWNsaWLvvIgxIGNvZGVz77yJCmRlZmluZSAiTDAxRUYwMiI6IHsnQkMyNzMyMDEwMCd9CgovL1BhbGJvY2ljbGli77yIMyBjb2Rlc++8iQpkZWZpbmUgIkwwMUVGMDEiOiB7J0JDMjcxMDIxMDAnLCAnQkMyNzEwMzEwMCcsICdCQzI3MTA0MTAwJ30KCi8vRXJpYnVsaW4KZGVmaW5lICJMMDFYWDQxIjogeyAnQUM2MTM5OTIxMicsICdCQzI2MTQwMjEyJyB9CgovL2l4YWJlcGlsb25lCmRlZmluZSAiTDAxREMwNCI6IHsgJ0JDMjUwNTMyMzUnLCAnWDAwMDI2NjIzNScgfQoKCi8vRXZlcm9saW11cwpkZWZpbmUgIkwwMUVHMDIiOiB7CiAgJ0IwMjUxNjUxMDAnLCAnQjAyNTE2NjEwMCcsICdCQzI1MTY1MTAwJywgJ0JDMjUxNjYxMDAnLAogICdWMDAwMDIwMTAwJywgJ1YwMDAwMjExMDAnLCAnVkMwMDAyMDEwMCcsICdWQzAwMDIxMTAwJwp9CgovL0V2ZXJvbGltdXMKZGVmaW5lICJMMDRBSDAyIjogewogICdCMDI0NzcwMTAwJywgJ0IwMjQ3NzExMDAnLCAnQjAyNDc3MjEwMCcsCiAgJ0JDMjQ3NzAxMDAnLCAnQkMyNDc3MTEwMCcsICdCQzI0NzcyMTAwJwp9CgpkZWZpbmUgIkV2ZXJvbGltdXMiOgpMMDFFRzAyIAp1bmlvbiBMMDRBSDAyCgoKLy9vbGFwYXJpYgpkZWZpbmUgIkwwMVhLMDEiOiB7J0JDMjc0NDUxMDAnLCAnQkMyNzQ0NjEwMCd9CgovLyBMMDFCQzA277yIMTEgY29kZXPvvIkKZGVmaW5lICJMMDFCQzA2IjogewogICdCMDIyNDA4MTAwJywgJ0IwMjI0MDkxMDAnLCAnQkMyMjQwODEwMCcsICdCQzIyNDA5MTAwJywgJ0JDMjcxNjUxMDAnLAogICdCQzI3MTY2MTAwJywgJ0JDMjY5NjAxMDAnLCAnQkMyNzE5NTEwMCcsICdCQzI3MjI5MTAwJywgJ0JDMjY5MTQxMDAnLAogICdCQzI2NzU3MTAwJwp9CgovLyBMMDFCQzA177yINTAgY29kZXPvvIkKZGVmaW5lICJMMDFCQzA1IjogewogICdBMDQ3ODcyMjIzJywgJ0EwNDc4NzIyNDMnLCAnQTA0ODA4MDI2MycsICdBQjQ3ODcyMjIzJywgJ0FDNTk3ODQyMDknLAogICdBQzU5Nzg0MjYzJywgJ0FCNDc4NzIyNDMnLCAnQjAyNTY4MTIwOScsICdCMDI1NjgxMjYzJywgJ0IwMjE4NDEyMDknLAogICdBQzU4NjQ2MjA5JywgJ0FDNTg2NDYyNjMnLCAnQjAyNDg0NjIwOScsICdCMDI0ODQ2MjYzJywgJ0IwMjE4NDEyNjMnLAogICdCMDIzMjk4MjYzJywgJ0FDNjExNzUyNjMnLCAnQjAyNTE4MzIwOScsICdCMDI1MTgzMjEyJywgJ0IwMjUxODMyNjMnLAogICdCMDI1ODk5MjIxJywgJ0IwMjU4OTkyNDAnLCAnQjAyNTg5OTI0OCcsICdCMDI2MDY1MjEyJywgJ0IwMjYwNjUyNjMnLAogICdCQzI1MTgzMjA5JywgJ0JDMjUxODMyNjMnLCAnQkMyNTY4MTIwOScsICdCQzI1NjgxMjYzJywgJ0IwMjYwNjUyMDknLAogICdCQjI1MTgzMjEyJywgJ0JCMjUxODMyNjMnLCAnQkMyNjYyNzJGUycsICdCQzIzMjk4MjYzJywgJ0JDMjQ4NDYyNjMnLAogICdCQzI3ODA4MjIxJywgJ0JDMjc4MDgyNDAnLCAnQkMyNzgwODI0OCcsICdCQzI2NjI3MkFGJywgJ0JDMjQ4NDYyMDknLAogICdCQzI2MDY1MjA5JywgJ0JDMjYwNjUyMTInLCAnQkMyNjA2NTI2MycsICdCQzI3MTA2MjA5JywgJ0JDMjcxMDYyNjMnLAogICdCQzI3NDY4MjA5JywgJ0JDMjU4OTkyMjEnLCAnQkMyNzQ2ODI2MycsICdCQzI1ODk5MjQwJywgJ0JDMjU4OTkyNDgnCn0KCi8vIEwwMUNBMDTvvIgyNiBjb2Rlc++8iQpkZWZpbmUgIkwwMUNBMDQiOiB7CiAgJ0FDNjA2MDgxMDAnLCAnQUM2MDg0MTEwMCcsICdBQzYwODQ5MTAwJywgJ0IwMjU4OTgyMDknLCAnQjAyNTg5ODIyMScsCiAgJ0IwMjQyNjgxMDAnLCAnQjAyNDI2OTEwMCcsICdCQzI0MjY4MTAwJywgJ0JDMjQyNjkxMDAnLCAnQjAyNDQ3MjIwOScsCiAgJ0IwMjQ0NzIyMjEnLCAnQjAyNTQ4OTIwOScsICdCMDI1NDg5MjIxJywgJ0JDMjIyMTUyMDknLCAnQkMyMjIxNTIyMScsCiAgJ0IwMjIyMTUyMDknLCAnQjAyMjIxNTIyMScsICdCQzI0NDcyMjA5JywgJ0JDMjQ0NzIyMjEnLCAnQkMyNTQ4OTIwOScsCiAgJ0JDMjU0ODkyMjEnLCAnWDAwMDIxNzIwOScsICdYMDAwMjE4MTAwJywgJ1gwMDAyMjUyMDknLCAnQkMyNTg5ODIwOScsCiAgJ0JDMjU4OTgyMjEnCn0KCi8vTDAxRkQwNApkZWZpbmUgIkwwMUZEMDQiOiB7J0tDMDExNzkyNTUnfQoKLy8gTDAxWEEwMe+8iDM2IGNvZGVz77yJCmRlZmluZSAiTDAxWEEwMSI6IHsKICAnQjAyMDkzNzIzOCcsICdCMDE4ODY5MjM4JywgJ0IwMTg4NzMyMzgnLCAnQjAxODg3MzI1NScsICdCMDIwOTM3MjU1JywKICAnQjAyMDkzNzI2MycsICdCMDEyMDIwMjQ4JywgJ0IwMTIxODQyMjknLCAnQjAxNzgwNTI1NScsICdCMDIxNzgyMjQ4JywKICAnQjAyMTc4MjI1NScsICdCMDIyNjAyMjM4JywgJ0IwMjI2MDIyNTUnLCAnQjAyNDk3MDI1NScsICdCMDI1NzQ0MjI5JywKICAnQjAyNTc0NDI0OCcsICdCMDE5MzMzMjI5JywgJ0IwMTkzMzMyNDgnLCAnQjAyMDE5MzIyOScsICdCMDIwMTkzMjYzJywKICAnQjAxNjQxNzIyOScsICdCMDE3ODA1MjM4JywgJ0IwMTc4MDUyNDgnLCAnQjAyMTc4MjIyOScsICdCMDIwMjIxMjQ4JywKICAnQjAyNDk3MDIzOCcsICdCQzI0OTcwMjM4JywgJ0JDMjQ5NzAyNTUnLCAnQkMyNTc0NDIyOScsICdCQzI1NzQ0MjQ4JywKICAnQkMyMTc4MjI0OCcsICdCQzIxNzgyMjU1JywgJ0JDMTg4NzMyMzgnLCAnQkMxODg3MzI1NScsICdCQzI3NzYyMjI5JywKICAnQkMyNzc2MjI0OCcKfQoKCi8vdGFsYXpvcGFyaWIKZGVmaW5lICJMMDFYSzA0IjogeydCQzI3ODAxMTAwJywgJ0JDMjc4MDIxMDAnfQoKZGVmaW5lICJMMDFYSyI6CkwwMVhLMDEKdW5pb24gTDAxWEswNAp1bmlvbiB7J0JDMjc3NjQxMDAnLCAnQkMyODY1MTEwMCd9CgovL1BlcnR1enVtYWIKZGVmaW5lICJMMDFGRDAyIjogeydLQzAwOTQyMjMzJ30KCi8vUGVydHV6dW1hYuiIhyB0cmFzdHV6dW1hYiDnmq7kuIvms6jlsITopIfmlrnoo73lipEKZGVmaW5lICJMMDFGWTAxIjogeydLQzAxMTcyMjM1JywgJ0tDMDExNzMyMjknfQoKLy9TYWNpdHV6dW1hYiBnb3ZpdGVjYW4KZGVmaW5lICJMMDFGWDE3IjogeydLQzAxMjA2MjYyJ30KCi8vVHJhc3R1enVtYWLvvIgxMiBjb2Rlc++8iQpkZWZpbmUgIkwwMUZEMDEiOiB7J0swMDA2MjUyQjUnLCAnSzAwMDc5MDI2MScsICdLMDAwOTYxMkI1JywgJ0pDMDAxNTQyNjEnLAogICdLQzAxMDY1MjIxJywgJ0tDMDA2MjUyQjUnLCAnS0MwMDk2MTJCNScsICdLQzAxMDg5MkI1JywKICAnS0MwMTExMTJERScsICdLQzAxMTE2MkI1JywgJ0tDMDExMzYyQjUnLCAnS0MwMTE1OTJERScKfQoKZGVmaW5lICJMMDFGRDAxYW5kTDAxRkQwMmV4Y2VwdEtDMDExMzYyQjUiOiB7J0swMDA2MjUyQjUnLCAnSzAwMDc5MDI2MScsICdLMDAwOTYxMkI1JywgJ0pDMDAxNTQyNjEnLAogICdLQzAxMDY1MjIxJywgJ0tDMDA2MjUyQjUnLCAnS0MwMDk2MTJCNScsICdLQzAxMDg5MkI1JywnS0MwMDk0MjIzMycsCiAgJ0tDMDExMTEyREUnLCAnS0MwMTExNjJCNScsICdLQzAxMTU5MkRFJwp9CgovL09naXZyaeOAgUhlcnp1bWHjgIFFaXJnYXN1buOAgUhlcmNlcHRpbuOAgUthbmppbnRpCmRlZmluZSAiVHJhc3R1enVtYWLkvbXnlKjol6XniakiOiB7J0tDMDEwODkyQjUnLCAnS0MwMTExNjJCNScsICdKQzAwMTU0MjYxJywgJ0tDMDA5NjEyQjUnLCAnS0MwMTA2NTIyMScsICdLQzAxMTExMkRFJ30KCi8vVHJhc3R1enVtYWIgZW10YW5zaW5lCmRlZmluZSAiTDAxRkQwMyI6IHsnS0MwMDk0OTI1NScsICdLQzAwOTQ5MkFYJ30KCi8vTGFyb3RyZWN0aW5pYgpkZWZpbmUgIkwwMUVYMTIiOiB7J0JDMjc3NDYxNDgnLCAnQkMyNzc0NjE1NScsICdCQzI3NzQ3MTAwJywgJ0JDMjc3NDgxMDAnfQoKZGVmaW5lICJMMDFFSDAxIjogeydCMDI0ODc4MTAwJywgJ0JDMjQ4NzgxMDAnfQoKLy8gTDAxREIgKDEyMyBjb2Rlc++8iQpkZWZpbmUgIkwwMURCIjogewogICdBQjQ3MDAzMjQwJywgJ0EwMzM0NDUyMjknLCAnQUI0NzU1NzIyOScsICdBMDQ4MzI5MjQ4JywgJ0EwMzM0NDUyOTknLAogICdBMDQ3MDAzMjIxJywgJ0FBMzY0MTgyMjknLCAnQUI0NzAwMzIyMScsICdBQzQ3MDAzMjIxJywgJ0FDNDcwMDMyNDAnLAogICdBMDQ3MDAzMjI5JywgJ0EwMzY0MTgyMjknLCAnQTA0NzAwMzI0MCcsICdBMDQ3NTUyMjI5JywgJ0EwNDc1NTIyNDAnLAogICdBQjQxMDM3MjI5JywgJ0FDMzM0NDUyMjknLCAnQUM0MTAzNzIyOScsICdBQjQ3MDAzMjI5JywgJ0FCNDgzMjkyNDgnLAogICdBMDQ3NTU3MjI5JywgJ0EwNDEwMzcyMjknLCAnQjAxODU4MDIyOScsICdCMDE4NTgwMjk5JywgJ0FDNTc5ODUyMjEnLAogICdBQzYxMTI1MjI5JywgJ0FDNjExMjYyMjknLCAnQUM2MTEyOTIyMScsICdCMDE5MTE3MjQ4JywgJ0IwMTkxMTkyNDgnLAogICdCMDE5MTIwMjI5JywgJ0IwMTkxMjAyNDgnLCAnQjAyNDc2MjIyMScsICdCMDI0NzYyMjQwJywgJ0FDNjExMzIyMjknLAogICdCMDE3OTkxMjI5JywgJ0IwMTc5OTEyOTknLCAnQUM1Nzk4NTIyOScsICdCMDE5MTIwMjk5JywgJ0IwMTIwMjcyMjknLAogICdCMDE4MTc0MjI5JywgJ0IwMTgxNzQyNDgnLCAnQUM1Nzk4NTI0MCcsICdCMDEzMDM5MjM4JywgJ0IwMTMwNTkyMzgnLAogICdCMDE0NjA1MjQ4JywgJ0IwMTQ2MDYyMjknLCAnQjAxNDYwNjI5OScsICdCMDE5MTE3MjIxJywgJ0IwMTE1OTYyMzgnLAogICdCMDI1NTA0MjIxJywgJ0IwMjU1MDQyNDAnLCAnQjAyMDg4MzIyOScsICdCMDIyMTc0MjQ4JywgJ0IwMTk0NDMyNDgnLAogICdCMDE5NDQ0MjI5JywgJ0IwMjIxNzUyMjknLCAnQjAyNDQyNzIyMScsICdCMDI0NDI3MjQwJywgJ0IwMjIyMDcyMjknLAogICdCMDIwMzM1MjIxJywgJ0IwMjAzMzUyMjknLCAnQjAyMDMzNTI0MCcsICdCMDIwOTgyMjI5JywgJ0IwMjA5ODIyNDAnLAogICdCMDIxNTc2MjIxJywgJ0IwMjE3OTAxMDAnLCAnQjAyMTc5MTEwMCcsICdCMDE5ODQ1MjIxJywgJ0IwMjE1NzYyNDAnLAogICdCMDIxNTc2MjQ4JywgJ0IwMjE3MTgyMjEnLCAnQjAyMTcxODIyOScsICdCMDIxNzE4MjQwJywgJ0JCMjU5NjgyMjEnLAogICdCQjI2MDI2MjIxJywgJ0JDMjE1NzYyMjEnLCAnQkMyMTU3NjI0MCcsICdCQjI2MDI2MjI5JywgJ0JDMTkxMTkyNDgnLAogICdCQzE5MTIwMjI5JywgJ0JCMjYwMjYyNDAnLCAnQkIyNjAyNjI0OCcsICdCQzIyNjk1MjIxJywgJ0JDMTMwNTkyMzgnLAogICdCQzIyNjk1MjQwJywgJ0JDMjI3MTIyMjEnLCAnQkMyMTc5MDEwMCcsICdCMDI1NTE1MjIxJywgJ0IwMjU1MTUyNDAnLAogICdCQzE5ODQ1MjIxJywgJ0JDMjQ0MjcyMjEnLCAnQkMyNTg0MDIyMScsICdCQzI0NzYyMjIxJywgJ0JDMjQ3NjIyNDAnLAogICdCMDI1ODQwMjIxJywgJ0IwMjU4NDAyNDAnLCAnQkMyNDQyNzI0MCcsICdCQzE4NTgwMjI5JywgJ0JCMjU5NjgyNDAnLAogICdCQzIzMzEzMjIxJywgJ0JDMjY1NzIyMjEnLCAnQkMyNjU3MjI0MCcsICdCQzI1NTE1MjIxJywgJ0JDMjU1MTUyNDAnLAogICdCQzI1ODA4MjIxJywgJ0JDMjU4MDgyMjknLCAnQkMyNTgwODI0MCcsICdCQzI2Njk5MjIxJywgJ0JDMjY2OTkyNDAnLAogICdCQzI3NzA0MjIxJywgJ0JDMjc4ODYyMjknLCAnQkMyNTk2ODIyMScsICdCQzI1OTY4MjQwJywgJ0JDMjYwMjYyMjEnLAogICdCQzI2MDI2MjI5JywgJ0JDMjYwMjYyNDAnLCAnQkMyNjAyNjI0OCcsICdYMDAwMzAwMjI5JywgJ1gwMDAzNDAyMjknLAogICdCQzI3ODg2MjQwJywgJ1gwMDAxNDYyMjknLCAnWDAwMDE4NDIyOScKfQoKCi8vIEwwMUNE77yIMTMxIGNvZGVz77yJCmRlZmluZSAiTDAxQ0QiOiB7CiAgJ0FCNDQ0NjYyMjknLCAnQUI0NDQ2NjIzNScsICdBQjU1MTEzMjA2JywgJ0FCNTUxMTMyMTInLAogICdBQjU2NjcyMjA2JywgJ0FCNTY2NzIyMTInLCAnQUI0NDQ2NjJFMicsICdBQjQ0NDY2MkZHJywKICAnQUM0NTMzMTIyOScsICdBQzQ1MzMxMjM1JywgJ0EwNDUzMzEyMjEnLCAnQTA0NTMzMTIyOScsCiAgJ0EwNDUzMzEyMzUnLCAnQTA0NTMzMTI0MCcsICdBMDQ0NDY2MjIxJywgJ0EwNDQ0NjYyMjknLAogICdBMDQ0NDY2MjM1JywgJ0EwNDUzMzEyNDgnLCAnQUI0NDQ2NjI0MCcsICdBQjU3MjQwMjA5JywKICAnQUE1NTExMzIwNicsICdBQTU1MTEzMjEyJywgJ0FCNTcyNDAyMTknLCAnQUM0NDYwMTIyOScsCiAgJ0FDNDUzMzEyNDAnLCAnQUM0NDYwMTI0MCcsICdBQzQ1MzMxMjQ4JywgJ0FDNDUzMzEyRTInLAogICdBMDQ0NDY2MjQwJywgJ0EwNDUzMzEyRTInLCAnQTA0NjQyOTIyMScsICdBMDQ0NDY2MjQ4JywKICAnQTA0NDQ2NjJFMicsICdBMDQ0NDY2MkZHJywgJ0FCNTgwNjUyMDknLCAnQUE1NjY3MjIwNicsCiAgJ0FBNTY2NzIyMTInLCAnQUI0Nzg4MjIwNicsICdBQzQ0NjAxMkZHJywgJ0EwNDQ2MDEyMjEnLAogICdBMDQ0NjAxMjI5JywgJ0EwNDQ2MDEyRTInLCAnQUI0NDQ2NjI0OCcsICdBQjQ0NDY2MjIxJywKICAnQUI0Nzg4MjIxMicsICdBQzQ1MzMxMjIxJywgJ0EwNDQ2MDEyRkcnLCAnQTA0NDYxMTIyMScsCiAgJ0EwNDc4ODIyMDYnLCAnQTA0Nzg4MjIxMicsICdBQzQ0NjAxMjIxJywgJ0FDNTc5NzEyMTknLAogICdBQzU4MDY2MjA5JywgJ0FDNTgwNjYyMTknLCAnQUM2MTA4NzIwOScsICdBQzU4MDY1MjA5JywKICAnQUM1NzI0MDIwOScsICdCMDI0NzM4MkJFJywgJ0IwMjQ3MzgyRkcnLCAnQUM1NzI0MDIxOScsCiAgJ0FDNTc5NzEyMDknLCAnQUM1ODU4MTIwOScsICdBQzU4NTgxMjE5JywgJ0FDNTg1ODEyMjMnLAogICdCMDIyMDQ4MjA2JywgJ0IwMjIwNDgyMTInLCAnQjAyMjQwMDIyMScsICdCMDIyNDAwMjQwJywKICAnQjAyNDQ2MzIyMScsICdCMDI1Mjg5MjA5JywgJ0IwMjUwNTUyMDYnLCAnQjAyNTA1NTIxMicsCiAgJ0IwMjExNTcyMjEnLCAnQjAyMTE1NzJFMicsICdCMDI1Mjg5MjE5JywgJ0IwMjQ0NjMyNDAnLAogICdCMDI0NDYzMjQ4JywgJ0IwMjQ0NjMyRTInLCAnQjAyNDQ3NjIyMScsICdCMDI0NDc2MjQwJywKICAnQjAyNDQ3NjI0OCcsICdCMDI0NDc2MkUyJywgJ0IwMjQ3MzgyMjEnLCAnQjAyNDczODI0OCcsCiAgJ0IwMjMzOTYyMjEnLCAnQkIyNTYwMDIxMicsICdCQjI1NjAwMjI2JywgJ0IwMjMzOTYyNDAnLAogICdCQzI3NTA0MjQ4JywgJ0JDMjc1MDQyRTInLCAnQkMyNzUyNTIwOScsICdCQzI1Mjg5MjA5JywKICAnQkMyNTI4OTIxOScsICdCQzI3NTI1MjE5JywgJ0JDMjQ3MzgyMjEnLCAnQkMyMzM5NjIyMScsCiAgJ0JDMjMzOTYyNDAnLCAnQkMyMzM5NjI0OCcsICdCQzI0NzM4MjQ4JywgJ0JDMjQ3MzgyQkUnLAogICdCQjIxMTU3MjIxJywgJ0JDMjQ3MzgyRkcnLCAnQjAyNTU1ODIxMicsICdCQzIzMzk2MkUyJywKICAnQkMyNzUwNDIyMScsICdCQjIxMTU3MkUyJywgJ0IwMjU1NTgyMjYnLCAnQkMyMTE1NzIyMScsCiAgJ0JDMjExNTcyRTInLCAnQkMyNzc4NjIwOScsICdCQzI3Nzg2MjE5JywgJ0JDMjY0ODQyNTUnLAogICdCQzI3MTM4MjA2JywgJ0JDMjc3MTIyMTknLCAnQkMyNzQzNDIyMScsICdCQzI3NDM0MjQwJywKICAnQkMyNzEzODIxMicsICdCQzI2MzM0MjA5JywgJ0JDMjYzMzQyMTknLCAnQkMyNzQzNDI0OCcsCiAgJ0JDMjc0MzQyNTUnLCAnQkMyNzQzNDI5NicsICdCQzI3NDM0MkUyJywgJ0JDMjc3MTIyMDknLAogICdCQzI1NTU4MjEyJywgJ0JDMjU1NTgyMjYnLCAnQkMyODAxMzIyMScsICdCQzI4MDEzMkUyJywKICAnWDAwMDIyMTI1NScsICdYMDAwMjIyMjU1JywgJ1gwMDAyMjkyNTUnCn0KCi8vIEwwMVhBIGNvZGVz77yJCmRlZmluZSAiTDAxWEEiOiB7CiAgJ0FCNDQ1MDgyMjknLCAnQUI0NDUwODIzOCcsICdBQzQ4NTYxMjI5JywgJ0EwNDg1NjEyMjknLAogICdBMDQ4NTYxMjM4JywgJ0EwNDg4MzgyMjknLCAnQUM0ODgzODIyOScsICdBMDQ0NTA4MjI5JywKICAnQTA0NDUwODIzOCcsICdBQTQ0NTA4MjI5JywgJ0FBNDQ1MDgyMzgnLCAnQUM0NDUwODIyOScsCiAgJ0FDNDQ1MDgyMzgnLCAnQUM1ODA5NDIyOScsICdCMDE3NzgyMjQ4JywgJ0IwMTc3ODIyNjEnLAogICdCMDE3NzgyMjcyJywgJ0IwMTc4MDUyMzgnLCAnQjAxNzgwNTI0OCcsICdCMDE2NDE3MjI5JywKICAnQjAxNzgwNTI1NScsICdBQzU1OTM0MjQ1JywgJ0IwMjA3MjUyMzUnLCAnQjAyMDcyNTJBUCcsCiAgJ0FDNTgwOTQyMzgnLCAnQjAyMTA0NzIzNScsICdCMDIxMDQ3MkFQJywgJ0FDNTczMTQyMzUnLAogICdBQzU3MzE0MkFQJywgJ0FDNTgwOTQyNDUnLCAnQjAxMjAyMDI0OCcsICdCMDEyMTg0MjI5JywKICAnQUM2MDkwNzIyOScsICdBQzYwOTA3MjM4JywgJ0IwMTg2OTYyNDgnLCAnQjAxODY5NjI2MScsCiAgJ0IwMTg2OTYyNzInLCAnQUM2MDkxNzIyOScsICdBQzYwOTE3MjM4JywgJ0FDNTU5MzQyMjknLAogICdCMDE4NzY4MjQ4JywgJ0IwMTg3NjgyNjEnLCAnQjAxODc2ODI3MicsICdCMDE4ODY5MjM4JywKICAnQjAxODg3MzIzOCcsICdCMDE4ODczMjU1JywgJ0FDNTU5MzQyMzgnLCAnQjAyMDkzNzIzOCcsCiAgJ0IwMjQ5MDYyMjknLCAnQjAyNDkwNjIzOCcsICdCMDI0OTA2MjQ1JywgJ0IwMjQ5NzAyMzgnLAogICdCMDI0OTcwMjU1JywgJ0IwMTkzMzMyMjknLCAnQjAxOTMzMzI0OCcsICdCMDIwMTkzMjI5JywKICAnQjAyMDE5MzI2MycsICdCMDI0NTkxMjM1JywgJ0IwMjQ1OTEyQVAnLCAnQjAyMDkzNzI1NScsCiAgJ0IwMjQ4MDQyMzUnLCAnQjAyNDgwNDJBUCcsICdCMDIwOTM3MjYzJywgJ0IwMjQ4NTAyNDgnLAogICdCMDIxNzgyMjI5JywgJ0IwMjE3ODIyNDgnLCAnQjAyMDIyMTI0OCcsICdCMDIxNzAxMjM1JywKICAnQjAyMDk2NjI0OCcsICdCMDIwOTY2MjYxJywgJ0IwMjQ4NTAyNTUnLCAnQjAyNDA3NDIzNScsCiAgJ0IwMjQ5ODEyMjknLCAnQjAyMDk2NjI3MicsICdCMDI0OTgxMjM4JywgJ0IwMjE3MDEyQVAnLAogICdCMDIxNzgyMjU1JywgJ0IwMjQ3MDEyNDgnLCAnQjAyNDcwMTI1NScsICdCMDI0MDc0MkFQJywKICAnQjAyNDg5NzI0OCcsICdCMDI0ODk3MjU1JywgJ0IwMjQ5MDYyMTknLCAnQjAyMTA0NzIyMScsCiAgJ0JDMjQ1NjMyMjknLCAnQkMyNDU2MzIzOCcsICdCQzI0NTYzMjQ1JywgJ0IwMjI1NjgyNDgnLAogICdCMDIyNjAyMjM4JywgJ0IwMjI2MDIyNTUnLCAnQjAyNDU2MzIyOScsICdCMDI0NTYzMjM4JywKICAnQjAyNDU2MzI0NScsICdCQzI0ODA0MjM1JywgJ0JDMjQ4MDQyQVAnLCAnQjAyNTYzMTIzOCcsCiAgJ0IwMjU2NTQyNDgnLCAnQkMyNDcwMTI0OCcsICdCMDI1NjU0MjU1JywgJ0JDMjQwNzQyMzUnLAogICdCQzI0MDc0MkFQJywgJ0JDMjQ3MDEyNTUnLCAnQjAyNTc0NDIyOScsICdCMDI1NzQ0MjQ4JywKICAnQkMyMTcwMTIzNScsICdCQzI0ODUwMjQ4JywgJ0JDMjQ4NTAyNTUnLCAnQkMyMTcwMTJBUCcsCiAgJ0JDMjE3ODIyNDgnLCAnQkMyMTc4MjI1NScsICdCQzI1NjMxMjI5JywgJ0JDMjU2MzEyMzgnLAogICdCQzI1NjU0MjQ4JywgJ0JDMjU2NTQyNTUnLCAnQjAyNTYyNjIzNScsICdCMDI1NjI2MkFQJywKICAnQjAyNTYzMTIyOScsICdCQzE4ODczMjM4JywgJ0JDMTg4NzMyNTUnLCAnQkMyNDk3MDIzOCcsCiAgJ0JDMjQ5NzAyNTUnLCAnQkMyNTYyNjIzNScsICdCQzI1NjI2MkFQJywgJ0JDMjYwNTAyMjknLAogICdCQzI2MDUwMjM4JywgJ0JDMjc3NjIyMjknLCAnQkMyNzc2MjI0OCcsICdCQzI1NTUxMjI5JywKICAnQkMyNTU1MTIzOCcsICdCQzI3MDgyMjI5JywgJ0JDMjcwODIyMzgnLCAnQkMyNzA4MjI0NScsCiAgJ0JDMjU3NDQyMjknLCAnQkMyNTc0NDI0OCcsICdCQzI2Mzg3MjM1JywgJ0JDMjcwODMyMzUnLAogICdCQzI3MDgzMkFQJwp9CgpkZWZpbmUgIkwwMUZGZXhjZXB0TDAxRkYwMiI6IHsgJ0tDMDEwMTMyMjknLCAnS0MwMTA1MDIzOCcsICdLQzAxMDEzMjMwJywgJ0tDMDEwODUyMjknLCAnS0MwMTA4ODIyOScsICdLQzAxMjU4MjM1JyB9CgoKZGVmaW5lICJMMDFGRjAyIjogeyAnS0MwMTAyNTIxOScgfQoKZGVmaW5lICLlhafliIbms4znmYLms5Xol6XniakodGFtb3hpZmVu5oiW6Iqz6aaZ55Kw6YW25oqR5Yi25YqRKSI6CkwwMkJBMDEgCnVuaW9uIEwwMkJBMDMgCnVuaW9uIEwwMkJHMDMgCnVuaW9uIEwwMkJHMDQKdW5pb24gTDAyQkcwNgoKZGVmaW5lICLoirPpppnnkrDovYnljJbphbbmipHliLblipEiOgpMMDJCRzAzCnVuaW9uIEwwMkJHMDQKdW5pb24gTDAyQkcwNgoKZGVmaW5lICJHblJIIGFuYWxvZ3VlIjoKTDAyQUUwMwp1bmlvbiBMMDJBRTAyCnVuaW9uIEwwMkFFMDQKCmRlZmluZSAi5qiZ5rqW5LmL5YyW5a245Y+K5pS+5bCE6LyU5Yqp5rK755mC6Jel54mpIjoKTDAxREIwMQp1bmlvbiBMMDFBQTAxCnVuaW9uIEwwMUNEMDIKdW5pb24gTDA0QVgwMwp1bmlvbiBMMDFCQTAxCnVuaW9uIEwwMUJDMDIKdW5pb24gTDAxQkM1Mwp1bmlvbiBMMDFEQjAzCnVuaW9uIEwwMVhBMDIKdW5pb24gTDAxQ0QwMQoKZGVmaW5lICLlhafliIbms4zmsrvnmYLol6XniakiOgpMMDJCQTAxCnVuaW9uIEwwMkJBMDMKdW5pb24gTDAyQkcwMwp1bmlvbiBMMDJCRzA0CnVuaW9uIEwwMkJHMDYKdW5pb24gTDAyQUUwMwp1bmlvbiBMMDJBRTAyCnVuaW9uIEwwMkFFMDQKCmRlZmluZSAiQ0RLNDbmipHliLblipEiOgpMMDFFRjAyIAp1bmlvbiBMMDFFRjAxCgpkZWZpbmUgIuWNteW3ouWKn+iDveaKkeWItuayu+eZgiI6CkwwMkFFMDIKdW5pb24gTDAyQUUwMwp1bmlvbiBMMDJBRTA0CgpkZWZpbmUgIuWJjeWwjuaAp+WMlueZguaIluihk+W+jOi8lOWKqeaAp+WMlueZgiI6CkwwMURCIAp1bmlvbiBMMDFDRCAKdW5pb24gTDAxWEEKCmRlZmluZSAi5omL6KGT5oiW5YyW55mC5oiW5pS+55mCIjoKTDAxREIgCnVuaW9uIEwwMUNEIAp1bmlvbiBMMDFYQQp1bmlvbiBMMDFYQTAyCnVuaW9uIEwwMUFBMDEKdW5pb24gTDAxQkMwNgoKZGVmaW5lICLkubPnmYzol6Xlk4EiOgpMMDFFRjAzCnVuaW9uIEwwMUVGMDIKdW5pb24gTDAxRUYwMQp1bmlvbiBMMDFYWDQxCnVuaW9uIEwwMUVHMDIKdW5pb24gTDA0QUgwMgp1bmlvbiBMMDFYSzA0CnVuaW9uIEwwMUZEMDIKdW5pb24gTDAxRlkwMQp1bmlvbiBMMDFGWDE3CnVuaW9uIEwwMUZEMDEKdW5pb24gTDAxRkQwMwp1bmlvbiBMMDFFWDEyCgpkZWZpbmUgIuWJjeWwjuaAp+WMlueZgiI6CkwwMURCMDEKdW5pb24gTDAxREIwMwp1bmlvbiBMMDFDRDAxCnVuaW9uIEwwMUNEMDIKdW5pb24gTDAxWEEwMgoKZGVmaW5lICLooZPlvozovJTliqnmgKfljJbnmYIiOgpMMDFEQjAxCnVuaW9uIEwwMUFBMDEKdW5pb24gTDAxQ0QwMgp1bmlvbiBMMDFCQzA2CgovL0wwMUZEMDXnhKEKZGVmaW5lICLovYnnp7vmgKfljJbnmYIiOgpMMDFGWDE3CnVuaW9uIEwwMUJDMDYKdW5pb24gTDAxQkMwNQp1bmlvbiBMMDFDQTA0CnVuaW9uIEwwMUZEMDEKdW5pb24gTDAxRkQwMwp1bmlvbiBMMDFGRDA0CnVuaW9uIEwwMUZZMDEKdW5pb24gTDAxWEEwMgp1bmlvbiBMMDFYQTAxCgovL0wwMUJDNTLnhKEKZGVmaW5lICLljJblrbjnmYLms5UiOgpMMDFYQTAyCnVuaW9uIEwwMUNEMDIKdW5pb24gTDAxQ0QwMQp1bmlvbiBMMDFEQjAxCnVuaW9uIEwwMURCMDMKdW5pb24gTDAxQUEwMQp1bmlvbiBMMDFCQzAyCgoKLy9MMDFGRDA154ShCmRlZmluZSAiUGVydHV6dW1hYuS9teeUqOiXpeeJqSI6CkwwMUZEMDIgCnVuaW9uIEwwMUZZMDEKdW5pb24gTDAxRkQwMQp1bmlvbiBMMDFGRDAzCnVuaW9uIEwwMUZEMDQKCi8vTDAxRkQwNeOAgUwwMUVIMDPjgIFMMDFFSDAy54ShCmRlZmluZSAi5oqXSEVSMuayu+eZgiI6CkwwMUZZMDEKdW5pb24gTDAxRkQwMQp1bmlvbiBMMDFGRDA0CnVuaW9uIEwwMUZEMDMKdW5pb24gTDAxRkQwMgoKZGVmaW5lICLkvbXnlKjljJblrbjmsrvnmYLms5UiOgpMMDFDRDAyCnVuaW9uIEwwMUNEMDEKdW5pb24gTDAxREIwMQp1bmlvbiBMMDFEQjAzCnVuaW9uIEwwMUFBMDEKCmRlZmluZSAiUGVydHV6dW1hYlRyYXN0dXp1bWFiU0PkuYvmipdIRVIy5rK755mCIjoKTDAxRkQwMQp1bmlvbiBMMDFGRDAyCnVuaW9uIEwwMUVIMDEKdW5pb24gTDAxRkQwMwp1bmlvbiBMMDFGRDA0CgovL0wwMUZEMDXjgIFMMDFFSDAz44CBTDAxRUgwMueEoQpkZWZpbmUgIlBlcnR1enVtYWLkuYvmipdIRVIy5rK755mCIjoKTDAxRlkwMQp1bmlvbiBMMDFGRDAxCnVuaW9uIEwwMUZEMDQKdW5pb24gTDAxRkQwMwp1bmlvbiBMMDFGRDAyCgoKZGVmaW5lICJQZXJ0dXp1bWFi5LmL5YyW5a2455mC5rOV5rK755mCIjoKTDAxQkMwNgp1bmlvbiBMMDFCQzA1CnVuaW9uIEwwMUNBMDQKdW5pb24gTDAxRkQwMQp1bmlvbiBMMDFGRDAzCnVuaW9uIEwwMUZEMDQKdW5pb24gTDAxRlkwMQoKCmRlZmluZSAi6Z2edGF4YW5l5YyW5a245rK755mCIjoKTDAxREIwMwp1bmlvbiBMMDFBQTAxCnVuaW9uIEwwMURCMDEKCgpkZWZpbmUgIuaKl0hFUjLol6XniankvbXnlKgiOgpMMDFGRDAxCnVuaW9uIEwwMUVIMDEKdW5pb24gTDAxRkQwNAp1bmlvbiBMMDFGRDAyCnVuaW9uIEwwMUZZMDEKCi8vIEwwMUVNMDPnhKHlgaXkv53norwKZGVmaW5lICLpganmh4nnl4fkuYvmqJnpnbbol6XniakiOgpMMDFGRDAxCnVuaW9uIEwwMUZEMDIKdW5pb24gTDAxRkQwMwp1bmlvbiBMMDFGRDA0CnVuaW9uIEwwMUVIMDEKdW5pb24gTDAxRUYwMQp1bmlvbiBMMDFFRjAyCnVuaW9uIEwwMUVGMDMKdW5pb24gTDAxRUcwMgp1bmlvbiBMMDFYSzAxCnVuaW9uIEwwMVhLMDQKdW5pb24gTDAxRlgxNwoKLy9MMDFGRDA154ShCi8vTDAxQkM1MueEoQpkZWZpbmUgIkxhcm90cmVjdGluaWLliY3lsI7mgKfljJblrbjmsrvnmYIiOgpMMDFEQjAxCnVuaW9uIEwwMUFBMDEKdW5pb24gTDAxQ0QwMQp1bmlvbiBMMDFDRDAyCnVuaW9uIEwwMURCMDMKdW5pb24gTDAxQkEwMQp1bmlvbiBMMDRBWDAzCnVuaW9uIEwwMUJDMDIKCi8vTDAxRkQwNeeEoQpkZWZpbmUgIkxhcm90cmVjdGluaWLkuIDnt5rmsrvnmYIiOgpMMDFFRjAxCnVuaW9uIEwwMUVGMDIKdW5pb24gTDAxRUYwMwp1bmlvbiBMMDJCQTAzCnVuaW9uIEwwMkJHCnVuaW9uIEwwMUNEMDIKdW5pb24gTDAxQ0QwMQp1bmlvbiBMMDFGRDAyCnVuaW9uIEwwMUZZMDEKdW5pb24gTDAxRkQwMQp1bmlvbiBMMDFGRDAzCnVuaW9uIEwwMUZEMDQKdW5pb24gTDAxQkMwNQp1bmlvbiBMMDFYQTAyCnVuaW9uIEwwMVhBMDEKdW5pb24gTDAxWEsKCgpkZWZpbmUgIkxhcm90cmVjdGluaWLooZPlvozovJTliqnmgKfljJblrbjmsrvnmYIiOgpMMDJCQTAxCnVuaW9uIEwwMURCMDEKdW5pb24gTDAxQUEwMQp1bmlvbiBMMDFDRDAxCnVuaW9uIEwwMUNEMDIKdW5pb24gTDAyQkcKdW5pb24gTDAxWEsKCi8vTDAxRkQwNeeEoQpkZWZpbmUgIkxhcm90cmVjdGluaWLovYnnp7vmgKfljJblrbjmsrvnmYIiOgpMMDFCQzA2CnVuaW9uIEwwMUJDMDUKdW5pb24gTDAxQ0EwNAp1bmlvbiBMMDFGRDAxCnVuaW9uIEwwMUZEMDMKdW5pb24gTDAxRkQwNAp1bmlvbiBMMDFGWTAxCg=="
+  }
+ ]
+}

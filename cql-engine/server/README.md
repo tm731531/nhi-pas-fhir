@@ -29,12 +29,20 @@ Sanity: `curl -s -X POST http://localhost:8095/fhir/\$cql -H 'Content-Type: appl
 - `load-libraries.mjs` loads the 4 rule ELM as Library resources (url aligned to the include
   canonical; FHIRHelpers → `http://hl7.org/fhir/FHIRHelpers`).
 
-## Remaining (bounded)
+## End-to-end: DONE (2026-09-29)
 
-`Library/$evaluate` loads source from **CQL text (`text/cql`)**, not our raw `application/elm+json`
-(the real rule errors `Could not load source … version null`; a text/cql library succeeds). We
-vendored only ELM. **Next:** fetch the rules' `.cql` from the official `tw.gov.mohw.nhi.cql`
-package, vendor it, then the proven text/cql path runs the real rule to a verdict. Then wire the
-C# `ICqlEngine` to POST our Bundle here and read back the named expressions.
+- Rules: official `tw.gov.mohw.nhi.cql` Library resources, kept to `text/cql`, vendored in
+  `../rules/Library-*.json` (HAPI-CR translates the CQL itself — it loads source from text/cql,
+  not our raw elm+json). `load-libraries.mjs` PUTs them.
+- `Library/BCAbemaciclibRule1/$evaluate` on our Bundle → 68 defines evaluated, verdict
+  `乳癌Abemaciclib申請結果_布林 = false` (correct: our sample is a myeloma case, not breast cancer).
+- Wired to C#: `impl/csharp/src/NhiPasFhir/Core/CqfRulerCqlEngine.cs` (`ICqlEngine`) POSTs the Bundle
+  here and returns the named expressions; `CqfRulerIntegrationTests.cs` (skips if server down) is green.
 
-Nothing here is wired to C# yet (`ICqlEngine` is still `NotWiredCqlEngine`).
+Enable it: `Pipeline.Run(case, cql: new CqlPreCheck(new CqfRulerCqlEngine(http, ".../fhir"), drugToRules))`.
+
+## Remaining (non-blocking)
+
+Build the full drug→rule 1:N map (66 rules); assemble longitudinal history into the Bundle for
+continuation/return-visit rules; a Pass-shaped sample Bundle if you want to see an approval; and
+make this server persistent / host it on your own infra instead of manual localhost.

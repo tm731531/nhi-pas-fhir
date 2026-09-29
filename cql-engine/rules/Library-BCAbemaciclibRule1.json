@@ -1,0 +1,689 @@
+{
+ "resourceType": "Library",
+ "id": "BCAbemaciclibRule1",
+ "text": {
+  "status": "extensions",
+  "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">\n  <table class=\"narrative-table\">\n    <tbody>\n<tr>\n\n\n<th colspan=\"2\" scope=\"row\" class=\"row-header\">Metadata</th>\n\n\n</tr>\n\n<tr>\n\n\n<th scope=\"row\" class=\"row-header\">Title</th>\n\n\n\n<td class=\"content-container\">Abemaciclib給付規定-Abemaciclib Rule1</td>\n\n\n</tr>\n\n\n\n<tr>\n\n\n<th scope=\"row\" class=\"row-header\">Version</th>\n\n\n\n<td class=\"content-container\">1.0.0</td>\n\n\n</tr>\n\n\n\n\n\n\n\n\n\n\n\n\n<tr>\n\n\n<th scope=\"row\" class=\"row-header\">Status</th>\n\n\n\n<td class=\"content-container\">Draft</td>\n\n\n</tr>\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n<tr>\n\n\n<th scope=\"row\" class=\"row-header\">Description</th>\n\n\n\n<td class=\"content-container\"><div><p>此 Library 為乳癌患者於申請使用 Abemaciclib 之給付檢核條件。</p>\n</div></td>\n\n\n</tr>\n\n\n\n\n\n\n<tr>\n\n\n<th scope=\"row\" class=\"row-header\">Type</th>\n\n\n\n<td class=\"content-container\">\n    logic-library from <a href=\"http://terminology.hl7.org/7.4.0/CodeSystem-library-type.html\">http://terminology.hl7.org/CodeSystem/library-type</a> \n\n\n</td>\n\n\n</tr>\n\n\n\n<tr>\n  \n  \n  \n  \n  \n\n<th scope=\"row\" class=\"row-header\">Dependency</th>\n\n\n  \n  \n  <td class=\"content-container\">\n    \n    <em>Description</em>: Library CodeConcept\n    \n    <br/>\n    \n    \n    \n    \n    \n    \n    \n    \n    <em>Resource</em>: <a href=\"Library-BCCodeConcept.html\">https://nhicore.nhi.gov.tw/cql/Library/BCCodeConcept|1.0.0</a>\n    \n    <br/>\n    <em>Canonical URL</em>: <tt>https://nhicore.nhi.gov.tw/cql/Library/BCCodeConcept|1.0.0</tt>\n    \n    \n    \n  </td>\n</tr>\n\n<tr>\n  \n  \n  \n  \n  \n\n<th scope=\"row\" class=\"row-header\">Dependency</th>\n\n\n  \n  \n  <td class=\"content-container\">\n    \n    <em>Description</em>: Library Reusable\n    \n    <br/>\n    \n    \n    \n    \n    \n    \n    \n    \n    <em>Resource</em>: <a href=\"Library-BCReusable.html\">https://nhicore.nhi.gov.tw/cql/Library/BCReusable|1.0.0</a>\n    \n    <br/>\n    <em>Canonical URL</em>: <tt>https://nhicore.nhi.gov.tw/cql/Library/BCReusable|1.0.0</tt>\n    \n    \n    \n  </td>\n</tr>\n\n\n\n\n\n\n\n\n\n\n  <tr>\n\n\n<th colspan=\"2\" scope=\"row\" class=\"row-header\">Library Content</th>\n\n\n</tr>\n  \n    \n    <tr>\n      <th scope=\"row\" class=\"row-header\">CQL Content</th>\n      <td>\n        <a name=\"cql-content\"> </a>\n        <pre style=\"border: none;\" class=\"content-container highlight language-cql\"><code class=\"language-cql\">//乳癌_Abemaciclib給付規定\nlibrary BCAbemaciclibRule1 version '1.0.0'\n\nusing FHIR version '4.0.1'\n\ninclude FHIRHelpers version '4.0.1' called FHIRHelpers\n\ninclude BCCodeConcept version '1.0.0' called CodeConcept\n\ninclude BCReusable version '1.0.0' called Reusable\n\ncontext Patient\n\n\n\n//============================================\n// 主要規定一：初次使用條件\n//============================================\n\n/*規則1*/\n\ndefine &quot;ICD代碼檢核_布林值&quot;: Reusable.&quot;ICD-10使用C50&quot;\n\ndefine &quot;主要疾病ICD資料存在&quot;:\n  exists (\n    [Claim] C\n      where exists (\n        C.diagnosis D\n          where D.sequence = 1\n            and exists (\n              D.diagnosis.coding Cdg\n                where Cdg in CodeConcept.ICD10CM2023\n                  or Cdg in CodeConcept.ICD10CM2014\n            )\n      )\n  )\n\n//條件1:Abemaciclib併用內分泌療法(tamoxifen或芳香環酶抑制劑)\ndefine &quot;1規則1-1=Abemaciclib併用內分泌療法(tamoxifen或芳香環酶抑制劑)&quot;:\n(\n  // 申請期間與內分泌療法時間重疊\n  Reusable.&quot;HasConcurrentMedicationOrder&quot;(CodeConcept.L01EF03, CodeConcept.&quot;內分泌療法藥物(tamoxifen或芳香環酶抑制劑)&quot;)\n  and Reusable.&quot;醫令類別為1&quot;\n)\n\n\n//條件2:作為荷爾蒙受體(HR)陽性(ER或PR&gt;30%)\n//條件2-1 ER\ndefine &quot;1規則1-2-1=檢驗檢查-作為荷爾蒙受體(HR)陽性(ER&gt;30%)&quot;:\n  exists (\n    [Observation] OBs\n      where Reusable.&quot;IsTestObservation&quot;(OBs)\n    and exists (\n      OBs.code.coding Cdg\n      where Cdg in CodeConcept.LOINC\n      and Cdg.code in CodeConcept.ER\n    )\n    and (\n      (OBs.value is Quantity\n        and (OBs.value as Quantity).value &gt; 30\n        and (OBs.value as Quantity).comparator = '&gt;')\n      or (OBs.value is FHIR.string\n        and Matches((OBs.value as FHIR.string).value, '.*ER&gt;30%.*'))\n    )\n  )\n\ndefine &quot;1規則1-2-1=基因檢測-作為荷爾蒙受體(HR)陽性(ER&gt;30%)&quot;:\n  exists (\n    [Observation] OBs\n      where Reusable.&quot;IsGeneInfoObservation&quot;(OBs)\n    and Reusable.&quot;IsGenePanelObservation&quot;(OBs)\n    and exists (\n      OBs.component Comp\n        where exists (\n          Comp.code.coding Cdg\n            where Cdg in CodeConcept.LOINC\n              and Cdg.code in CodeConcept.ER\n        )\n        and (\n          (Comp.value is Quantity\n            and (Comp.value as Quantity).value &gt; 30\n            and (Comp.value as Quantity).comparator = '&gt;'\n            and (Comp.value as Quantity).unit = '%')\n          or (Comp.value is FHIR.string\n            and Matches((Comp.value as FHIR.string).value, '.*ER&gt;30%.*'))\n        )\n    )\n  )\n\ndefine &quot;檢查報告-1規則1-2-1=作為荷爾蒙受體(HR)陽性(ER&gt;30%)&quot;:\n  Reusable.&quot;HasDiagnosticReportResult&quot;(CodeConcept.ER, '.*ER&gt;30%.*')\n\ndefine &quot;1規則1-2-1=作為荷爾蒙受體(HR)陽性(ER&gt;30%)&quot;:\n  &quot;1規則1-2-1=檢驗檢查-作為荷爾蒙受體(HR)陽性(ER&gt;30%)&quot;\n  or &quot;1規則1-2-1=基因檢測-作為荷爾蒙受體(HR)陽性(ER&gt;30%)&quot;\n  or &quot;檢查報告-1規則1-2-1=作為荷爾蒙受體(HR)陽性(ER&gt;30%)&quot;\n\ndefine &quot;1規則1-2-1=有填ER檢測資料&quot;:\n  exists (\n    [Observation] OBs\n      where Reusable.&quot;IsTestObservation&quot;(OBs)\n        and exists (\n          OBs.code.coding Cdg\n            where Cdg in CodeConcept.LOINC\n              and Cdg.code in CodeConcept.ER\n        )\n        and OBs.value is not null\n  )\n  or exists (\n    [Observation] OBs\n      where Reusable.&quot;IsGeneInfoObservation&quot;(OBs)\n        and Reusable.&quot;IsGenePanelObservation&quot;(OBs)\n        and exists (\n          OBs.component Comp\n            where exists (\n              Comp.code.coding Cdg\n                where Cdg in CodeConcept.LOINC\n                  and Cdg.code in CodeConcept.ER\n            )\n            and Comp.value is not null\n        )\n  )\n  or Reusable.&quot;HasDiagnosticReportData&quot;(CodeConcept.ER)\n\n//條件2-2 PR\ndefine &quot;1規則1-2-2=檢驗檢查-作為荷爾蒙受體(HR)陽性(PR&gt;30%)&quot;:\n  exists (\n    [Observation] OBs\n      where Reusable.&quot;IsTestObservation&quot;(OBs)\n    and exists (\n      OBs.code.coding Cdg\n      where Cdg in CodeConcept.LOINC\n      and Cdg.code in CodeConcept.PR\n    )\n    and (\n      (OBs.value is Quantity\n        and (OBs.value as Quantity).value &gt; 30\n        and (OBs.value as Quantity).comparator = '&gt;')\n      or (OBs.value is FHIR.string\n        and Matches((OBs.value as FHIR.string).value, '.*PR&gt;30%.*'))\n    )\n  )\n\ndefine &quot;1規則1-2-2=基因檢測-作為荷爾蒙受體(HR)陽性(PR&gt;30%)&quot;:\n  exists (\n    [Observation] OBs\n      where Reusable.&quot;IsGeneInfoObservation&quot;(OBs)\n    and Reusable.&quot;IsGenePanelObservation&quot;(OBs)\n    and exists (\n      OBs.component Comp\n        where exists (\n          Comp.code.coding Cdg\n            where Cdg in CodeConcept.LOINC\n              and Cdg.code in CodeConcept.PR\n        )\n        and (\n          (Comp.value is Quantity\n            and (Comp.value as Quantity).value &gt; 30\n            and (Comp.value as Quantity).comparator = '&gt;'\n            and (Comp.value as Quantity).unit = '%')\n          or (Comp.value is FHIR.string\n            and Matches((Comp.value as FHIR.string).value, '.*PR&gt;30%.*'))\n        )\n    )\n  )\n\ndefine &quot;檢查報告-1規則1-2-2=作為荷爾蒙受體(HR)陽性(PR&gt;30%)&quot;:\n  Reusable.&quot;HasDiagnosticReportResult&quot;(CodeConcept.PR, '.*PR&gt;30%.*')\n\ndefine &quot;1規則1-2-2=作為荷爾蒙受體(HR)陽性(PR&gt;30%)&quot;:\n  &quot;1規則1-2-2=檢驗檢查-作為荷爾蒙受體(HR)陽性(PR&gt;30%)&quot;\n  or &quot;1規則1-2-2=基因檢測-作為荷爾蒙受體(HR)陽性(PR&gt;30%)&quot;\n  or &quot;檢查報告-1規則1-2-2=作為荷爾蒙受體(HR)陽性(PR&gt;30%)&quot;\n\ndefine &quot;1規則1-2-2=有填PR檢測資料&quot;:\n  exists (\n    [Observation] OBs\n      where Reusable.&quot;IsTestObservation&quot;(OBs)\n        and exists (\n          OBs.code.coding Cdg\n            where Cdg in CodeConcept.LOINC\n              and Cdg.code in CodeConcept.PR\n        )\n        and OBs.value is not null\n  )\n  or exists (\n    [Observation] OBs\n      where Reusable.&quot;IsGeneInfoObservation&quot;(OBs)\n        and Reusable.&quot;IsGenePanelObservation&quot;(OBs)\n        and exists (\n          OBs.component Comp\n            where exists (\n              Comp.code.coding Cdg\n                where Cdg in CodeConcept.LOINC\n                  and Cdg.code in CodeConcept.PR\n            )\n            and Comp.value is not null\n        )\n  )\n  or Reusable.&quot;HasDiagnosticReportData&quot;(CodeConcept.PR)\n\n\ndefine &quot;1規則1-2=作為荷爾蒙受體(HR)陽性(ER或PR&gt;30%)&quot;:\n&quot;1規則1-2-1=作為荷爾蒙受體(HR)陽性(ER&gt;30%)&quot; or &quot;1規則1-2-2=作為荷爾蒙受體(HR)陽性(PR&gt;30%)&quot;\n\ndefine &quot;1規則1-2=有填荷爾蒙受體(HR)檢測資料&quot;:\n  &quot;1規則1-2-1=有填ER檢測資料&quot;\n  or &quot;1規則1-2-2=有填PR檢測資料&quot;\n\n\n//條件3:第二型人類表皮生長因子受體(HER2)陰性\ndefine &quot;1規則1-3=檢驗檢查-第二型人類表皮生長因子受體(HER2)陰性&quot;:\n  Reusable.&quot;HasHER2NegativeOrNDTest&quot;\n\ndefine &quot;1規則1-3=基因檢測-第二型人類表皮生長因子受體(HER2)陰性&quot;:\n  Reusable.&quot;HasHER2NegativeOrNDGene&quot;\n\ndefine &quot;檢查報告-1規則1-3=第二型人類表皮生長因子受體(HER2)陰性&quot;:\n  Reusable.&quot;HasDiagnosticReportResult&quot;(CodeConcept.HER2, '(?i).*(陰性|negative|\\\\bNEG\\\\b|\\\\bND\\\\b).*')\n\ndefine &quot;1規則1-3=第二型人類表皮生長因子受體(HER2)陰性&quot;:\n  &quot;1規則1-3=檢驗檢查-第二型人類表皮生長因子受體(HER2)陰性&quot;\n  or &quot;1規則1-3=基因檢測-第二型人類表皮生長因子受體(HER2)陰性&quot;\n  or &quot;檢查報告-1規則1-3=第二型人類表皮生長因子受體(HER2)陰性&quot;\n\ndefine &quot;1規則1-3=有填HER2檢測資料&quot;:\n  exists (\n    [Observation] OBs\n      where Reusable.&quot;IsTestObservation&quot;(OBs)\n        and exists (\n          OBs.code.coding Cdg\n            where Cdg in CodeConcept.LOINC\n              and Cdg.code in CodeConcept.HER2\n        )\n        and (\n          OBs.value is not null\n          or exists (OBs.interpretation I where I is not null)\n        )\n  )\n  or exists (\n    [Observation] OBs\n      where Reusable.&quot;IsGeneInfoObservation&quot;(OBs)\n        and Reusable.&quot;IsGenePanelObservation&quot;(OBs)\n        and exists (\n          OBs.component Comp\n            where exists (\n              Comp.code.coding Cdg\n                where Cdg in CodeConcept.LOINC\n                  and Cdg.code in CodeConcept.HER2\n            )\n            and (\n              Comp.value is not null\n            )\n        )\n  )\n  or Reusable.&quot;HasDiagnosticReportData&quot;(CodeConcept.HER2)\n\n\n//條件4:淋巴結陽性\n\n//條件4-1\ndefine &quot;1規則1-4-1=6個月內影像報告&quot;:\n  Reusable.&quot;HasRecentImageReport&quot;(&quot;本次申請起始日期&quot;, 180)\n\ndefine &quot;1規則1-4-1=有填影像報告資料&quot;:\n  exists (\n    [DiagnosticReport] Report\n    where Report.effective is not null\n      and (\n        Reusable.&quot;IsImageReport&quot;(Report)\n        or Reusable.&quot;IsReportWithinDaysBefore&quot;(Report, &quot;本次申請起始日期&quot;, 180)\n      )\n  )\n\n\n\n//條件4-2\ndefine &quot;1規則1-4-2=癌症分期分數或結果為N&gt;=1&quot;:\n  exists (\n    [Observation] O\n      where exists (\n        O.code.coding Cdg\n          where Cdg.code = '399390009'\n            and Cdg in CodeConcept.SNOMED\n      )\n        and O.value is not null\n        and O.value is FHIR.string\n        and Matches((O.value as FHIR.string).value, '.*N[1-9].*')\n  )\n\ndefine &quot;1規則1-4-2=有填癌症分期資料&quot;:\n  exists (\n    [Observation] O\n      where exists (\n        O.code.coding Cdg\n          where Cdg.code = '399390009'\n            and Cdg in CodeConcept.SNOMED\n      )\n        and O.value is not null\n        and O.value is FHIR.string\n  )\n\n\n//條件4-3\ndefine &quot;1規則1-4-3=6個月內淋巴結陽性檢查報告&quot;:\n  exists (\n    [DiagnosticReport] O2\n    where exists (\n      O2.code.coding Cdg\n      where Cdg in CodeConcept.LOINC\n        and Cdg.code in CodeConcept.DiagnosticReportCode\n    )\n    and O2.effective is not null\n    and FHIRHelpers.ToDateTime(O2.effective) &gt;= &quot;本次申請起始日期&quot; - 180 days\n    and FHIRHelpers.ToDateTime(O2.effective) &lt;= &quot;本次申請起始日期&quot;\n    and O2.conclusion is not null\n    and Matches(O2.conclusion, '(?i).*(positive|detected|present|Positive|Detected|Present|\\\\+).*')\n  )\n\ndefine &quot;1規則1-4-3=有填6個月內淋巴結檢查報告&quot;:\n  exists (\n    [DiagnosticReport] O2\n    where exists (\n      O2.code.coding Cdg\n      where Cdg in CodeConcept.LOINC\n        and Cdg.code in CodeConcept.DiagnosticReportCode\n    )\n    and O2.effective is not null\n    and FHIRHelpers.ToDateTime(O2.effective) &gt;= &quot;本次申請起始日期&quot; - 180 days\n    and FHIRHelpers.ToDateTime(O2.effective) &lt;= &quot;本次申請起始日期&quot;\n    and O2.conclusion is not null\n  )\n\ndefine &quot;1規則1-4-3=有填淋巴結檢查報告資料&quot;:\n  exists (\n    [DiagnosticReport] O2\n    where O2.effective is not null\n      and O2.conclusion is not null\n      and (\n        exists (\n          O2.code.coding Cdg\n          where Cdg in CodeConcept.LOINC\n            and Cdg.code in CodeConcept.DiagnosticReportCode\n        )\n        or Reusable.&quot;IsReportWithinDaysBefore&quot;(O2, &quot;本次申請起始日期&quot;, 90)\n      )\n  )\n\ndefine &quot;1規則1-4=淋巴結陽性&quot;:\n&quot;1規則1-4-1=6個月內影像報告&quot;\nand &quot;1規則1-4-2=癌症分期分數或結果為N&gt;=1&quot;\nand &quot;1規則1-4-3=6個月內淋巴結陽性檢查報告&quot;\n\ndefine &quot;1規則1-4=淋巴結相關必要資料存在&quot;:\n  &quot;1規則1-4-1=有填影像報告資料&quot;\n  and &quot;1規則1-4-2=有填癌症分期資料&quot;\n  and &quot;1規則1-4-3=有填淋巴結檢查報告資料&quot;\n\n\n//條件5:高復發風險之早期乳癌\n\n//條件5-1\ndefine &quot;1規則1-5-1=pALN，陽性腋下淋巴結≥4&quot;:\nReusable.&quot;ICD-10使用C50&quot; \nand &quot;1規則1-4-1=6個月內影像報告&quot;\nand Count(\n    [Observation] O\n    where exists (\n      O.code.coding Cdg\n      where Cdg.code = '399390009'\n        and Cdg in CodeConcept.SNOMED\n    )\n    and O.value is not null\n    and O.value is FHIR.string\n    and Matches((O.value as FHIR.string).value, '.*N[2-9].*') //癌症分期分數或結果為N&gt;=2\n  ) &gt; 0\n\n\n//條件5-2\ndefine &quot;1規則1-5-2=pALN，陽性腋下淋巴結為1-3，且腫瘤大小≥5&quot;:\nReusable.&quot;ICD-10使用C50&quot; \nand &quot;1規則1-4-1=6個月內影像報告&quot;\nand Count(\n    [Observation] O\n    where exists (\n      O.code.coding Cdg\n      where Cdg.code = '399390009'\n        and Cdg in CodeConcept.SNOMED\n    )\n    and O.value is not null\n    and O.value is FHIR.string\n    and Matches((O.value as FHIR.string).value, '.*N[1-9].*')//癌症分期分數或結果為N&gt;=1\n    and Matches((O.value as FHIR.string).value, '.*T[2-9].*') //癌症分期分數或結果為T&gt;=2\n  ) &gt; 0\n\n\n//條件5-3\ndefine &quot;1規則1-5-3=pALN，陽性腋下淋巴結為1-3，且腫瘤細胞分化第3級&quot;:\nReusable.&quot;ICD-10使用C50&quot; \nand &quot;1規則1-4-1=6個月內影像報告&quot;\nand (Count(\n    [Observation] O\n    where exists (\n      O.code.coding Cdg\n      where Cdg.code = '399390009'\n        and Cdg in CodeConcept.SNOMED\n    )\n    and O.value is not null\n    and O.value is FHIR.string\n    and Matches((O.value as FHIR.string).value, '.*N[1-9].*')//癌症分期分數或結果為N&gt;=1\n  ) &gt; 0)\nand exists (\n    [DiagnosticReport] O2\n    where exists (\n      O2.code.coding Cdg\n      where Cdg in CodeConcept.LOINC\n        and Cdg.code in CodeConcept.pALNReport\n    )\n    and O2.effective is not null\n    and FHIRHelpers.ToDateTime(O2.effective) &gt;= &quot;本次申請起始日期&quot; - 90 days\n    and FHIRHelpers.ToDateTime(O2.effective) &lt;= &quot;本次申請起始日期&quot;\n    and O2.conclusion is not null\n    and Matches(O2.conclusion, '(?i).*(Grade 3|Grade3|\\\\+).*')\n  )\n\ndefine &quot;1規則1-5=高復發風險之早期乳癌&quot;:\n&quot;1規則1-5-1=pALN，陽性腋下淋巴結≥4&quot;\nor &quot;1規則1-5-2=pALN，陽性腋下淋巴結為1-3，且腫瘤大小≥5&quot;\nor &quot;1規則1-5-3=pALN，陽性腋下淋巴結為1-3，且腫瘤細胞分化第3級&quot;\n\ndefine &quot;1規則1-5=高復發風險判斷資料存在&quot;:\n  &quot;1規則1-4-1=有填影像報告資料&quot;\n  and &quot;1規則1-4-2=有填癌症分期資料&quot;\n\n//條件6\ndefine &quot;年齡計算用申請日期&quot;:\n  date from &quot;本次申請起始日期&quot;\n\ndefine &quot;申請日時病人年齡歲數&quot;:\n  Reusable.&quot;PatientAgeInYearsAt&quot;(&quot;年齡計算用申請日期&quot;)\n\ndefine &quot;是否滿18歲&quot;:\n  Reusable.&quot;IsPatientAdultAt&quot;(&quot;年齡計算用申請日期&quot;)\n\n\ndefine &quot;1規則1-6=成年女性&quot;:\n  Patient.gender = 'female'\n  and &quot;是否滿18歲&quot;\n\ndefine &quot;1規則1-6=性別與年齡資料存在&quot;:\n  Patient.gender is not null\n  and Patient.birthDate is not null\n  and &quot;年齡計算用申請日期&quot; is not null\n\n//規則1\ndefine &quot;1規則1&quot;:\n&quot;1規則1-1=Abemaciclib併用內分泌療法(tamoxifen或芳香環酶抑制劑)&quot;\nand &quot;1規則1-2=作為荷爾蒙受體(HR)陽性(ER或PR&gt;30%)&quot;\nand &quot;1規則1-3=第二型人類表皮生長因子受體(HER2)陰性&quot;\nand &quot;1規則1-4=淋巴結陽性&quot;\nand &quot;1規則1-5=高復發風險之早期乳癌&quot;\nand &quot;1規則1-6=成年女性&quot;\n\ndefine &quot;有Abemaciclib申請醫令&quot;:\n  exists (\n    [MedicationRequest] MR\n      where Reusable.&quot;IsMedicationPlan&quot;(MR, CodeConcept.L01EF03)\n  )\n\ndefine &quot;有內分泌療法醫令&quot;:\n  Reusable.&quot;HasMedicationUse&quot;(CodeConcept.&quot;內分泌療法藥物(tamoxifen或芳香環酶抑制劑)&quot;)\n\ndefine &quot;1規則1-1=Abemaciclib併用內分泌療法資料存在&quot;:\n  &quot;有Abemaciclib申請醫令&quot;\n  and &quot;有內分泌療法醫令&quot;\n\n\n/*規則2*/\n\n//標準之化學及放射輔助治療藥物清單\ndefine &quot;1規則2=使用Abemaciclib前，需接受標準之化學及放射輔助治療&quot;:\n  Reusable.&quot;HasPriorMedicationUse&quot;(CodeConcept.L01EF03, CodeConcept.&quot;標準之化學及放射輔助治療藥物&quot;)\n  and Reusable.&quot;醫令類別為1&quot;\n\ndefine &quot;1規則2=標準化學及放射輔助治療資料存在&quot;:\n  &quot;有Abemaciclib申請醫令&quot;\n  and Reusable.&quot;HasMedicationUse&quot;(CodeConcept.&quot;標準之化學及放射輔助治療藥物&quot;)\n\n\n/*規則3*/\n\n//條件1:使用Abemaciclib前，僅能接受最多12週的內分泌治療\n\n\ndefine &quot;1規則3-1=使用Abemaciclib前，僅能接受最多12週的內分泌治療&quot;:\n  Sum(\n    [MedicationRequest] MRPrior\n    where (MRPrior.intent = 'plan' or MRPrior.intent = 'order')\n    and (MRPrior.status is null or MRPrior.status in { 'active', 'completed' })\n    // 排除本次申請的藥物\n    and not Reusable.&quot;HasMedicationCode&quot;(MRPrior, CodeConcept.L01EF03)\n    // 僅計算其他內分泌治療藥物\n    and Reusable.&quot;HasMedicationCode&quot;(MRPrior, CodeConcept.&quot;內分泌治療藥物&quot;)\n    // 確保是在本次申請之前使用\n    and exists MRPrior.dosageInstruction\n    and MRPrior.dosageInstruction[0].timing.repeat.bounds is Period\n    and (end of (MRPrior.dosageInstruction[0].timing.repeat.bounds as Period)) &lt; &quot;本次申請起始日期&quot;\n    return\n      difference in days between\n        start of (MRPrior.dosageInstruction[0].timing.repeat.bounds as Period)\n      and\n        end of (MRPrior.dosageInstruction[0].timing.repeat.bounds as Period)\n  ) &lt;= 84\n\ndefine &quot;1規則3-1=使用前內分泌治療資料存在&quot;:\n  exists (\n    [MedicationRequest] MRPrior\n    where (MRPrior.intent = 'plan' or MRPrior.intent = 'order')\n      and (MRPrior.status is null or MRPrior.status in { 'active', 'completed' })\n      and not Reusable.&quot;HasMedicationCode&quot;(MRPrior, CodeConcept.L01EF03)\n      and Reusable.&quot;HasMedicationCode&quot;(MRPrior, CodeConcept.&quot;內分泌治療藥物&quot;)\n      and exists MRPrior.dosageInstruction\n      and MRPrior.dosageInstruction[0].timing.repeat.bounds is Period\n      and (end of (MRPrior.dosageInstruction[0].timing.repeat.bounds as Period)) &lt; &quot;本次申請起始日期&quot;\n  )\n\n\n//條件2:應於手術切除後16個月內接受本品治療\ndefine &quot;1規則3-2=應於手術切除後16個月內接受本品治療&quot;:\n  exists (\n    [DiagnosticReport] O\n    where exists (\n      O.code.coding Cdg\n      where (\n        Cdg in CodeConcept.ICD10PCS2023Image\n        or Cdg in CodeConcept.ICD10PCS2014Image\n      )\n      and Cdg.code in CodeConcept.ProcedureCodes\n    )\n    and O.effective is not null\n    and FHIRHelpers.ToDateTime(O.effective) &gt;= &quot;本次申請起始日期&quot; - 480 days\n    and FHIRHelpers.ToDateTime(O.effective) &lt;= &quot;本次申請起始日期&quot;\n  ) \n\ndefine &quot;1規則3-2=有填手術切除紀錄&quot;:\n  exists (\n    [DiagnosticReport] O\n    where exists (\n      O.code.coding Cdg\n      where (\n        Cdg in CodeConcept.ICD10PCS2023Image\n        or Cdg in CodeConcept.ICD10PCS2014Image\n      )\n      and Cdg.code in CodeConcept.ProcedureCodes\n    )\n    and O.effective is not null\n  )\n\ndefine &quot;1規則3=使用前，僅能接受最多12週的內分泌治療，且應於手術切除後16個月內接受本品治療。&quot;:\n&quot;1規則3-1=使用Abemaciclib前，僅能接受最多12週的內分泌治療&quot;\nand &quot;1規則3-2=應於手術切除後16個月內接受本品治療&quot;\n\n//主要規定一\ndefine &quot;主要規定一&quot;:\n&quot;1規則1&quot;\nand &quot;1規則2=使用Abemaciclib前，需接受標準之化學及放射輔助治療&quot;\nand &quot;1規則3=使用前，僅能接受最多12週的內分泌治療，且應於手術切除後16個月內接受本品治療。&quot;\n\n\n//============================================\n// 主要規定二：續用條件－治療持續給付\n//============================================\n\n//條件1:每24週須再次申請並檢附療效評估資料\n\n// 本次申請紀錄（以最新一筆申請作為本次申請）\ndefine &quot;本次申請紀錄&quot;:\n  Reusable.&quot;LatestMedicationPlan&quot;(CodeConcept.L01EF03)\n\ndefine &quot;本次申請起始日期&quot;:\n  Reusable.&quot;GetStartTime&quot;(&quot;本次申請紀錄&quot;)\n\n// 前次申請紀錄（本次申請之前最近一次的申請）\ndefine &quot;前次申請紀錄&quot;:\n  Reusable.&quot;LatestMedicationPlanBefore&quot;(CodeConcept.L01EF03, &quot;本次申請起始日期&quot;)\n\n// 檢查本次申請療程長度是否在24週內\ndefine &quot;2規則1-1=每24週須再次申請並檢附療效評估資料&quot;:\n  Reusable.&quot;醫令類別為1&quot; \n  and Reusable.&quot;續用註記為2&quot;\n  and &quot;本次申請紀錄&quot; is not null\n  and Reusable.&quot;HasMedicationPlanPeriodWithinDays&quot;(CodeConcept.L01EF03, 168)\n\n\n//條件2:疾病有惡化情形須停止使用\n\n// 取得前次治療紀錄（最近一次已完成的治療）\ndefine &quot;前次治療紀錄&quot;:\n  Reusable.&quot;LatestCompletedMedicationOrderBefore&quot;(CodeConcept.L01EF03, &quot;本次申請起始日期&quot;)\n\n// 前次用藥開始日期\ndefine &quot;前次用藥開始日期&quot;:\n  Reusable.&quot;GetStartTime&quot;(&quot;前次治療紀錄&quot;)\n\n// 規則1-2: 疾病有惡化情形須停止使用(續用須檢附前次治療後影像學報告)\ndefine &quot;2規則1-2=疾病有惡化情形須停止使用&quot;:\n  Reusable.&quot;HasImageReportBetweenPreviousTreatmentAndCurrentApply&quot;(CodeConcept.L01EF03)\n\n// 主要規定二\ndefine &quot;主要規定二&quot;:\nReusable.&quot;續用註記為2&quot;\nand Reusable.&quot;醫令類別為1&quot;\nand &quot;本次申請紀錄&quot; is not null\nand &quot;2規則1-1=每24週須再次申請並檢附療效評估資料&quot;\nand &quot;2規則1-2=疾病有惡化情形須停止使用&quot;\n\n\n\n//============================================\n// 主要規定三：藥品使用規則\n//============================================\n\n//條件1:每日至多使用2錠\ndefine &quot;3規則1-1=每日至多使用2錠&quot;:\n  Reusable.&quot;HasDailyDoseAtMost&quot;(CodeConcept.L01EF03, 2.0, '{tbl}', 'QD')\n\ndefine &quot;3規則3-1=每日劑量資料存在&quot;:\n  exists (\n    [MedicationRequest] MR\n    where Reusable.&quot;IsMedicationPlan&quot;(MR, CodeConcept.L01EF03)\n      and exists (\n        MR.dosageInstruction DI\n        where exists (\n          DI.timing.code.coding C\n          where C.code = 'QD'\n        )\n        and exists (\n          DI.doseAndRate DR\n          where (DR.dose as FHIR.SimpleQuantity) is not null\n            and (DR.dose as FHIR.SimpleQuantity).value is not null\n            and (DR.dose as FHIR.SimpleQuantity).code = '{tbl}'\n        )\n      )\n  )\n\n\n//條件2:使用不得超過2年\ndefine &quot;3規則1-2=使用不得超過2年&quot;:\n  Reusable.&quot;HasMedicationTotalDurationWithin&quot;(CodeConcept.L01EF03, 730)\n\ndefine &quot;3規則3-2=療程期間資料存在&quot;:\n  exists (\n    [MedicationRequest] MR\n    where MR.intent = 'plan'\n      and (MR.status is null or MR.status in { 'active', 'completed', 'on-hold' })\n      and Reusable.&quot;HasMedicationCode&quot;(MR, CodeConcept.L01EF03)\n      and Reusable.&quot;HasValidTiming&quot;(MR)\n  )\n\n//主要規定三\ndefine &quot;主要規定三&quot;:\n&quot;3規則1-1=每日至多使用2錠&quot; and &quot;3規則1-2=使用不得超過2年&quot;\n\n\n//============================================\n// 檢核結果用：必要資料存在判斷\n//============================================\n\n//============================================\n// 列出「符合」項目判斷式\n//============================================\n\ndefine function &quot;符合項目&quot;():\n  // 主要規定一：初次使用條件\n  (if Reusable.&quot;初次申請&quot; and (\n    &quot;1規則1-1=Abemaciclib併用內分泌療法(tamoxifen或芳香環酶抑制劑)&quot; or \n    &quot;1規則1-2=作為荷爾蒙受體(HR)陽性(ER或PR&gt;30%)&quot; or \n    &quot;1規則1-3=第二型人類表皮生長因子受體(HER2)陰性&quot; or \n    &quot;1規則1-4=淋巴結陽性&quot; or \n    &quot;1規則1-5=高復發風險之早期乳癌&quot; or \n    &quot;1規則1-6=成年女性&quot; or \n    &quot;1規則2=使用Abemaciclib前，需接受標準之化學及放射輔助治療&quot; or \n    &quot;1規則3-1=使用Abemaciclib前，僅能接受最多12週的內分泌治療&quot; or \n    &quot;1規則3-2=應於手術切除後16個月內接受本品治療&quot;\n  )\n    then '&lt;主要規定一：初次使用條件&gt;\\n' +\n         (if &quot;1規則1-1=Abemaciclib併用內分泌療法(tamoxifen或芳香環酶抑制劑)&quot; \n           then '● 1規則1-1：Abemaciclib併用內分泌療法(tamoxifen或芳香環酶抑制劑)\\n' else '') +\n         (if &quot;1規則1-2-1=作為荷爾蒙受體(HR)陽性(ER&gt;30%)&quot; \n           then '● 1規則1-2-1：荷爾蒙受體(HR)陽性(ER&gt;30%)\\n' else '') +\n         (if &quot;1規則1-2-2=作為荷爾蒙受體(HR)陽性(PR&gt;30%)&quot; \n           then '● 1規則1-2-2：荷爾蒙受體(HR)陽性(PR&gt;30%)\\n' else '') +\n         (if &quot;1規則1-3=第二型人類表皮生長因子受體(HER2)陰性&quot; \n           then '● 1規則1-3：第二型人類表皮生長因子受體(HER2)陰性\\n' else '') +\n         (if &quot;1規則1-4-1=6個月內影像報告&quot; \n           then '● 1規則1-4-1：3個月內影像報告\\n' else '') +\n         (if &quot;1規則1-4-2=癌症分期分數或結果為N&gt;=1&quot; \n           then '● 1規則1-4-2：癌症分期分數或結果為N&gt;=1\\n' else '') +\n         (if &quot;1規則1-4-3=6個月內淋巴結陽性檢查報告&quot; \n           then '● 1規則1-4-3：3個月內有淋巴結陽性檢查報告\\n' else '') +\n         (if &quot;1規則1-5-1=pALN，陽性腋下淋巴結≥4&quot; \n           then '● 1規則1-5-1：pALN，陽性腋下淋巴結≥4\\n' else '') +\n         (if &quot;1規則1-5-2=pALN，陽性腋下淋巴結為1-3，且腫瘤大小≥5&quot; \n           then '● 1規則1-5-2：pALN，陽性腋下淋巴結為1-3，且腫瘤大小≥5\\n' else '') +\n         (if &quot;1規則1-5-3=pALN，陽性腋下淋巴結為1-3，且腫瘤細胞分化第3級&quot; \n           then '● 1規則1-5-3：pALN，陽性腋下淋巴結為1-3，且腫瘤細胞分化第3級\\n' else '') +\n         (if &quot;1規則1-6=成年女性&quot; \n           then '● 1規則1-6：成年女性(≥18歲)\\n' else '') +\n         (if &quot;1規則2=使用Abemaciclib前，需接受標準之化學及放射輔助治療&quot; \n           then '● 1規則2：使用Abemaciclib前，已接受標準之化學及放射輔助治療\\n' else '') +\n         (if &quot;1規則3-1=使用Abemaciclib前，僅能接受最多12週的內分泌治療&quot; \n           then '● 1規則3-1：使用Abemaciclib前，僅能接受最多12週的內分泌治療\\n' else '') +\n         (if &quot;1規則3-2=應於手術切除後16個月內接受本品治療&quot; \n           then '● 1規則3-2：於手術切除後16個月內接受本品治療\\n' else '') +\n         '\\n'\n    else '') +\n  \n\n\n  // 主要規定二：續用條件\n  (if Reusable.&quot;續用申請&quot; and (\n    &quot;2規則1-1=每24週須再次申請並檢附療效評估資料&quot; or \n    &quot;2規則1-2=疾病有惡化情形須停止使用&quot;\n  )\n    then '&lt;主要規定二：續用條件－治療持續給付&gt;\\n' +\n         (if &quot;2規則1-1=每24週須再次申請並檢附療效評估資料&quot; \n           then '● 2規則1-1：於24週內再次申請並檢附療效評估資料\\n' else '') +\n         (if &quot;2規則1-2=疾病有惡化情形須停止使用&quot; \n           then '● 2規則1-2：已檢附前次治療後影像學報告，確認無惡化\\n' else '') +\n         '\\n'\n    else '') +\n  \n  // 主要規定三：藥品使用規則\n  (if &quot;3規則1-1=每日至多使用2錠&quot; or &quot;3規則1-2=使用不得超過2年&quot;\n    then '&lt;主要規定三：藥品使用規則&gt;\\n' +\n         (if &quot;3規則1-1=每日至多使用2錠&quot;\n           then '● 3規則1：每日劑量≤2錠（參考資訊）\\n' else '') +\n         (if &quot;3規則1-2=使用不得超過2年&quot;\n           then '● 3規則2：使用總療程≤2年(730天)（參考資訊）\\n' else '')\n    else '')\n\n//============================================\n// 列出「不符合」項目判斷式 - 條件或代碼不符合\n//============================================\n\ndefine function &quot;不符合項目_條件或代碼不符合&quot;():\n  // 主要規定一：初次使用條件 - 資料已填但條件或代碼不符合\n  (if Reusable.&quot;初次申請&quot; and (\n    (&quot;主要疾病ICD資料存在&quot; and Reusable.&quot;主要疾病ICD診斷資料存在&quot; and not Reusable.&quot;ICD-10使用C50&quot;) or\n    (&quot;1規則1-1=Abemaciclib併用內分泌療法資料存在&quot; and not &quot;1規則1-1=Abemaciclib併用內分泌療法(tamoxifen或芳香環酶抑制劑)&quot;) or\n    (&quot;1規則1-2=有填荷爾蒙受體(HR)檢測資料&quot; and Reusable.&quot;ER檢測資料存在&quot; and Reusable.&quot;PR檢測資料存在&quot; and not &quot;1規則1-2=作為荷爾蒙受體(HR)陽性(ER或PR&gt;30%)&quot;) or\n    (&quot;1規則1-3=有填HER2檢測資料&quot; and Reusable.&quot;HER2檢測資料存在&quot; and not &quot;1規則1-3=第二型人類表皮生長因子受體(HER2)陰性&quot;) or\n    (&quot;1規則1-4-1=有填影像報告資料&quot; and not &quot;1規則1-4-1=6個月內影像報告&quot;) or\n    (&quot;1規則1-4-2=有填癌症分期資料&quot; and Reusable.&quot;癌症分期資料存在&quot; and not &quot;1規則1-4-2=癌症分期分數或結果為N&gt;=1&quot;) or\n    (&quot;1規則1-4-3=有填淋巴結檢查報告資料&quot; and not &quot;1規則1-4-3=6個月內淋巴結陽性檢查報告&quot;) or\n    (&quot;1規則1-5=高復發風險判斷資料存在&quot; and not &quot;1規則1-5=高復發風險之早期乳癌&quot;) or\n    (&quot;1規則1-6=性別與年齡資料存在&quot; and not &quot;1規則1-6=成年女性&quot;) or\n    (&quot;1規則2=標準化學及放射輔助治療資料存在&quot; and not &quot;1規則2=使用Abemaciclib前，需接受標準之化學及放射輔助治療&quot;) or\n    (&quot;1規則3-1=使用前內分泌治療資料存在&quot; and not &quot;1規則3-1=使用Abemaciclib前，僅能接受最多12週的內分泌治療&quot;) or\n    (&quot;1規則3-2=有填手術切除紀錄&quot; and not &quot;1規則3-2=應於手術切除後16個月內接受本品治療&quot;)\n  )\n    then '&lt;主要規定一：初次使用條件&gt;\\n' +\n         (if &quot;主要疾病ICD資料存在&quot; and Reusable.&quot;主要疾病ICD診斷資料存在&quot; and not Reusable.&quot;ICD-10使用C50&quot;\n           then '▲ 1條件ICD代碼檢核：主要疾病之ICD代碼未使用C50\\n' else '') +\n         (if &quot;1規則1-1=Abemaciclib併用內分泌療法資料存在&quot; and not &quot;1規則1-1=Abemaciclib併用內分泌療法(tamoxifen或芳香環酶抑制劑)&quot;\n           then '▲ 1規則1-1：Abemaciclib與內分泌療法醫令期間未重疊或醫令類別不符\\n' else '') +\n         (if &quot;1規則1-2=有填荷爾蒙受體(HR)檢測資料&quot; and Reusable.&quot;ER檢測資料存在&quot; and Reusable.&quot;PR檢測資料存在&quot; and not &quot;1規則1-2=作為荷爾蒙受體(HR)陽性(ER或PR&gt;30%)&quot;\n           then '▲ 1規則1-2：荷爾蒙受體(HR)未達陽性標準(ER或PR&gt;30%)\\n' else '') +\n         (if &quot;1規則1-3=有填HER2檢測資料&quot; and Reusable.&quot;HER2檢測資料存在&quot; and not &quot;1規則1-3=第二型人類表皮生長因子受體(HER2)陰性&quot;\n           then '▲ 1規則1-3：HER2檢測結果非陰性或非ND\\n' else '') +\n         (if &quot;1規則1-4-1=有填影像報告資料&quot; and not &quot;1規則1-4-1=6個月內影像報告&quot;\n           then '▲ 1規則1-4-1：未符合「三個月內且代碼正確」之影像或檢查報告條件\\n' else '') +\n         (if &quot;1規則1-4-2=有填癌症分期資料&quot; and Reusable.&quot;癌症分期資料存在&quot; and not &quot;1規則1-4-2=癌症分期分數或結果為N&gt;=1&quot;\n           then '▲ 1規則1-4-2：癌症分期未達N&gt;=1\\n' else '') +\n         (if &quot;1規則1-4-3=有填淋巴結檢查報告資料&quot; and not &quot;1規則1-4-3=6個月內淋巴結陽性檢查報告&quot;\n           then '▲ 1規則1-4-3：未符合「三個月內且代碼正確」之影像或檢查報告條件\\n' else '') +\n         (if &quot;1規則1-5=高復發風險判斷資料存在&quot; and not &quot;1規則1-5=高復發風險之早期乳癌&quot;\n           then '▲ 1規則1-5：未符合高復發風險條件（需符合pALN相關標準之一）\\n' else '') +\n         (if &quot;1規則1-6=性別與年齡資料存在&quot; and not &quot;1規則1-6=成年女性&quot;\n           then '▲ 1規則1-6：非成年女性或性別不符\\n' else '') +\n         (if &quot;1規則2=標準化學及放射輔助治療資料存在&quot; and not &quot;1規則2=使用Abemaciclib前，需接受標準之化學及放射輔助治療&quot;\n           then '▲ 1規則2：標準之化學及放射輔助治療未早於本次Abemaciclib申請或醫令類別不符\\n' else '') +\n         (if &quot;1規則3-1=使用前內分泌治療資料存在&quot; and not &quot;1規則3-1=使用Abemaciclib前，僅能接受最多12週的內分泌治療&quot;\n           then '▲ 1規則3-1：使用Abemaciclib前內分泌治療超過12週\\n' else '') +\n         (if &quot;1規則3-2=有填手術切除紀錄&quot; and not &quot;1規則3-2=應於手術切除後16個月內接受本品治療&quot;\n           then '▲ 1規則3-2：超過手術切除後16個月才接受本品治療\\n' else '') +\n         '\\n'\n    else '') +\n  \n  // 主要規定三：藥品使用規則 - 資料已填但條件或代碼不符合\n  (if (&quot;3規則3-1=每日劑量資料存在&quot; and not &quot;3規則1-1=每日至多使用2錠&quot;)\n    or (&quot;3規則3-2=療程期間資料存在&quot; and not &quot;3規則1-2=使用不得超過2年&quot;)\n    then '&lt;主要規定三：藥品使用規則&gt;\\n' +\n         (if &quot;3規則3-1=每日劑量資料存在&quot; and not &quot;3規則1-1=每日至多使用2錠&quot;\n           then '▲ 3規則1：每日劑量超過2錠（參考資訊）\\n' else '') +\n         (if &quot;3規則3-2=療程期間資料存在&quot; and not &quot;3規則1-2=使用不得超過2年&quot;\n           then '▲ 3規則2：使用總療程超過2年(730天)（參考資訊）\\n' else '')\n    else '')\n\n//============================================\n// 列出「不符合」項目判斷式 - 必要資料未填寫\n//============================================\n\ndefine function &quot;不符合項目_必要資料未填寫&quot;():\n  (if Reusable.&quot;申請類型未知&quot;\n    then '▲ 申請類型：未提供可判定初次使用或續用之申請註記\\n\\n'\n    else '') +\n  // 主要規定一：初次使用條件 - 必要資料未填寫\n  (if Reusable.&quot;初次申請&quot; and (\n    not &quot;主要疾病ICD資料存在&quot; or\n    not &quot;1規則1-1=Abemaciclib併用內分泌療法資料存在&quot; or\n    not &quot;1規則1-2=有填荷爾蒙受體(HR)檢測資料&quot; or\n    not Reusable.&quot;HER2檢測資料存在&quot; or\n    not &quot;1規則1-4-1=有填影像報告資料&quot; or\n    not Reusable.&quot;癌症分期資料存在&quot; or\n    not &quot;1規則1-4-3=有填淋巴結檢查報告資料&quot; or\n    not &quot;1規則1-6=性別與年齡資料存在&quot; or\n    not &quot;1規則2=標準化學及放射輔助治療資料存在&quot; or\n    not &quot;1規則3-1=使用前內分泌治療資料存在&quot; or\n    not &quot;1規則3-2=有填手術切除紀錄&quot;\n  )\n    then '&lt;主要規定一：初次使用條件&gt;\\n' +\n         (if not &quot;主要疾病ICD資料存在&quot;\n           then '▲ 1條件ICD代碼檢核：未提供主要疾病ICD診斷資料\\n' else '') +\n         (if not &quot;1規則1-1=Abemaciclib併用內分泌療法資料存在&quot;\n           then '▲ 1規則1-1：未提供Abemaciclib申請醫令或內分泌療法醫令資料(tamoxifen或芳香環酶抑制劑)\\n' else '') +\n         (if not &quot;1規則1-2=有填荷爾蒙受體(HR)檢測資料&quot;\n           then '▲ 1規則1-2：未提供荷爾蒙受體(HR)檢測資料(ER或PR)\\n' else '') +\n         (if not Reusable.&quot;HER2檢測資料存在&quot;\n           then '▲ 1規則1-3：未提供HER2檢測資料\\n' else '') +\n         (if not &quot;1規則1-4-1=有填影像報告資料&quot;\n           then '▲ 1規則1-4-1：未提供影像報告資料\\n' else '') +\n         (if not Reusable.&quot;癌症分期資料存在&quot;\n           then '▲ 1規則1-4-2：未提供癌症分期分數或結果資料\\n' else '') +\n         (if not &quot;1規則1-4-3=有填淋巴結檢查報告資料&quot;\n           then '▲ 1規則1-4-3：未提供淋巴結檢查報告資料\\n' else '') +\n         (if not &quot;1規則1-6=性別與年齡資料存在&quot;\n           then '▲ 1規則1-6：未提供性別、出生日期或本次申請日期資料\\n' else '') +\n         (if not &quot;1規則2=標準化學及放射輔助治療資料存在&quot;\n           then '▲ 1規則2：未提供標準之化學及放射輔助治療紀錄\\n' else '') +\n         (if not &quot;1規則3-1=使用前內分泌治療資料存在&quot;\n           then '▲ 1規則3-1：未提供使用Abemaciclib前內分泌治療紀錄\\n' else '') +\n         (if not &quot;1規則3-2=有填手術切除紀錄&quot;\n           then '▲ 1規則3-2：未提供手術切除紀錄\\n' else '') +\n         '\\n'\n    else '') +\n  \n  // 主要規定二：續用條件 - 必要資料未填寫\n  (if Reusable.&quot;續用申請&quot; and (\n    not &quot;2規則1-1=每24週須再次申請並檢附療效評估資料&quot; or \n    not &quot;2規則1-2=疾病有惡化情形須停止使用&quot;\n  )\n    then '&lt;主要規定二：續用條件－治療持續給付&gt;\\n' +\n         (if not &quot;2規則1-1=每24週須再次申請並檢附療效評估資料&quot; \n           then '▲ 2規則1-1：未於24週內再次申請或未檢附療效評估資料\\n' else '') +\n         (if not &quot;2規則1-2=疾病有惡化情形須停止使用&quot; \n           then '▲ 2規則1-2：未提供前次治療後影像學報告資料\\n' else '') +\n         '\\n'\n    else '') +\n\n  // 主要規定三：藥品使用規則 - 必要資料未填寫\n  (if (not &quot;3規則3-1=每日劑量資料存在&quot; or not &quot;3規則3-2=療程期間資料存在&quot;)\n    then '&lt;主要規定三：藥品使用規則&gt;\\n' +\n         (if not &quot;3規則3-1=每日劑量資料存在&quot;\n           then '▲ 3規則1：未提供每日劑量資料（參考資訊）\\n' else '') +\n         (if not &quot;3規則3-2=療程期間資料存在&quot;\n           then '▲ 3規則2：未提供療程起迄日期資料（參考資訊）\\n' else '') +\n         '\\n'\n    else '')\n\n//============================================\n// 審核結果\n//============================================\n\ndefine &quot;乳癌Abemaciclib申請結果_布林&quot;:\n  case\n    when Reusable.&quot;初次申請&quot; then (\n      &quot;1規則1&quot; and\n      &quot;1規則2=使用Abemaciclib前，需接受標準之化學及放射輔助治療&quot; and\n      &quot;1規則3=使用前，僅能接受最多12週的內分泌治療，且應於手術切除後16個月內接受本品治療。&quot;\n    )\n    when Reusable.&quot;續用申請&quot; then (\n      &quot;2規則1-1=每24週須再次申請並檢附療效評估資料&quot; and\n      &quot;2規則1-2=疾病有惡化情形須停止使用&quot;\n    )\n    else false\n  end\n\ndefine &quot;乳癌Abemaciclib申請之CQL檢核結果&quot;:\n  if Reusable.&quot;初次申請&quot; and &quot;乳癌Abemaciclib申請結果_布林&quot;\n  then '✓通過：初次使用－乳癌 Abemaciclib 用藥申請'\n\n  else if Reusable.&quot;續用申請&quot; and &quot;乳癌Abemaciclib申請結果_布林&quot;\n  then '✓通過：續用－乳癌 Abemaciclib 用藥申請'\n  else if Reusable.&quot;初次申請&quot;\n  then '✖不通過：初次使用－乳癌 Abemaciclib 用藥申請'\n  else if Reusable.&quot;續用申請&quot;\n  then '✖不通過：續用－乳癌 Abemaciclib 用藥申請'\n  else '✖不通過：無法判定申請類型－乳癌 Abemaciclib 用藥申請'\n\n//============================================\n// 報告總結\n//============================================\n\ndefine &quot;報告總結&quot;:\n  '\\n=== 乳癌之 Abemaciclib 申請審核報告 ===\\n' +\n  '\\n※ 備註：標示為「參考資訊」之檢核項目，係供審核參酌使用，不作為最終【申請結果】判定之依據。\\n' +\n  '\\n【申請類型】' + Reusable.&quot;申請類型&quot; + '\\n' +\n  '\\n【年齡檢核】' +\n  '申請日時病人年齡歲數：' +\n  Coalesce(ToString(&quot;申請日時病人年齡歲數&quot;), '無法計算') + '\\n' +\n  '\\n【●符合項目】\\n' +\n  (if &quot;符合項目&quot;() = '' then '無\\n' else &quot;符合項目&quot;()) +\n  '\\n【▲不符合項目 - 必要資料未填寫】\\n' +\n  (if &quot;不符合項目_必要資料未填寫&quot;() = '' then '無\\n' else &quot;不符合項目_必要資料未填寫&quot;()) +\n  '\\n【▲不符合項目 - 條件或代碼不符合】\\n' +\n  (if &quot;不符合項目_條件或代碼不符合&quot;() = '' then '無\\n' else &quot;不符合項目_條件或代碼不符合&quot;()) +\n  '\\n【申請結果】\\n' +\n  &quot;乳癌Abemaciclib申請之CQL檢核結果&quot; +\n  '\\n===============================================\\n'\n</code></pre>\n      </td>\n    </tr>\n    \n  \n    \n    <tr>\n      <th scope=\"row\" class=\"row-header\">ELM XML Content</th>\n      <td>\n        <pre style=\"border: none;\" class=\"content-container highlight language-cql\"><code>Encoded data </code></pre>\n      </td>\n    </tr>\n    \n  \n    \n    <tr>\n      <th scope=\"row\" class=\"row-header\">ELM JSON Content</th>\n      <td>\n        <pre style=\"border: none;\" class=\"content-container highlight language-cql\"><code>Encoded data </code></pre>\n      </td>\n    </tr>\n    \n  \n\n\n<tr>\n  <th colspan=\"2\" scope=\"row\" class=\"row-header\">Generated using version 0.5.3-cibuild of the sample-content-ig Liquid templates</th>\n</tr>\n\n    </tbody>\n  </table>\n</div>"
+ },
+ "url": "https://nhicore.nhi.gov.tw/cql/Library/BCAbemaciclibRule1",
+ "version": "1.0.0",
+ "name": "BCAbemaciclibRule1",
+ "title": "Abemaciclib給付規定-Abemaciclib Rule1",
+ "status": "draft",
+ "type": {
+  "coding": [
+   {
+    "system": "http://terminology.hl7.org/CodeSystem/library-type",
+    "code": "logic-library"
+   }
+  ]
+ },
+ "date": "2026-07-30",
+ "description": "此 Library 為乳癌患者於申請使用 Abemaciclib 之給付檢核條件。",
+ "relatedArtifact": [
+  {
+   "type": "depends-on",
+   "display": "Library CodeConcept",
+   "resource": "https://nhicore.nhi.gov.tw/cql/Library/BCCodeConcept|1.0.0"
+  },
+  {
+   "type": "depends-on",
+   "display": "Library Reusable",
+   "resource": "https://nhicore.nhi.gov.tw/cql/Library/BCReusable|1.0.0"
+  }
+ ],
+ "parameter": [
+  {
+   "name": "Patient",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "Patient"
+  },
+  {
+   "name": "ICD代碼檢核_布林值",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "主要疾病ICD資料存在",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-1=Abemaciclib併用內分泌療法(tamoxifen或芳香環酶抑制劑)",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-2-1=檢驗檢查-作為荷爾蒙受體(HR)陽性(ER>30%)",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-2-1=基因檢測-作為荷爾蒙受體(HR)陽性(ER>30%)",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "檢查報告-1規則1-2-1=作為荷爾蒙受體(HR)陽性(ER>30%)",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-2-1=作為荷爾蒙受體(HR)陽性(ER>30%)",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-2-1=有填ER檢測資料",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-2-2=檢驗檢查-作為荷爾蒙受體(HR)陽性(PR>30%)",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-2-2=基因檢測-作為荷爾蒙受體(HR)陽性(PR>30%)",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "檢查報告-1規則1-2-2=作為荷爾蒙受體(HR)陽性(PR>30%)",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-2-2=作為荷爾蒙受體(HR)陽性(PR>30%)",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-2-2=有填PR檢測資料",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-2=作為荷爾蒙受體(HR)陽性(ER或PR>30%)",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-2=有填荷爾蒙受體(HR)檢測資料",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-3=檢驗檢查-第二型人類表皮生長因子受體(HER2)陰性",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-3=基因檢測-第二型人類表皮生長因子受體(HER2)陰性",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "檢查報告-1規則1-3=第二型人類表皮生長因子受體(HER2)陰性",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-3=第二型人類表皮生長因子受體(HER2)陰性",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-3=有填HER2檢測資料",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "本次申請紀錄",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "MedicationRequest"
+  },
+  {
+   "name": "本次申請起始日期",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "dateTime"
+  },
+  {
+   "name": "1規則1-4-1=6個月內影像報告",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-4-1=有填影像報告資料",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-4-2=癌症分期分數或結果為N>=1",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-4-2=有填癌症分期資料",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-4-3=6個月內淋巴結陽性檢查報告",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-4-3=有填6個月內淋巴結檢查報告",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-4-3=有填淋巴結檢查報告資料",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-4=淋巴結陽性",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-4=淋巴結相關必要資料存在",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-5-1=pALN，陽性腋下淋巴結≥4",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-5-2=pALN，陽性腋下淋巴結為1-3，且腫瘤大小≥5",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-5-3=pALN，陽性腋下淋巴結為1-3，且腫瘤細胞分化第3級",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-5=高復發風險之早期乳癌",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-5=高復發風險判斷資料存在",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "年齡計算用申請日期",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "date"
+  },
+  {
+   "name": "申請日時病人年齡歲數",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "integer"
+  },
+  {
+   "name": "是否滿18歲",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-6=成年女性",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-6=性別與年齡資料存在",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "有Abemaciclib申請醫令",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "有內分泌療法醫令",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則1-1=Abemaciclib併用內分泌療法資料存在",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則2=使用Abemaciclib前，需接受標準之化學及放射輔助治療",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則2=標準化學及放射輔助治療資料存在",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則3-1=使用Abemaciclib前，僅能接受最多12週的內分泌治療",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則3-1=使用前內分泌治療資料存在",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則3-2=應於手術切除後16個月內接受本品治療",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則3-2=有填手術切除紀錄",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "1規則3=使用前，僅能接受最多12週的內分泌治療，且應於手術切除後16個月內接受本品治療。",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "主要規定一",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "前次申請紀錄",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "MedicationRequest"
+  },
+  {
+   "name": "2規則1-1=每24週須再次申請並檢附療效評估資料",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "前次治療紀錄",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "MedicationRequest"
+  },
+  {
+   "name": "前次用藥開始日期",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "dateTime"
+  },
+  {
+   "name": "2規則1-2=疾病有惡化情形須停止使用",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "主要規定二",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "3規則1-1=每日至多使用2錠",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "3規則3-1=每日劑量資料存在",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "3規則1-2=使用不得超過2年",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "3規則3-2=療程期間資料存在",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "主要規定三",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "乳癌Abemaciclib申請結果_布林",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "boolean"
+  },
+  {
+   "name": "乳癌Abemaciclib申請之CQL檢核結果",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "string"
+  },
+  {
+   "name": "報告總結",
+   "use": "out",
+   "min": 0,
+   "max": "1",
+   "type": "string"
+  }
+ ],
+ "dataRequirement": [
+  {
+   "type": "Claim",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Claim"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "DiagnosticReport",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/DiagnosticReport"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "DiagnosticReport",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/DiagnosticReport"
+   ]
+  },
+  {
+   "type": "DiagnosticReport",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/DiagnosticReport"
+   ]
+  },
+  {
+   "type": "DiagnosticReport",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/DiagnosticReport"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "Observation",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/Observation"
+   ]
+  },
+  {
+   "type": "DiagnosticReport",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/DiagnosticReport"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "DiagnosticReport",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/DiagnosticReport"
+   ]
+  },
+  {
+   "type": "DiagnosticReport",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/DiagnosticReport"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  },
+  {
+   "type": "MedicationRequest",
+   "profile": [
+    "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
+   ]
+  }
+ ],
+ "content": [
+  {
+   "contentType": "text/cql",
+   "data": "Ly/kubPnmYxfQWJlbWFjaWNsaWLntabku5jopo/lrpoKbGlicmFyeSBCQ0FiZW1hY2ljbGliUnVsZTEgdmVyc2lvbiAnMS4wLjAnCgp1c2luZyBGSElSIHZlcnNpb24gJzQuMC4xJwoKaW5jbHVkZSBGSElSSGVscGVycyB2ZXJzaW9uICc0LjAuMScgY2FsbGVkIEZISVJIZWxwZXJzCgppbmNsdWRlIEJDQ29kZUNvbmNlcHQgdmVyc2lvbiAnMS4wLjAnIGNhbGxlZCBDb2RlQ29uY2VwdAoKaW5jbHVkZSBCQ1JldXNhYmxlIHZlcnNpb24gJzEuMC4wJyBjYWxsZWQgUmV1c2FibGUKCmNvbnRleHQgUGF0aWVudAoKCgovLz09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09Ci8vIOS4u+imgeimj+WumuS4gO+8muWIneasoeS9v+eUqOaineS7tgovLz09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CgovKuimj+WJhzEqLwoKZGVmaW5lICJJQ0Tku6PnorzmqqLmoLhf5biD5p6X5YC8IjogUmV1c2FibGUuIklDRC0xMOS9v+eUqEM1MCIKCmRlZmluZSAi5Li76KaB55a+55eFSUNE6LOH5paZ5a2Y5ZyoIjoKICBleGlzdHMgKAogICAgW0NsYWltXSBDCiAgICAgIHdoZXJlIGV4aXN0cyAoCiAgICAgICAgQy5kaWFnbm9zaXMgRAogICAgICAgICAgd2hlcmUgRC5zZXF1ZW5jZSA9IDEKICAgICAgICAgICAgYW5kIGV4aXN0cyAoCiAgICAgICAgICAgICAgRC5kaWFnbm9zaXMuY29kaW5nIENkZwogICAgICAgICAgICAgICAgd2hlcmUgQ2RnIGluIENvZGVDb25jZXB0LklDRDEwQ00yMDIzCiAgICAgICAgICAgICAgICAgIG9yIENkZyBpbiBDb2RlQ29uY2VwdC5JQ0QxMENNMjAxNAogICAgICAgICAgICApCiAgICAgICkKICApCgovL+aineS7tjE6QWJlbWFjaWNsaWLkvbXnlKjlhafliIbms4znmYLms5UodGFtb3hpZmVu5oiW6Iqz6aaZ55Kw6YW25oqR5Yi25YqRKQpkZWZpbmUgIjHopo/liYcxLTE9QWJlbWFjaWNsaWLkvbXnlKjlhafliIbms4znmYLms5UodGFtb3hpZmVu5oiW6Iqz6aaZ55Kw6YW25oqR5Yi25YqRKSI6CigKICAvLyDnlLPoq4vmnJ/plpPoiIflhafliIbms4znmYLms5XmmYLplpPph43nlooKICBSZXVzYWJsZS4iSGFzQ29uY3VycmVudE1lZGljYXRpb25PcmRlciIoQ29kZUNvbmNlcHQuTDAxRUYwMywgQ29kZUNvbmNlcHQuIuWFp+WIhuazjOeZguazleiXpeeJqSh0YW1veGlmZW7miJboirPpppnnkrDphbbmipHliLblipEpIikKICBhbmQgUmV1c2FibGUuIumGq+S7pOmhnuWIpeeCujEiCikKCgovL+aineS7tjI65L2c54K66I2354i+6JKZ5Y+X6auUKEhSKemZveaApyhFUuaIllBSPjMwJSkKLy/mop3ku7YyLTEgRVIKZGVmaW5lICIx6KaP5YmHMS0yLTE95qqi6amX5qqi5p+lLeS9nOeCuuiNt+eIvuiSmeWPl+mrlChIUinpmb3mgKcoRVI+MzAlKSI6CiAgZXhpc3RzICgKICAgIFtPYnNlcnZhdGlvbl0gT0JzCiAgICAgIHdoZXJlIFJldXNhYmxlLiJJc1Rlc3RPYnNlcnZhdGlvbiIoT0JzKQogICAgYW5kIGV4aXN0cyAoCiAgICAgIE9Ccy5jb2RlLmNvZGluZyBDZGcKICAgICAgd2hlcmUgQ2RnIGluIENvZGVDb25jZXB0LkxPSU5DCiAgICAgIGFuZCBDZGcuY29kZSBpbiBDb2RlQ29uY2VwdC5FUgogICAgKQogICAgYW5kICgKICAgICAgKE9Ccy52YWx1ZSBpcyBRdWFudGl0eQogICAgICAgIGFuZCAoT0JzLnZhbHVlIGFzIFF1YW50aXR5KS52YWx1ZSA+IDMwCiAgICAgICAgYW5kIChPQnMudmFsdWUgYXMgUXVhbnRpdHkpLmNvbXBhcmF0b3IgPSAnPicpCiAgICAgIG9yIChPQnMudmFsdWUgaXMgRkhJUi5zdHJpbmcKICAgICAgICBhbmQgTWF0Y2hlcygoT0JzLnZhbHVlIGFzIEZISVIuc3RyaW5nKS52YWx1ZSwgJy4qRVI+MzAlLionKSkKICAgICkKICApCgpkZWZpbmUgIjHopo/liYcxLTItMT3ln7rlm6DmqqLmuKwt5L2c54K66I2354i+6JKZ5Y+X6auUKEhSKemZveaApyhFUj4zMCUpIjoKICBleGlzdHMgKAogICAgW09ic2VydmF0aW9uXSBPQnMKICAgICAgd2hlcmUgUmV1c2FibGUuIklzR2VuZUluZm9PYnNlcnZhdGlvbiIoT0JzKQogICAgYW5kIFJldXNhYmxlLiJJc0dlbmVQYW5lbE9ic2VydmF0aW9uIihPQnMpCiAgICBhbmQgZXhpc3RzICgKICAgICAgT0JzLmNvbXBvbmVudCBDb21wCiAgICAgICAgd2hlcmUgZXhpc3RzICgKICAgICAgICAgIENvbXAuY29kZS5jb2RpbmcgQ2RnCiAgICAgICAgICAgIHdoZXJlIENkZyBpbiBDb2RlQ29uY2VwdC5MT0lOQwogICAgICAgICAgICAgIGFuZCBDZGcuY29kZSBpbiBDb2RlQ29uY2VwdC5FUgogICAgICAgICkKICAgICAgICBhbmQgKAogICAgICAgICAgKENvbXAudmFsdWUgaXMgUXVhbnRpdHkKICAgICAgICAgICAgYW5kIChDb21wLnZhbHVlIGFzIFF1YW50aXR5KS52YWx1ZSA+IDMwCiAgICAgICAgICAgIGFuZCAoQ29tcC52YWx1ZSBhcyBRdWFudGl0eSkuY29tcGFyYXRvciA9ICc+JwogICAgICAgICAgICBhbmQgKENvbXAudmFsdWUgYXMgUXVhbnRpdHkpLnVuaXQgPSAnJScpCiAgICAgICAgICBvciAoQ29tcC52YWx1ZSBpcyBGSElSLnN0cmluZwogICAgICAgICAgICBhbmQgTWF0Y2hlcygoQ29tcC52YWx1ZSBhcyBGSElSLnN0cmluZykudmFsdWUsICcuKkVSPjMwJS4qJykpCiAgICAgICAgKQogICAgKQogICkKCmRlZmluZSAi5qqi5p+l5aCx5ZGKLTHopo/liYcxLTItMT3kvZzngrrojbfniL7okpnlj5fpq5QoSFIp6Zm95oCnKEVSPjMwJSkiOgogIFJldXNhYmxlLiJIYXNEaWFnbm9zdGljUmVwb3J0UmVzdWx0IihDb2RlQ29uY2VwdC5FUiwgJy4qRVI+MzAlLionKQoKZGVmaW5lICIx6KaP5YmHMS0yLTE95L2c54K66I2354i+6JKZ5Y+X6auUKEhSKemZveaApyhFUj4zMCUpIjoKICAiMeimj+WJhzEtMi0xPeaqoumpl+aqouafpS3kvZzngrrojbfniL7okpnlj5fpq5QoSFIp6Zm95oCnKEVSPjMwJSkiCiAgb3IgIjHopo/liYcxLTItMT3ln7rlm6DmqqLmuKwt5L2c54K66I2354i+6JKZ5Y+X6auUKEhSKemZveaApyhFUj4zMCUpIgogIG9yICLmqqLmn6XloLHlkYotMeimj+WJhzEtMi0xPeS9nOeCuuiNt+eIvuiSmeWPl+mrlChIUinpmb3mgKcoRVI+MzAlKSIKCmRlZmluZSAiMeimj+WJhzEtMi0xPeacieWhq0VS5qqi5ris6LOH5paZIjoKICBleGlzdHMgKAogICAgW09ic2VydmF0aW9uXSBPQnMKICAgICAgd2hlcmUgUmV1c2FibGUuIklzVGVzdE9ic2VydmF0aW9uIihPQnMpCiAgICAgICAgYW5kIGV4aXN0cyAoCiAgICAgICAgICBPQnMuY29kZS5jb2RpbmcgQ2RnCiAgICAgICAgICAgIHdoZXJlIENkZyBpbiBDb2RlQ29uY2VwdC5MT0lOQwogICAgICAgICAgICAgIGFuZCBDZGcuY29kZSBpbiBDb2RlQ29uY2VwdC5FUgogICAgICAgICkKICAgICAgICBhbmQgT0JzLnZhbHVlIGlzIG5vdCBudWxsCiAgKQogIG9yIGV4aXN0cyAoCiAgICBbT2JzZXJ2YXRpb25dIE9CcwogICAgICB3aGVyZSBSZXVzYWJsZS4iSXNHZW5lSW5mb09ic2VydmF0aW9uIihPQnMpCiAgICAgICAgYW5kIFJldXNhYmxlLiJJc0dlbmVQYW5lbE9ic2VydmF0aW9uIihPQnMpCiAgICAgICAgYW5kIGV4aXN0cyAoCiAgICAgICAgICBPQnMuY29tcG9uZW50IENvbXAKICAgICAgICAgICAgd2hlcmUgZXhpc3RzICgKICAgICAgICAgICAgICBDb21wLmNvZGUuY29kaW5nIENkZwogICAgICAgICAgICAgICAgd2hlcmUgQ2RnIGluIENvZGVDb25jZXB0LkxPSU5DCiAgICAgICAgICAgICAgICAgIGFuZCBDZGcuY29kZSBpbiBDb2RlQ29uY2VwdC5FUgogICAgICAgICAgICApCiAgICAgICAgICAgIGFuZCBDb21wLnZhbHVlIGlzIG5vdCBudWxsCiAgICAgICAgKQogICkKICBvciBSZXVzYWJsZS4iSGFzRGlhZ25vc3RpY1JlcG9ydERhdGEiKENvZGVDb25jZXB0LkVSKQoKLy/mop3ku7YyLTIgUFIKZGVmaW5lICIx6KaP5YmHMS0yLTI95qqi6amX5qqi5p+lLeS9nOeCuuiNt+eIvuiSmeWPl+mrlChIUinpmb3mgKcoUFI+MzAlKSI6CiAgZXhpc3RzICgKICAgIFtPYnNlcnZhdGlvbl0gT0JzCiAgICAgIHdoZXJlIFJldXNhYmxlLiJJc1Rlc3RPYnNlcnZhdGlvbiIoT0JzKQogICAgYW5kIGV4aXN0cyAoCiAgICAgIE9Ccy5jb2RlLmNvZGluZyBDZGcKICAgICAgd2hlcmUgQ2RnIGluIENvZGVDb25jZXB0LkxPSU5DCiAgICAgIGFuZCBDZGcuY29kZSBpbiBDb2RlQ29uY2VwdC5QUgogICAgKQogICAgYW5kICgKICAgICAgKE9Ccy52YWx1ZSBpcyBRdWFudGl0eQogICAgICAgIGFuZCAoT0JzLnZhbHVlIGFzIFF1YW50aXR5KS52YWx1ZSA+IDMwCiAgICAgICAgYW5kIChPQnMudmFsdWUgYXMgUXVhbnRpdHkpLmNvbXBhcmF0b3IgPSAnPicpCiAgICAgIG9yIChPQnMudmFsdWUgaXMgRkhJUi5zdHJpbmcKICAgICAgICBhbmQgTWF0Y2hlcygoT0JzLnZhbHVlIGFzIEZISVIuc3RyaW5nKS52YWx1ZSwgJy4qUFI+MzAlLionKSkKICAgICkKICApCgpkZWZpbmUgIjHopo/liYcxLTItMj3ln7rlm6DmqqLmuKwt5L2c54K66I2354i+6JKZ5Y+X6auUKEhSKemZveaApyhQUj4zMCUpIjoKICBleGlzdHMgKAogICAgW09ic2VydmF0aW9uXSBPQnMKICAgICAgd2hlcmUgUmV1c2FibGUuIklzR2VuZUluZm9PYnNlcnZhdGlvbiIoT0JzKQogICAgYW5kIFJldXNhYmxlLiJJc0dlbmVQYW5lbE9ic2VydmF0aW9uIihPQnMpCiAgICBhbmQgZXhpc3RzICgKICAgICAgT0JzLmNvbXBvbmVudCBDb21wCiAgICAgICAgd2hlcmUgZXhpc3RzICgKICAgICAgICAgIENvbXAuY29kZS5jb2RpbmcgQ2RnCiAgICAgICAgICAgIHdoZXJlIENkZyBpbiBDb2RlQ29uY2VwdC5MT0lOQwogICAgICAgICAgICAgIGFuZCBDZGcuY29kZSBpbiBDb2RlQ29uY2VwdC5QUgogICAgICAgICkKICAgICAgICBhbmQgKAogICAgICAgICAgKENvbXAudmFsdWUgaXMgUXVhbnRpdHkKICAgICAgICAgICAgYW5kIChDb21wLnZhbHVlIGFzIFF1YW50aXR5KS52YWx1ZSA+IDMwCiAgICAgICAgICAgIGFuZCAoQ29tcC52YWx1ZSBhcyBRdWFudGl0eSkuY29tcGFyYXRvciA9ICc+JwogICAgICAgICAgICBhbmQgKENvbXAudmFsdWUgYXMgUXVhbnRpdHkpLnVuaXQgPSAnJScpCiAgICAgICAgICBvciAoQ29tcC52YWx1ZSBpcyBGSElSLnN0cmluZwogICAgICAgICAgICBhbmQgTWF0Y2hlcygoQ29tcC52YWx1ZSBhcyBGSElSLnN0cmluZykudmFsdWUsICcuKlBSPjMwJS4qJykpCiAgICAgICAgKQogICAgKQogICkKCmRlZmluZSAi5qqi5p+l5aCx5ZGKLTHopo/liYcxLTItMj3kvZzngrrojbfniL7okpnlj5fpq5QoSFIp6Zm95oCnKFBSPjMwJSkiOgogIFJldXNhYmxlLiJIYXNEaWFnbm9zdGljUmVwb3J0UmVzdWx0IihDb2RlQ29uY2VwdC5QUiwgJy4qUFI+MzAlLionKQoKZGVmaW5lICIx6KaP5YmHMS0yLTI95L2c54K66I2354i+6JKZ5Y+X6auUKEhSKemZveaApyhQUj4zMCUpIjoKICAiMeimj+WJhzEtMi0yPeaqoumpl+aqouafpS3kvZzngrrojbfniL7okpnlj5fpq5QoSFIp6Zm95oCnKFBSPjMwJSkiCiAgb3IgIjHopo/liYcxLTItMj3ln7rlm6DmqqLmuKwt5L2c54K66I2354i+6JKZ5Y+X6auUKEhSKemZveaApyhQUj4zMCUpIgogIG9yICLmqqLmn6XloLHlkYotMeimj+WJhzEtMi0yPeS9nOeCuuiNt+eIvuiSmeWPl+mrlChIUinpmb3mgKcoUFI+MzAlKSIKCmRlZmluZSAiMeimj+WJhzEtMi0yPeacieWhq1BS5qqi5ris6LOH5paZIjoKICBleGlzdHMgKAogICAgW09ic2VydmF0aW9uXSBPQnMKICAgICAgd2hlcmUgUmV1c2FibGUuIklzVGVzdE9ic2VydmF0aW9uIihPQnMpCiAgICAgICAgYW5kIGV4aXN0cyAoCiAgICAgICAgICBPQnMuY29kZS5jb2RpbmcgQ2RnCiAgICAgICAgICAgIHdoZXJlIENkZyBpbiBDb2RlQ29uY2VwdC5MT0lOQwogICAgICAgICAgICAgIGFuZCBDZGcuY29kZSBpbiBDb2RlQ29uY2VwdC5QUgogICAgICAgICkKICAgICAgICBhbmQgT0JzLnZhbHVlIGlzIG5vdCBudWxsCiAgKQogIG9yIGV4aXN0cyAoCiAgICBbT2JzZXJ2YXRpb25dIE9CcwogICAgICB3aGVyZSBSZXVzYWJsZS4iSXNHZW5lSW5mb09ic2VydmF0aW9uIihPQnMpCiAgICAgICAgYW5kIFJldXNhYmxlLiJJc0dlbmVQYW5lbE9ic2VydmF0aW9uIihPQnMpCiAgICAgICAgYW5kIGV4aXN0cyAoCiAgICAgICAgICBPQnMuY29tcG9uZW50IENvbXAKICAgICAgICAgICAgd2hlcmUgZXhpc3RzICgKICAgICAgICAgICAgICBDb21wLmNvZGUuY29kaW5nIENkZwogICAgICAgICAgICAgICAgd2hlcmUgQ2RnIGluIENvZGVDb25jZXB0LkxPSU5DCiAgICAgICAgICAgICAgICAgIGFuZCBDZGcuY29kZSBpbiBDb2RlQ29uY2VwdC5QUgogICAgICAgICAgICApCiAgICAgICAgICAgIGFuZCBDb21wLnZhbHVlIGlzIG5vdCBudWxsCiAgICAgICAgKQogICkKICBvciBSZXVzYWJsZS4iSGFzRGlhZ25vc3RpY1JlcG9ydERhdGEiKENvZGVDb25jZXB0LlBSKQoKCmRlZmluZSAiMeimj+WJhzEtMj3kvZzngrrojbfniL7okpnlj5fpq5QoSFIp6Zm95oCnKEVS5oiWUFI+MzAlKSI6CiIx6KaP5YmHMS0yLTE95L2c54K66I2354i+6JKZ5Y+X6auUKEhSKemZveaApyhFUj4zMCUpIiBvciAiMeimj+WJhzEtMi0yPeS9nOeCuuiNt+eIvuiSmeWPl+mrlChIUinpmb3mgKcoUFI+MzAlKSIKCmRlZmluZSAiMeimj+WJhzEtMj3mnInloavojbfniL7okpnlj5fpq5QoSFIp5qqi5ris6LOH5paZIjoKICAiMeimj+WJhzEtMi0xPeacieWhq0VS5qqi5ris6LOH5paZIgogIG9yICIx6KaP5YmHMS0yLTI95pyJ5aGrUFLmqqLmuKzos4fmlpkiCgoKLy/mop3ku7YzOuesrOS6jOWei+S6uumhnuihqOearueUn+mVt+WboOWtkOWPl+mrlChIRVIyKemZsOaApwpkZWZpbmUgIjHopo/liYcxLTM95qqi6amX5qqi5p+lLeesrOS6jOWei+S6uumhnuihqOearueUn+mVt+WboOWtkOWPl+mrlChIRVIyKemZsOaApyI6CiAgUmV1c2FibGUuIkhhc0hFUjJOZWdhdGl2ZU9yTkRUZXN0IgoKZGVmaW5lICIx6KaP5YmHMS0zPeWfuuWboOaqoua4rC3nrKzkuozlnovkurrpoZ7ooajnmq7nlJ/plbflm6DlrZDlj5fpq5QoSEVSMinpmbDmgKciOgogIFJldXNhYmxlLiJIYXNIRVIyTmVnYXRpdmVPck5ER2VuZSIKCmRlZmluZSAi5qqi5p+l5aCx5ZGKLTHopo/liYcxLTM956ys5LqM5Z6L5Lq66aGe6KGo55qu55Sf6ZW35Zug5a2Q5Y+X6auUKEhFUjIp6Zmw5oCnIjoKICBSZXVzYWJsZS4iSGFzRGlhZ25vc3RpY1JlcG9ydFJlc3VsdCIoQ29kZUNvbmNlcHQuSEVSMiwgJyg/aSkuKijpmbDmgKd8bmVnYXRpdmV8XFxiTkVHXFxifFxcYk5EXFxiKS4qJykKCmRlZmluZSAiMeimj+WJhzEtMz3nrKzkuozlnovkurrpoZ7ooajnmq7nlJ/plbflm6DlrZDlj5fpq5QoSEVSMinpmbDmgKciOgogICIx6KaP5YmHMS0zPeaqoumpl+aqouafpS3nrKzkuozlnovkurrpoZ7ooajnmq7nlJ/plbflm6DlrZDlj5fpq5QoSEVSMinpmbDmgKciCiAgb3IgIjHopo/liYcxLTM95Z+65Zug5qqi5risLeesrOS6jOWei+S6uumhnuihqOearueUn+mVt+WboOWtkOWPl+mrlChIRVIyKemZsOaApyIKICBvciAi5qqi5p+l5aCx5ZGKLTHopo/liYcxLTM956ys5LqM5Z6L5Lq66aGe6KGo55qu55Sf6ZW35Zug5a2Q5Y+X6auUKEhFUjIp6Zmw5oCnIgoKZGVmaW5lICIx6KaP5YmHMS0zPeacieWhq0hFUjLmqqLmuKzos4fmlpkiOgogIGV4aXN0cyAoCiAgICBbT2JzZXJ2YXRpb25dIE9CcwogICAgICB3aGVyZSBSZXVzYWJsZS4iSXNUZXN0T2JzZXJ2YXRpb24iKE9CcykKICAgICAgICBhbmQgZXhpc3RzICgKICAgICAgICAgIE9Ccy5jb2RlLmNvZGluZyBDZGcKICAgICAgICAgICAgd2hlcmUgQ2RnIGluIENvZGVDb25jZXB0LkxPSU5DCiAgICAgICAgICAgICAgYW5kIENkZy5jb2RlIGluIENvZGVDb25jZXB0LkhFUjIKICAgICAgICApCiAgICAgICAgYW5kICgKICAgICAgICAgIE9Ccy52YWx1ZSBpcyBub3QgbnVsbAogICAgICAgICAgb3IgZXhpc3RzIChPQnMuaW50ZXJwcmV0YXRpb24gSSB3aGVyZSBJIGlzIG5vdCBudWxsKQogICAgICAgICkKICApCiAgb3IgZXhpc3RzICgKICAgIFtPYnNlcnZhdGlvbl0gT0JzCiAgICAgIHdoZXJlIFJldXNhYmxlLiJJc0dlbmVJbmZvT2JzZXJ2YXRpb24iKE9CcykKICAgICAgICBhbmQgUmV1c2FibGUuIklzR2VuZVBhbmVsT2JzZXJ2YXRpb24iKE9CcykKICAgICAgICBhbmQgZXhpc3RzICgKICAgICAgICAgIE9Ccy5jb21wb25lbnQgQ29tcAogICAgICAgICAgICB3aGVyZSBleGlzdHMgKAogICAgICAgICAgICAgIENvbXAuY29kZS5jb2RpbmcgQ2RnCiAgICAgICAgICAgICAgICB3aGVyZSBDZGcgaW4gQ29kZUNvbmNlcHQuTE9JTkMKICAgICAgICAgICAgICAgICAgYW5kIENkZy5jb2RlIGluIENvZGVDb25jZXB0LkhFUjIKICAgICAgICAgICAgKQogICAgICAgICAgICBhbmQgKAogICAgICAgICAgICAgIENvbXAudmFsdWUgaXMgbm90IG51bGwKICAgICAgICAgICAgKQogICAgICAgICkKICApCiAgb3IgUmV1c2FibGUuIkhhc0RpYWdub3N0aWNSZXBvcnREYXRhIihDb2RlQ29uY2VwdC5IRVIyKQoKCi8v5qKd5Lu2NDrmt4vlt7TntZDpmb3mgKcKCi8v5qKd5Lu2NC0xCmRlZmluZSAiMeimj+WJhzEtNC0xPTblgIvmnIjlhaflvbHlg4/loLHlkYoiOgogIFJldXNhYmxlLiJIYXNSZWNlbnRJbWFnZVJlcG9ydCIoIuacrOasoeeUs+iri+i1t+Wni+aXpeacnyIsIDE4MCkKCmRlZmluZSAiMeimj+WJhzEtNC0xPeacieWhq+W9seWDj+WgseWRiuizh+aWmSI6CiAgZXhpc3RzICgKICAgIFtEaWFnbm9zdGljUmVwb3J0XSBSZXBvcnQKICAgIHdoZXJlIFJlcG9ydC5lZmZlY3RpdmUgaXMgbm90IG51bGwKICAgICAgYW5kICgKICAgICAgICBSZXVzYWJsZS4iSXNJbWFnZVJlcG9ydCIoUmVwb3J0KQogICAgICAgIG9yIFJldXNhYmxlLiJJc1JlcG9ydFdpdGhpbkRheXNCZWZvcmUiKFJlcG9ydCwgIuacrOasoeeUs+iri+i1t+Wni+aXpeacnyIsIDE4MCkKICAgICAgKQogICkKCgoKLy/mop3ku7Y0LTIKZGVmaW5lICIx6KaP5YmHMS00LTI955mM55eH5YiG5pyf5YiG5pW45oiW57WQ5p6c54K6Tj49MSI6CiAgZXhpc3RzICgKICAgIFtPYnNlcnZhdGlvbl0gTwogICAgICB3aGVyZSBleGlzdHMgKAogICAgICAgIE8uY29kZS5jb2RpbmcgQ2RnCiAgICAgICAgICB3aGVyZSBDZGcuY29kZSA9ICczOTkzOTAwMDknCiAgICAgICAgICAgIGFuZCBDZGcgaW4gQ29kZUNvbmNlcHQuU05PTUVECiAgICAgICkKICAgICAgICBhbmQgTy52YWx1ZSBpcyBub3QgbnVsbAogICAgICAgIGFuZCBPLnZhbHVlIGlzIEZISVIuc3RyaW5nCiAgICAgICAgYW5kIE1hdGNoZXMoKE8udmFsdWUgYXMgRkhJUi5zdHJpbmcpLnZhbHVlLCAnLipOWzEtOV0uKicpCiAgKQoKZGVmaW5lICIx6KaP5YmHMS00LTI95pyJ5aGr55mM55eH5YiG5pyf6LOH5paZIjoKICBleGlzdHMgKAogICAgW09ic2VydmF0aW9uXSBPCiAgICAgIHdoZXJlIGV4aXN0cyAoCiAgICAgICAgTy5jb2RlLmNvZGluZyBDZGcKICAgICAgICAgIHdoZXJlIENkZy5jb2RlID0gJzM5OTM5MDAwOScKICAgICAgICAgICAgYW5kIENkZyBpbiBDb2RlQ29uY2VwdC5TTk9NRUQKICAgICAgKQogICAgICAgIGFuZCBPLnZhbHVlIGlzIG5vdCBudWxsCiAgICAgICAgYW5kIE8udmFsdWUgaXMgRkhJUi5zdHJpbmcKICApCgoKLy/mop3ku7Y0LTMKZGVmaW5lICIx6KaP5YmHMS00LTM9NuWAi+aciOWFp+a3i+W3tOe1kOmZveaAp+aqouafpeWgseWRiiI6CiAgZXhpc3RzICgKICAgIFtEaWFnbm9zdGljUmVwb3J0XSBPMgogICAgd2hlcmUgZXhpc3RzICgKICAgICAgTzIuY29kZS5jb2RpbmcgQ2RnCiAgICAgIHdoZXJlIENkZyBpbiBDb2RlQ29uY2VwdC5MT0lOQwogICAgICAgIGFuZCBDZGcuY29kZSBpbiBDb2RlQ29uY2VwdC5EaWFnbm9zdGljUmVwb3J0Q29kZQogICAgKQogICAgYW5kIE8yLmVmZmVjdGl2ZSBpcyBub3QgbnVsbAogICAgYW5kIEZISVJIZWxwZXJzLlRvRGF0ZVRpbWUoTzIuZWZmZWN0aXZlKSA+PSAi5pys5qyh55Sz6KuL6LW35aeL5pel5pyfIiAtIDE4MCBkYXlzCiAgICBhbmQgRkhJUkhlbHBlcnMuVG9EYXRlVGltZShPMi5lZmZlY3RpdmUpIDw9ICLmnKzmrKHnlLPoq4votbflp4vml6XmnJ8iCiAgICBhbmQgTzIuY29uY2x1c2lvbiBpcyBub3QgbnVsbAogICAgYW5kIE1hdGNoZXMoTzIuY29uY2x1c2lvbiwgJyg/aSkuKihwb3NpdGl2ZXxkZXRlY3RlZHxwcmVzZW50fFBvc2l0aXZlfERldGVjdGVkfFByZXNlbnR8XFwrKS4qJykKICApCgpkZWZpbmUgIjHopo/liYcxLTQtMz3mnInloas25YCL5pyI5YWn5reL5be057WQ5qqi5p+l5aCx5ZGKIjoKICBleGlzdHMgKAogICAgW0RpYWdub3N0aWNSZXBvcnRdIE8yCiAgICB3aGVyZSBleGlzdHMgKAogICAgICBPMi5jb2RlLmNvZGluZyBDZGcKICAgICAgd2hlcmUgQ2RnIGluIENvZGVDb25jZXB0LkxPSU5DCiAgICAgICAgYW5kIENkZy5jb2RlIGluIENvZGVDb25jZXB0LkRpYWdub3N0aWNSZXBvcnRDb2RlCiAgICApCiAgICBhbmQgTzIuZWZmZWN0aXZlIGlzIG5vdCBudWxsCiAgICBhbmQgRkhJUkhlbHBlcnMuVG9EYXRlVGltZShPMi5lZmZlY3RpdmUpID49ICLmnKzmrKHnlLPoq4votbflp4vml6XmnJ8iIC0gMTgwIGRheXMKICAgIGFuZCBGSElSSGVscGVycy5Ub0RhdGVUaW1lKE8yLmVmZmVjdGl2ZSkgPD0gIuacrOasoeeUs+iri+i1t+Wni+aXpeacnyIKICAgIGFuZCBPMi5jb25jbHVzaW9uIGlzIG5vdCBudWxsCiAgKQoKZGVmaW5lICIx6KaP5YmHMS00LTM95pyJ5aGr5reL5be057WQ5qqi5p+l5aCx5ZGK6LOH5paZIjoKICBleGlzdHMgKAogICAgW0RpYWdub3N0aWNSZXBvcnRdIE8yCiAgICB3aGVyZSBPMi5lZmZlY3RpdmUgaXMgbm90IG51bGwKICAgICAgYW5kIE8yLmNvbmNsdXNpb24gaXMgbm90IG51bGwKICAgICAgYW5kICgKICAgICAgICBleGlzdHMgKAogICAgICAgICAgTzIuY29kZS5jb2RpbmcgQ2RnCiAgICAgICAgICB3aGVyZSBDZGcgaW4gQ29kZUNvbmNlcHQuTE9JTkMKICAgICAgICAgICAgYW5kIENkZy5jb2RlIGluIENvZGVDb25jZXB0LkRpYWdub3N0aWNSZXBvcnRDb2RlCiAgICAgICAgKQogICAgICAgIG9yIFJldXNhYmxlLiJJc1JlcG9ydFdpdGhpbkRheXNCZWZvcmUiKE8yLCAi5pys5qyh55Sz6KuL6LW35aeL5pel5pyfIiwgOTApCiAgICAgICkKICApCgpkZWZpbmUgIjHopo/liYcxLTQ95reL5be057WQ6Zm95oCnIjoKIjHopo/liYcxLTQtMT025YCL5pyI5YWn5b2x5YOP5aCx5ZGKIgphbmQgIjHopo/liYcxLTQtMj3nmYznl4fliIbmnJ/liIbmlbjmiJbntZDmnpzngrpOPj0xIgphbmQgIjHopo/liYcxLTQtMz025YCL5pyI5YWn5reL5be057WQ6Zm95oCn5qqi5p+l5aCx5ZGKIgoKZGVmaW5lICIx6KaP5YmHMS00Pea3i+W3tOe1kOebuOmXnOW/heimgeizh+aWmeWtmOWcqCI6CiAgIjHopo/liYcxLTQtMT3mnInloavlvbHlg4/loLHlkYros4fmlpkiCiAgYW5kICIx6KaP5YmHMS00LTI95pyJ5aGr55mM55eH5YiG5pyf6LOH5paZIgogIGFuZCAiMeimj+WJhzEtNC0zPeacieWhq+a3i+W3tOe1kOaqouafpeWgseWRiuizh+aWmSIKCgovL+aineS7tjU66auY5b6p55m86aKo6Zqq5LmL5pep5pyf5Lmz55mMCgovL+aineS7tjUtMQpkZWZpbmUgIjHopo/liYcxLTUtMT1wQUxO77yM6Zm95oCn6IWL5LiL76e15be057WQ4omlNCI6ClJldXNhYmxlLiJJQ0QtMTDkvb/nlKhDNTAiIAphbmQgIjHopo/liYcxLTQtMT025YCL5pyI5YWn5b2x5YOP5aCx5ZGKIgphbmQgQ291bnQoCiAgICBbT2JzZXJ2YXRpb25dIE8KICAgIHdoZXJlIGV4aXN0cyAoCiAgICAgIE8uY29kZS5jb2RpbmcgQ2RnCiAgICAgIHdoZXJlIENkZy5jb2RlID0gJzM5OTM5MDAwOScKICAgICAgICBhbmQgQ2RnIGluIENvZGVDb25jZXB0LlNOT01FRAogICAgKQogICAgYW5kIE8udmFsdWUgaXMgbm90IG51bGwKICAgIGFuZCBPLnZhbHVlIGlzIEZISVIuc3RyaW5nCiAgICBhbmQgTWF0Y2hlcygoTy52YWx1ZSBhcyBGSElSLnN0cmluZykudmFsdWUsICcuKk5bMi05XS4qJykgLy/nmYznl4fliIbmnJ/liIbmlbjmiJbntZDmnpzngrpOPj0yCiAgKSA+IDAKCgovL+aineS7tjUtMgpkZWZpbmUgIjHopo/liYcxLTUtMj1wQUxO77yM6Zm95oCn6IWL5LiL76e15be057WQ54K6MS0z77yM5LiU6IWr55ik5aSn5bCP4omlNSI6ClJldXNhYmxlLiJJQ0QtMTDkvb/nlKhDNTAiIAphbmQgIjHopo/liYcxLTQtMT025YCL5pyI5YWn5b2x5YOP5aCx5ZGKIgphbmQgQ291bnQoCiAgICBbT2JzZXJ2YXRpb25dIE8KICAgIHdoZXJlIGV4aXN0cyAoCiAgICAgIE8uY29kZS5jb2RpbmcgQ2RnCiAgICAgIHdoZXJlIENkZy5jb2RlID0gJzM5OTM5MDAwOScKICAgICAgICBhbmQgQ2RnIGluIENvZGVDb25jZXB0LlNOT01FRAogICAgKQogICAgYW5kIE8udmFsdWUgaXMgbm90IG51bGwKICAgIGFuZCBPLnZhbHVlIGlzIEZISVIuc3RyaW5nCiAgICBhbmQgTWF0Y2hlcygoTy52YWx1ZSBhcyBGSElSLnN0cmluZykudmFsdWUsICcuKk5bMS05XS4qJykvL+eZjOeXh+WIhuacn+WIhuaVuOaIlue1kOaenOeCuk4+PTEKICAgIGFuZCBNYXRjaGVzKChPLnZhbHVlIGFzIEZISVIuc3RyaW5nKS52YWx1ZSwgJy4qVFsyLTldLionKSAvL+eZjOeXh+WIhuacn+WIhuaVuOaIlue1kOaenOeCulQ+PTIKICApID4gMAoKCi8v5qKd5Lu2NS0zCmRlZmluZSAiMeimj+WJhzEtNS0zPXBBTE7vvIzpmb3mgKfohYvkuIvvp7Xlt7TntZDngroxLTPvvIzkuJTohavnmKTntLDog57liIbljJbnrKwz57SaIjoKUmV1c2FibGUuIklDRC0xMOS9v+eUqEM1MCIgCmFuZCAiMeimj+WJhzEtNC0xPTblgIvmnIjlhaflvbHlg4/loLHlkYoiCmFuZCAoQ291bnQoCiAgICBbT2JzZXJ2YXRpb25dIE8KICAgIHdoZXJlIGV4aXN0cyAoCiAgICAgIE8uY29kZS5jb2RpbmcgQ2RnCiAgICAgIHdoZXJlIENkZy5jb2RlID0gJzM5OTM5MDAwOScKICAgICAgICBhbmQgQ2RnIGluIENvZGVDb25jZXB0LlNOT01FRAogICAgKQogICAgYW5kIE8udmFsdWUgaXMgbm90IG51bGwKICAgIGFuZCBPLnZhbHVlIGlzIEZISVIuc3RyaW5nCiAgICBhbmQgTWF0Y2hlcygoTy52YWx1ZSBhcyBGSElSLnN0cmluZykudmFsdWUsICcuKk5bMS05XS4qJykvL+eZjOeXh+WIhuacn+WIhuaVuOaIlue1kOaenOeCuk4+PTEKICApID4gMCkKYW5kIGV4aXN0cyAoCiAgICBbRGlhZ25vc3RpY1JlcG9ydF0gTzIKICAgIHdoZXJlIGV4aXN0cyAoCiAgICAgIE8yLmNvZGUuY29kaW5nIENkZwogICAgICB3aGVyZSBDZGcgaW4gQ29kZUNvbmNlcHQuTE9JTkMKICAgICAgICBhbmQgQ2RnLmNvZGUgaW4gQ29kZUNvbmNlcHQucEFMTlJlcG9ydAogICAgKQogICAgYW5kIE8yLmVmZmVjdGl2ZSBpcyBub3QgbnVsbAogICAgYW5kIEZISVJIZWxwZXJzLlRvRGF0ZVRpbWUoTzIuZWZmZWN0aXZlKSA+PSAi5pys5qyh55Sz6KuL6LW35aeL5pel5pyfIiAtIDkwIGRheXMKICAgIGFuZCBGSElSSGVscGVycy5Ub0RhdGVUaW1lKE8yLmVmZmVjdGl2ZSkgPD0gIuacrOasoeeUs+iri+i1t+Wni+aXpeacnyIKICAgIGFuZCBPMi5jb25jbHVzaW9uIGlzIG5vdCBudWxsCiAgICBhbmQgTWF0Y2hlcyhPMi5jb25jbHVzaW9uLCAnKD9pKS4qKEdyYWRlIDN8R3JhZGUzfFxcKykuKicpCiAgKQoKZGVmaW5lICIx6KaP5YmHMS01PemrmOW+qeeZvOmiqOmaquS5i+aXqeacn+S5s+eZjCI6CiIx6KaP5YmHMS01LTE9cEFMTu+8jOmZveaAp+iFi+S4i++nteW3tOe1kOKJpTQiCm9yICIx6KaP5YmHMS01LTI9cEFMTu+8jOmZveaAp+iFi+S4i++nteW3tOe1kOeCujEtM++8jOS4lOiFq+eYpOWkp+Wwj+KJpTUiCm9yICIx6KaP5YmHMS01LTM9cEFMTu+8jOmZveaAp+iFi+S4i++nteW3tOe1kOeCujEtM++8jOS4lOiFq+eYpOe0sOiDnuWIhuWMluesrDPntJoiCgpkZWZpbmUgIjHopo/liYcxLTU96auY5b6p55m86aKo6Zqq5Yik5pa36LOH5paZ5a2Y5ZyoIjoKICAiMeimj+WJhzEtNC0xPeacieWhq+W9seWDj+WgseWRiuizh+aWmSIKICBhbmQgIjHopo/liYcxLTQtMj3mnInloavnmYznl4fliIbmnJ/os4fmlpkiCgovL+aineS7tjYKZGVmaW5lICLlubTpvaHoqIjnrpfnlKjnlLPoq4vml6XmnJ8iOgogIGRhdGUgZnJvbSAi5pys5qyh55Sz6KuL6LW35aeL5pel5pyfIgoKZGVmaW5lICLnlLPoq4vml6XmmYLnl4XkurrlubTpvaHmrbLmlbgiOgogIFJldXNhYmxlLiJQYXRpZW50QWdlSW5ZZWFyc0F0Iigi5bm06b2h6KiI566X55So55Sz6KuL5pel5pyfIikKCmRlZmluZSAi5piv5ZCm5ru/MTjmrbIiOgogIFJldXNhYmxlLiJJc1BhdGllbnRBZHVsdEF0Iigi5bm06b2h6KiI566X55So55Sz6KuL5pel5pyfIikKCgpkZWZpbmUgIjHopo/liYcxLTY95oiQ5bm05aWz5oCnIjoKICBQYXRpZW50LmdlbmRlciA9ICdmZW1hbGUnCiAgYW5kICLmmK/lkKbmu78xOOatsiIKCmRlZmluZSAiMeimj+WJhzEtNj3mgKfliKXoiIflubTpvaHos4fmlpnlrZjlnKgiOgogIFBhdGllbnQuZ2VuZGVyIGlzIG5vdCBudWxsCiAgYW5kIFBhdGllbnQuYmlydGhEYXRlIGlzIG5vdCBudWxsCiAgYW5kICLlubTpvaHoqIjnrpfnlKjnlLPoq4vml6XmnJ8iIGlzIG5vdCBudWxsCgovL+imj+WJhzEKZGVmaW5lICIx6KaP5YmHMSI6CiIx6KaP5YmHMS0xPUFiZW1hY2ljbGli5L2155So5YWn5YiG5rOM55mC5rOVKHRhbW94aWZlbuaIluiKs+mmmeeSsOmFtuaKkeWItuWKkSkiCmFuZCAiMeimj+WJhzEtMj3kvZzngrrojbfniL7okpnlj5fpq5QoSFIp6Zm95oCnKEVS5oiWUFI+MzAlKSIKYW5kICIx6KaP5YmHMS0zPeesrOS6jOWei+S6uumhnuihqOearueUn+mVt+WboOWtkOWPl+mrlChIRVIyKemZsOaApyIKYW5kICIx6KaP5YmHMS00Pea3i+W3tOe1kOmZveaApyIKYW5kICIx6KaP5YmHMS01PemrmOW+qeeZvOmiqOmaquS5i+aXqeacn+S5s+eZjCIKYW5kICIx6KaP5YmHMS02PeaIkOW5tOWls+aApyIKCmRlZmluZSAi5pyJQWJlbWFjaWNsaWLnlLPoq4vphqvku6QiOgogIGV4aXN0cyAoCiAgICBbTWVkaWNhdGlvblJlcXVlc3RdIE1SCiAgICAgIHdoZXJlIFJldXNhYmxlLiJJc01lZGljYXRpb25QbGFuIihNUiwgQ29kZUNvbmNlcHQuTDAxRUYwMykKICApCgpkZWZpbmUgIuacieWFp+WIhuazjOeZguazlemGq+S7pCI6CiAgUmV1c2FibGUuIkhhc01lZGljYXRpb25Vc2UiKENvZGVDb25jZXB0LiLlhafliIbms4znmYLms5Xol6XniakodGFtb3hpZmVu5oiW6Iqz6aaZ55Kw6YW25oqR5Yi25YqRKSIpCgpkZWZpbmUgIjHopo/liYcxLTE9QWJlbWFjaWNsaWLkvbXnlKjlhafliIbms4znmYLms5Xos4fmlpnlrZjlnKgiOgogICLmnIlBYmVtYWNpY2xpYueUs+iri+mGq+S7pCIKICBhbmQgIuacieWFp+WIhuazjOeZguazlemGq+S7pCIKCgovKuimj+WJhzIqLwoKLy/mqJnmupbkuYvljJblrbjlj4rmlL7lsITovJTliqnmsrvnmYLol6XnianmuIXllq4KZGVmaW5lICIx6KaP5YmHMj3kvb/nlKhBYmVtYWNpY2xpYuWJje+8jOmcgOaOpeWPl+aomea6luS5i+WMluWtuOWPiuaUvuWwhOi8lOWKqeayu+eZgiI6CiAgUmV1c2FibGUuIkhhc1ByaW9yTWVkaWNhdGlvblVzZSIoQ29kZUNvbmNlcHQuTDAxRUYwMywgQ29kZUNvbmNlcHQuIuaomea6luS5i+WMluWtuOWPiuaUvuWwhOi8lOWKqeayu+eZguiXpeeJqSIpCiAgYW5kIFJldXNhYmxlLiLphqvku6TpoZ7liKXngroxIgoKZGVmaW5lICIx6KaP5YmHMj3mqJnmupbljJblrbjlj4rmlL7lsITovJTliqnmsrvnmYLos4fmlpnlrZjlnKgiOgogICLmnIlBYmVtYWNpY2xpYueUs+iri+mGq+S7pCIKICBhbmQgUmV1c2FibGUuIkhhc01lZGljYXRpb25Vc2UiKENvZGVDb25jZXB0LiLmqJnmupbkuYvljJblrbjlj4rmlL7lsITovJTliqnmsrvnmYLol6XniakiKQoKCi8q6KaP5YmHMyovCgovL+aineS7tjE65L2/55SoQWJlbWFjaWNsaWLliY3vvIzlg4Xog73mjqXlj5fmnIDlpJoxMumAseeahOWFp+WIhuazjOayu+eZggoKCmRlZmluZSAiMeimj+WJhzMtMT3kvb/nlKhBYmVtYWNpY2xpYuWJje+8jOWDheiDveaOpeWPl+acgOWkmjEy6YCx55qE5YWn5YiG5rOM5rK755mCIjoKICBTdW0oCiAgICBbTWVkaWNhdGlvblJlcXVlc3RdIE1SUHJpb3IKICAgIHdoZXJlIChNUlByaW9yLmludGVudCA9ICdwbGFuJyBvciBNUlByaW9yLmludGVudCA9ICdvcmRlcicpCiAgICBhbmQgKE1SUHJpb3Iuc3RhdHVzIGlzIG51bGwgb3IgTVJQcmlvci5zdGF0dXMgaW4geyAnYWN0aXZlJywgJ2NvbXBsZXRlZCcgfSkKICAgIC8vIOaOkumZpOacrOasoeeUs+iri+eahOiXpeeJqQogICAgYW5kIG5vdCBSZXVzYWJsZS4iSGFzTWVkaWNhdGlvbkNvZGUiKE1SUHJpb3IsIENvZGVDb25jZXB0LkwwMUVGMDMpCiAgICAvLyDlg4XoqIjnrpflhbbku5blhafliIbms4zmsrvnmYLol6XniakKICAgIGFuZCBSZXVzYWJsZS4iSGFzTWVkaWNhdGlvbkNvZGUiKE1SUHJpb3IsIENvZGVDb25jZXB0LiLlhafliIbms4zmsrvnmYLol6XniakiKQogICAgLy8g56K65L+d5piv5Zyo5pys5qyh55Sz6KuL5LmL5YmN5L2/55SoCiAgICBhbmQgZXhpc3RzIE1SUHJpb3IuZG9zYWdlSW5zdHJ1Y3Rpb24KICAgIGFuZCBNUlByaW9yLmRvc2FnZUluc3RydWN0aW9uWzBdLnRpbWluZy5yZXBlYXQuYm91bmRzIGlzIFBlcmlvZAogICAgYW5kIChlbmQgb2YgKE1SUHJpb3IuZG9zYWdlSW5zdHJ1Y3Rpb25bMF0udGltaW5nLnJlcGVhdC5ib3VuZHMgYXMgUGVyaW9kKSkgPCAi5pys5qyh55Sz6KuL6LW35aeL5pel5pyfIgogICAgcmV0dXJuCiAgICAgIGRpZmZlcmVuY2UgaW4gZGF5cyBiZXR3ZWVuCiAgICAgICAgc3RhcnQgb2YgKE1SUHJpb3IuZG9zYWdlSW5zdHJ1Y3Rpb25bMF0udGltaW5nLnJlcGVhdC5ib3VuZHMgYXMgUGVyaW9kKQogICAgICBhbmQKICAgICAgICBlbmQgb2YgKE1SUHJpb3IuZG9zYWdlSW5zdHJ1Y3Rpb25bMF0udGltaW5nLnJlcGVhdC5ib3VuZHMgYXMgUGVyaW9kKQogICkgPD0gODQKCmRlZmluZSAiMeimj+WJhzMtMT3kvb/nlKjliY3lhafliIbms4zmsrvnmYLos4fmlpnlrZjlnKgiOgogIGV4aXN0cyAoCiAgICBbTWVkaWNhdGlvblJlcXVlc3RdIE1SUHJpb3IKICAgIHdoZXJlIChNUlByaW9yLmludGVudCA9ICdwbGFuJyBvciBNUlByaW9yLmludGVudCA9ICdvcmRlcicpCiAgICAgIGFuZCAoTVJQcmlvci5zdGF0dXMgaXMgbnVsbCBvciBNUlByaW9yLnN0YXR1cyBpbiB7ICdhY3RpdmUnLCAnY29tcGxldGVkJyB9KQogICAgICBhbmQgbm90IFJldXNhYmxlLiJIYXNNZWRpY2F0aW9uQ29kZSIoTVJQcmlvciwgQ29kZUNvbmNlcHQuTDAxRUYwMykKICAgICAgYW5kIFJldXNhYmxlLiJIYXNNZWRpY2F0aW9uQ29kZSIoTVJQcmlvciwgQ29kZUNvbmNlcHQuIuWFp+WIhuazjOayu+eZguiXpeeJqSIpCiAgICAgIGFuZCBleGlzdHMgTVJQcmlvci5kb3NhZ2VJbnN0cnVjdGlvbgogICAgICBhbmQgTVJQcmlvci5kb3NhZ2VJbnN0cnVjdGlvblswXS50aW1pbmcucmVwZWF0LmJvdW5kcyBpcyBQZXJpb2QKICAgICAgYW5kIChlbmQgb2YgKE1SUHJpb3IuZG9zYWdlSW5zdHJ1Y3Rpb25bMF0udGltaW5nLnJlcGVhdC5ib3VuZHMgYXMgUGVyaW9kKSkgPCAi5pys5qyh55Sz6KuL6LW35aeL5pel5pyfIgogICkKCgovL+aineS7tjI65oeJ5pa85omL6KGT5YiH6Zmk5b6MMTblgIvmnIjlhafmjqXlj5fmnKzlk4HmsrvnmYIKZGVmaW5lICIx6KaP5YmHMy0yPeaHieaWvOaJi+ihk+WIh+mZpOW+jDE25YCL5pyI5YWn5o6l5Y+X5pys5ZOB5rK755mCIjoKICBleGlzdHMgKAogICAgW0RpYWdub3N0aWNSZXBvcnRdIE8KICAgIHdoZXJlIGV4aXN0cyAoCiAgICAgIE8uY29kZS5jb2RpbmcgQ2RnCiAgICAgIHdoZXJlICgKICAgICAgICBDZGcgaW4gQ29kZUNvbmNlcHQuSUNEMTBQQ1MyMDIzSW1hZ2UKICAgICAgICBvciBDZGcgaW4gQ29kZUNvbmNlcHQuSUNEMTBQQ1MyMDE0SW1hZ2UKICAgICAgKQogICAgICBhbmQgQ2RnLmNvZGUgaW4gQ29kZUNvbmNlcHQuUHJvY2VkdXJlQ29kZXMKICAgICkKICAgIGFuZCBPLmVmZmVjdGl2ZSBpcyBub3QgbnVsbAogICAgYW5kIEZISVJIZWxwZXJzLlRvRGF0ZVRpbWUoTy5lZmZlY3RpdmUpID49ICLmnKzmrKHnlLPoq4votbflp4vml6XmnJ8iIC0gNDgwIGRheXMKICAgIGFuZCBGSElSSGVscGVycy5Ub0RhdGVUaW1lKE8uZWZmZWN0aXZlKSA8PSAi5pys5qyh55Sz6KuL6LW35aeL5pel5pyfIgogICkgCgpkZWZpbmUgIjHopo/liYczLTI95pyJ5aGr5omL6KGT5YiH6Zmk57SA6YyEIjoKICBleGlzdHMgKAogICAgW0RpYWdub3N0aWNSZXBvcnRdIE8KICAgIHdoZXJlIGV4aXN0cyAoCiAgICAgIE8uY29kZS5jb2RpbmcgQ2RnCiAgICAgIHdoZXJlICgKICAgICAgICBDZGcgaW4gQ29kZUNvbmNlcHQuSUNEMTBQQ1MyMDIzSW1hZ2UKICAgICAgICBvciBDZGcgaW4gQ29kZUNvbmNlcHQuSUNEMTBQQ1MyMDE0SW1hZ2UKICAgICAgKQogICAgICBhbmQgQ2RnLmNvZGUgaW4gQ29kZUNvbmNlcHQuUHJvY2VkdXJlQ29kZXMKICAgICkKICAgIGFuZCBPLmVmZmVjdGl2ZSBpcyBub3QgbnVsbAogICkKCmRlZmluZSAiMeimj+WJhzM95L2/55So5YmN77yM5YOF6IO95o6l5Y+X5pyA5aSaMTLpgLHnmoTlhafliIbms4zmsrvnmYLvvIzkuJTmh4nmlrzmiYvooZPliIfpmaTlvowxNuWAi+aciOWFp+aOpeWPl+acrOWTgeayu+eZguOAgiI6CiIx6KaP5YmHMy0xPeS9v+eUqEFiZW1hY2ljbGli5YmN77yM5YOF6IO95o6l5Y+X5pyA5aSaMTLpgLHnmoTlhafliIbms4zmsrvnmYIiCmFuZCAiMeimj+WJhzMtMj3mh4nmlrzmiYvooZPliIfpmaTlvowxNuWAi+aciOWFp+aOpeWPl+acrOWTgeayu+eZgiIKCi8v5Li76KaB6KaP5a6a5LiACmRlZmluZSAi5Li76KaB6KaP5a6a5LiAIjoKIjHopo/liYcxIgphbmQgIjHopo/liYcyPeS9v+eUqEFiZW1hY2ljbGli5YmN77yM6ZyA5o6l5Y+X5qiZ5rqW5LmL5YyW5a245Y+K5pS+5bCE6LyU5Yqp5rK755mCIgphbmQgIjHopo/liYczPeS9v+eUqOWJje+8jOWDheiDveaOpeWPl+acgOWkmjEy6YCx55qE5YWn5YiG5rOM5rK755mC77yM5LiU5oeJ5pa85omL6KGT5YiH6Zmk5b6MMTblgIvmnIjlhafmjqXlj5fmnKzlk4HmsrvnmYLjgIIiCgoKLy89PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQovLyDkuLvopoHopo/lrprkuozvvJrnuoznlKjmop3ku7bvvI3msrvnmYLmjIHnuozntabku5gKLy89PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQoKLy/mop3ku7YxOuavjzI06YCx6aCI5YaN5qyh55Sz6KuL5Lim5qqi6ZmE55mC5pWI6KmV5Lyw6LOH5paZCgovLyDmnKzmrKHnlLPoq4vntIDpjITvvIjku6XmnIDmlrDkuIDnrYbnlLPoq4vkvZzngrrmnKzmrKHnlLPoq4vvvIkKZGVmaW5lICLmnKzmrKHnlLPoq4vntIDpjIQiOgogIFJldXNhYmxlLiJMYXRlc3RNZWRpY2F0aW9uUGxhbiIoQ29kZUNvbmNlcHQuTDAxRUYwMykKCmRlZmluZSAi5pys5qyh55Sz6KuL6LW35aeL5pel5pyfIjoKICBSZXVzYWJsZS4iR2V0U3RhcnRUaW1lIigi5pys5qyh55Sz6KuL57SA6YyEIikKCi8vIOWJjeasoeeUs+iri+e0gOmMhO+8iOacrOasoeeUs+iri+S5i+WJjeacgOi/keS4gOasoeeahOeUs+iri++8iQpkZWZpbmUgIuWJjeasoeeUs+iri+e0gOmMhCI6CiAgUmV1c2FibGUuIkxhdGVzdE1lZGljYXRpb25QbGFuQmVmb3JlIihDb2RlQ29uY2VwdC5MMDFFRjAzLCAi5pys5qyh55Sz6KuL6LW35aeL5pel5pyfIikKCi8vIOaqouafpeacrOasoeeUs+iri+eZgueoi+mVt+W6puaYr+WQpuWcqDI06YCx5YWnCmRlZmluZSAiMuimj+WJhzEtMT3mr48yNOmAsemgiOWGjeasoeeUs+iri+S4puaqoumZhOeZguaViOipleS8sOizh+aWmSI6CiAgUmV1c2FibGUuIumGq+S7pOmhnuWIpeeCujEiIAogIGFuZCBSZXVzYWJsZS4i57qM55So6Ki76KiY54K6MiIKICBhbmQgIuacrOasoeeUs+iri+e0gOmMhCIgaXMgbm90IG51bGwKICBhbmQgUmV1c2FibGUuIkhhc01lZGljYXRpb25QbGFuUGVyaW9kV2l0aGluRGF5cyIoQ29kZUNvbmNlcHQuTDAxRUYwMywgMTY4KQoKCi8v5qKd5Lu2Mjrnlr7nl4XmnInmg6HljJbmg4XlvaLpoIjlgZzmraLkvb/nlKgKCi8vIOWPluW+l+WJjeasoeayu+eZgue0gOmMhO+8iOacgOi/keS4gOasoeW3suWujOaIkOeahOayu+eZgu+8iQpkZWZpbmUgIuWJjeasoeayu+eZgue0gOmMhCI6CiAgUmV1c2FibGUuIkxhdGVzdENvbXBsZXRlZE1lZGljYXRpb25PcmRlckJlZm9yZSIoQ29kZUNvbmNlcHQuTDAxRUYwMywgIuacrOasoeeUs+iri+i1t+Wni+aXpeacnyIpCgovLyDliY3mrKHnlKjol6Xplovlp4vml6XmnJ8KZGVmaW5lICLliY3mrKHnlKjol6Xplovlp4vml6XmnJ8iOgogIFJldXNhYmxlLiJHZXRTdGFydFRpbWUiKCLliY3mrKHmsrvnmYLntIDpjIQiKQoKLy8g6KaP5YmHMS0yOiDnlr7nl4XmnInmg6HljJbmg4XlvaLpoIjlgZzmraLkvb/nlKgo57qM55So6aCI5qqi6ZmE5YmN5qyh5rK755mC5b6M5b2x5YOP5a245aCx5ZGKKQpkZWZpbmUgIjLopo/liYcxLTI955a+55eF5pyJ5oOh5YyW5oOF5b2i6aCI5YGc5q2i5L2/55SoIjoKICBSZXVzYWJsZS4iSGFzSW1hZ2VSZXBvcnRCZXR3ZWVuUHJldmlvdXNUcmVhdG1lbnRBbmRDdXJyZW50QXBwbHkiKENvZGVDb25jZXB0LkwwMUVGMDMpCgovLyDkuLvopoHopo/lrprkuowKZGVmaW5lICLkuLvopoHopo/lrprkuowiOgpSZXVzYWJsZS4i57qM55So6Ki76KiY54K6MiIKYW5kIFJldXNhYmxlLiLphqvku6TpoZ7liKXngroxIgphbmQgIuacrOasoeeUs+iri+e0gOmMhCIgaXMgbm90IG51bGwKYW5kICIy6KaP5YmHMS0xPeavjzI06YCx6aCI5YaN5qyh55Sz6KuL5Lim5qqi6ZmE55mC5pWI6KmV5Lyw6LOH5paZIgphbmQgIjLopo/liYcxLTI955a+55eF5pyJ5oOh5YyW5oOF5b2i6aCI5YGc5q2i5L2/55SoIgoKCgovLz09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09Ci8vIOS4u+imgeimj+WumuS4ie+8muiXpeWTgeS9v+eUqOimj+WJhwovLz09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CgovL+aineS7tjE65q+P5pel6Iez5aSa5L2/55SoMumMoApkZWZpbmUgIjPopo/liYcxLTE95q+P5pel6Iez5aSa5L2/55SoMumMoCI6CiAgUmV1c2FibGUuIkhhc0RhaWx5RG9zZUF0TW9zdCIoQ29kZUNvbmNlcHQuTDAxRUYwMywgMi4wLCAne3RibH0nLCAnUUQnKQoKZGVmaW5lICIz6KaP5YmHMy0xPeavj+aXpeWKkemHj+izh+aWmeWtmOWcqCI6CiAgZXhpc3RzICgKICAgIFtNZWRpY2F0aW9uUmVxdWVzdF0gTVIKICAgIHdoZXJlIFJldXNhYmxlLiJJc01lZGljYXRpb25QbGFuIihNUiwgQ29kZUNvbmNlcHQuTDAxRUYwMykKICAgICAgYW5kIGV4aXN0cyAoCiAgICAgICAgTVIuZG9zYWdlSW5zdHJ1Y3Rpb24gREkKICAgICAgICB3aGVyZSBleGlzdHMgKAogICAgICAgICAgREkudGltaW5nLmNvZGUuY29kaW5nIEMKICAgICAgICAgIHdoZXJlIEMuY29kZSA9ICdRRCcKICAgICAgICApCiAgICAgICAgYW5kIGV4aXN0cyAoCiAgICAgICAgICBESS5kb3NlQW5kUmF0ZSBEUgogICAgICAgICAgd2hlcmUgKERSLmRvc2UgYXMgRkhJUi5TaW1wbGVRdWFudGl0eSkgaXMgbm90IG51bGwKICAgICAgICAgICAgYW5kIChEUi5kb3NlIGFzIEZISVIuU2ltcGxlUXVhbnRpdHkpLnZhbHVlIGlzIG5vdCBudWxsCiAgICAgICAgICAgIGFuZCAoRFIuZG9zZSBhcyBGSElSLlNpbXBsZVF1YW50aXR5KS5jb2RlID0gJ3t0Ymx9JwogICAgICAgICkKICAgICAgKQogICkKCgovL+aineS7tjI65L2/55So5LiN5b6X6LaF6YGOMuW5tApkZWZpbmUgIjPopo/liYcxLTI95L2/55So5LiN5b6X6LaF6YGOMuW5tCI6CiAgUmV1c2FibGUuIkhhc01lZGljYXRpb25Ub3RhbER1cmF0aW9uV2l0aGluIihDb2RlQ29uY2VwdC5MMDFFRjAzLCA3MzApCgpkZWZpbmUgIjPopo/liYczLTI955mC56iL5pyf6ZaT6LOH5paZ5a2Y5ZyoIjoKICBleGlzdHMgKAogICAgW01lZGljYXRpb25SZXF1ZXN0XSBNUgogICAgd2hlcmUgTVIuaW50ZW50ID0gJ3BsYW4nCiAgICAgIGFuZCAoTVIuc3RhdHVzIGlzIG51bGwgb3IgTVIuc3RhdHVzIGluIHsgJ2FjdGl2ZScsICdjb21wbGV0ZWQnLCAnb24taG9sZCcgfSkKICAgICAgYW5kIFJldXNhYmxlLiJIYXNNZWRpY2F0aW9uQ29kZSIoTVIsIENvZGVDb25jZXB0LkwwMUVGMDMpCiAgICAgIGFuZCBSZXVzYWJsZS4iSGFzVmFsaWRUaW1pbmciKE1SKQogICkKCi8v5Li76KaB6KaP5a6a5LiJCmRlZmluZSAi5Li76KaB6KaP5a6a5LiJIjoKIjPopo/liYcxLTE95q+P5pel6Iez5aSa5L2/55SoMumMoCIgYW5kICIz6KaP5YmHMS0yPeS9v+eUqOS4jeW+l+i2hemBjjLlubQiCgoKLy89PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQovLyDmqqLmoLjntZDmnpznlKjvvJrlv4XopoHos4fmlpnlrZjlnKjliKTmlrcKLy89PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQoKLy89PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQovLyDliJflh7rjgIznrKblkIjjgI3poIXnm67liKTmlrflvI8KLy89PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQoKZGVmaW5lIGZ1bmN0aW9uICLnrKblkIjpoIXnm64iKCk6CiAgLy8g5Li76KaB6KaP5a6a5LiA77ya5Yid5qyh5L2/55So5qKd5Lu2CiAgKGlmIFJldXNhYmxlLiLliJ3mrKHnlLPoq4siIGFuZCAoCiAgICAiMeimj+WJhzEtMT1BYmVtYWNpY2xpYuS9teeUqOWFp+WIhuazjOeZguazlSh0YW1veGlmZW7miJboirPpppnnkrDphbbmipHliLblipEpIiBvciAKICAgICIx6KaP5YmHMS0yPeS9nOeCuuiNt+eIvuiSmeWPl+mrlChIUinpmb3mgKcoRVLmiJZQUj4zMCUpIiBvciAKICAgICIx6KaP5YmHMS0zPeesrOS6jOWei+S6uumhnuihqOearueUn+mVt+WboOWtkOWPl+mrlChIRVIyKemZsOaApyIgb3IgCiAgICAiMeimj+WJhzEtND3mt4vlt7TntZDpmb3mgKciIG9yIAogICAgIjHopo/liYcxLTU96auY5b6p55m86aKo6Zqq5LmL5pep5pyf5Lmz55mMIiBvciAKICAgICIx6KaP5YmHMS02PeaIkOW5tOWls+aApyIgb3IgCiAgICAiMeimj+WJhzI95L2/55SoQWJlbWFjaWNsaWLliY3vvIzpnIDmjqXlj5fmqJnmupbkuYvljJblrbjlj4rmlL7lsITovJTliqnmsrvnmYIiIG9yIAogICAgIjHopo/liYczLTE95L2/55SoQWJlbWFjaWNsaWLliY3vvIzlg4Xog73mjqXlj5fmnIDlpJoxMumAseeahOWFp+WIhuazjOayu+eZgiIgb3IgCiAgICAiMeimj+WJhzMtMj3mh4nmlrzmiYvooZPliIfpmaTlvowxNuWAi+aciOWFp+aOpeWPl+acrOWTgeayu+eZgiIKICApCiAgICB0aGVuICc85Li76KaB6KaP5a6a5LiA77ya5Yid5qyh5L2/55So5qKd5Lu2PlxuJyArCiAgICAgICAgIChpZiAiMeimj+WJhzEtMT1BYmVtYWNpY2xpYuS9teeUqOWFp+WIhuazjOeZguazlSh0YW1veGlmZW7miJboirPpppnnkrDphbbmipHliLblipEpIiAKICAgICAgICAgICB0aGVuICfil48gMeimj+WJhzEtMe+8mkFiZW1hY2ljbGli5L2155So5YWn5YiG5rOM55mC5rOVKHRhbW94aWZlbuaIluiKs+mmmeeSsOmFtuaKkeWItuWKkSlcbicgZWxzZSAnJykgKwogICAgICAgICAoaWYgIjHopo/liYcxLTItMT3kvZzngrrojbfniL7okpnlj5fpq5QoSFIp6Zm95oCnKEVSPjMwJSkiIAogICAgICAgICAgIHRoZW4gJ+KXjyAx6KaP5YmHMS0yLTHvvJrojbfniL7okpnlj5fpq5QoSFIp6Zm95oCnKEVSPjMwJSlcbicgZWxzZSAnJykgKwogICAgICAgICAoaWYgIjHopo/liYcxLTItMj3kvZzngrrojbfniL7okpnlj5fpq5QoSFIp6Zm95oCnKFBSPjMwJSkiIAogICAgICAgICAgIHRoZW4gJ+KXjyAx6KaP5YmHMS0yLTLvvJrojbfniL7okpnlj5fpq5QoSFIp6Zm95oCnKFBSPjMwJSlcbicgZWxzZSAnJykgKwogICAgICAgICAoaWYgIjHopo/liYcxLTM956ys5LqM5Z6L5Lq66aGe6KGo55qu55Sf6ZW35Zug5a2Q5Y+X6auUKEhFUjIp6Zmw5oCnIiAKICAgICAgICAgICB0aGVuICfil48gMeimj+WJhzEtM++8muesrOS6jOWei+S6uumhnuihqOearueUn+mVt+WboOWtkOWPl+mrlChIRVIyKemZsOaAp1xuJyBlbHNlICcnKSArCiAgICAgICAgIChpZiAiMeimj+WJhzEtNC0xPTblgIvmnIjlhaflvbHlg4/loLHlkYoiIAogICAgICAgICAgIHRoZW4gJ+KXjyAx6KaP5YmHMS00LTHvvJoz5YCL5pyI5YWn5b2x5YOP5aCx5ZGKXG4nIGVsc2UgJycpICsKICAgICAgICAgKGlmICIx6KaP5YmHMS00LTI955mM55eH5YiG5pyf5YiG5pW45oiW57WQ5p6c54K6Tj49MSIgCiAgICAgICAgICAgdGhlbiAn4pePIDHopo/liYcxLTQtMu+8mueZjOeXh+WIhuacn+WIhuaVuOaIlue1kOaenOeCuk4+PTFcbicgZWxzZSAnJykgKwogICAgICAgICAoaWYgIjHopo/liYcxLTQtMz025YCL5pyI5YWn5reL5be057WQ6Zm95oCn5qqi5p+l5aCx5ZGKIiAKICAgICAgICAgICB0aGVuICfil48gMeimj+WJhzEtNC0z77yaM+WAi+aciOWFp+aciea3i+W3tOe1kOmZveaAp+aqouafpeWgseWRilxuJyBlbHNlICcnKSArCiAgICAgICAgIChpZiAiMeimj+WJhzEtNS0xPXBBTE7vvIzpmb3mgKfohYvkuIvvp7Xlt7TntZDiiaU0IiAKICAgICAgICAgICB0aGVuICfil48gMeimj+WJhzEtNS0x77yacEFMTu+8jOmZveaAp+iFi+S4i+a3i+W3tOe1kOKJpTRcbicgZWxzZSAnJykgKwogICAgICAgICAoaWYgIjHopo/liYcxLTUtMj1wQUxO77yM6Zm95oCn6IWL5LiL76e15be057WQ54K6MS0z77yM5LiU6IWr55ik5aSn5bCP4omlNSIgCiAgICAgICAgICAgdGhlbiAn4pePIDHopo/liYcxLTUtMu+8mnBBTE7vvIzpmb3mgKfohYvkuIvmt4vlt7TntZDngroxLTPvvIzkuJTohavnmKTlpKflsI/iiaU1XG4nIGVsc2UgJycpICsKICAgICAgICAgKGlmICIx6KaP5YmHMS01LTM9cEFMTu+8jOmZveaAp+iFi+S4i++nteW3tOe1kOeCujEtM++8jOS4lOiFq+eYpOe0sOiDnuWIhuWMluesrDPntJoiIAogICAgICAgICAgIHRoZW4gJ+KXjyAx6KaP5YmHMS01LTPvvJpwQUxO77yM6Zm95oCn6IWL5LiL5reL5be057WQ54K6MS0z77yM5LiU6IWr55ik57Sw6IOe5YiG5YyW56ysM+e0mlxuJyBlbHNlICcnKSArCiAgICAgICAgIChpZiAiMeimj+WJhzEtNj3miJDlubTlpbPmgKciIAogICAgICAgICAgIHRoZW4gJ+KXjyAx6KaP5YmHMS0277ya5oiQ5bm05aWz5oCnKOKJpTE45q2yKVxuJyBlbHNlICcnKSArCiAgICAgICAgIChpZiAiMeimj+WJhzI95L2/55SoQWJlbWFjaWNsaWLliY3vvIzpnIDmjqXlj5fmqJnmupbkuYvljJblrbjlj4rmlL7lsITovJTliqnmsrvnmYIiIAogICAgICAgICAgIHRoZW4gJ+KXjyAx6KaP5YmHMu+8muS9v+eUqEFiZW1hY2ljbGli5YmN77yM5bey5o6l5Y+X5qiZ5rqW5LmL5YyW5a245Y+K5pS+5bCE6LyU5Yqp5rK755mCXG4nIGVsc2UgJycpICsKICAgICAgICAgKGlmICIx6KaP5YmHMy0xPeS9v+eUqEFiZW1hY2ljbGli5YmN77yM5YOF6IO95o6l5Y+X5pyA5aSaMTLpgLHnmoTlhafliIbms4zmsrvnmYIiIAogICAgICAgICAgIHRoZW4gJ+KXjyAx6KaP5YmHMy0x77ya5L2/55SoQWJlbWFjaWNsaWLliY3vvIzlg4Xog73mjqXlj5fmnIDlpJoxMumAseeahOWFp+WIhuazjOayu+eZglxuJyBlbHNlICcnKSArCiAgICAgICAgIChpZiAiMeimj+WJhzMtMj3mh4nmlrzmiYvooZPliIfpmaTlvowxNuWAi+aciOWFp+aOpeWPl+acrOWTgeayu+eZgiIgCiAgICAgICAgICAgdGhlbiAn4pePIDHopo/liYczLTLvvJrmlrzmiYvooZPliIfpmaTlvowxNuWAi+aciOWFp+aOpeWPl+acrOWTgeayu+eZglxuJyBlbHNlICcnKSArCiAgICAgICAgICdcbicKICAgIGVsc2UgJycpICsKICAKCgogIC8vIOS4u+imgeimj+WumuS6jO+8mue6jOeUqOaineS7tgogIChpZiBSZXVzYWJsZS4i57qM55So55Sz6KuLIiBhbmQgKAogICAgIjLopo/liYcxLTE95q+PMjTpgLHpoIjlho3mrKHnlLPoq4vkuKbmqqLpmYTnmYLmlYjoqZXkvLDos4fmlpkiIG9yIAogICAgIjLopo/liYcxLTI955a+55eF5pyJ5oOh5YyW5oOF5b2i6aCI5YGc5q2i5L2/55SoIgogICkKICAgIHRoZW4gJzzkuLvopoHopo/lrprkuozvvJrnuoznlKjmop3ku7bvvI3msrvnmYLmjIHnuozntabku5g+XG4nICsKICAgICAgICAgKGlmICIy6KaP5YmHMS0xPeavjzI06YCx6aCI5YaN5qyh55Sz6KuL5Lim5qqi6ZmE55mC5pWI6KmV5Lyw6LOH5paZIiAKICAgICAgICAgICB0aGVuICfil48gMuimj+WJhzEtMe+8muaWvDI06YCx5YWn5YaN5qyh55Sz6KuL5Lim5qqi6ZmE55mC5pWI6KmV5Lyw6LOH5paZXG4nIGVsc2UgJycpICsKICAgICAgICAgKGlmICIy6KaP5YmHMS0yPeeWvueXheacieaDoeWMluaDheW9oumgiOWBnOatouS9v+eUqCIgCiAgICAgICAgICAgdGhlbiAn4pePIDLopo/liYcxLTLvvJrlt7LmqqLpmYTliY3mrKHmsrvnmYLlvozlvbHlg4/lrbjloLHlkYrvvIznorroqo3nhKHmg6HljJZcbicgZWxzZSAnJykgKwogICAgICAgICAnXG4nCiAgICBlbHNlICcnKSArCiAgCiAgLy8g5Li76KaB6KaP5a6a5LiJ77ya6Jel5ZOB5L2/55So6KaP5YmHCiAgKGlmICIz6KaP5YmHMS0xPeavj+aXpeiHs+WkmuS9v+eUqDLpjKAiIG9yICIz6KaP5YmHMS0yPeS9v+eUqOS4jeW+l+i2hemBjjLlubQiCiAgICB0aGVuICc85Li76KaB6KaP5a6a5LiJ77ya6Jel5ZOB5L2/55So6KaP5YmHPlxuJyArCiAgICAgICAgIChpZiAiM+imj+WJhzEtMT3mr4/ml6Xoh7PlpJrkvb/nlKgy6YygIgogICAgICAgICAgIHRoZW4gJ+KXjyAz6KaP5YmHMe+8muavj+aXpeWKkemHj+KJpDLpjKDvvIjlj4PogIPos4foqIrvvIlcbicgZWxzZSAnJykgKwogICAgICAgICAoaWYgIjPopo/liYcxLTI95L2/55So5LiN5b6X6LaF6YGOMuW5tCIKICAgICAgICAgICB0aGVuICfil48gM+imj+WJhzLvvJrkvb/nlKjnuL3nmYLnqIviiaQy5bm0KDczMOWkqSnvvIjlj4PogIPos4foqIrvvIlcbicgZWxzZSAnJykKICAgIGVsc2UgJycpCgovLz09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09Ci8vIOWIl+WHuuOAjOS4jeespuWQiOOAjemgheebruWIpOaWt+W8jyAtIOaineS7tuaIluS7o+eivOS4jeespuWQiAovLz09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CgpkZWZpbmUgZnVuY3Rpb24gIuS4jeespuWQiOmgheebrl/mop3ku7bmiJbku6PnorzkuI3nrKblkIgiKCk6CiAgLy8g5Li76KaB6KaP5a6a5LiA77ya5Yid5qyh5L2/55So5qKd5Lu2IC0g6LOH5paZ5bey5aGr5L2G5qKd5Lu25oiW5Luj56K85LiN56ym5ZCICiAgKGlmIFJldXNhYmxlLiLliJ3mrKHnlLPoq4siIGFuZCAoCiAgICAoIuS4u+imgeeWvueXhUlDROizh+aWmeWtmOWcqCIgYW5kIFJldXNhYmxlLiLkuLvopoHnlr7nl4VJQ0ToqLrmlrfos4fmlpnlrZjlnKgiIGFuZCBub3QgUmV1c2FibGUuIklDRC0xMOS9v+eUqEM1MCIpIG9yCiAgICAoIjHopo/liYcxLTE9QWJlbWFjaWNsaWLkvbXnlKjlhafliIbms4znmYLms5Xos4fmlpnlrZjlnKgiIGFuZCBub3QgIjHopo/liYcxLTE9QWJlbWFjaWNsaWLkvbXnlKjlhafliIbms4znmYLms5UodGFtb3hpZmVu5oiW6Iqz6aaZ55Kw6YW25oqR5Yi25YqRKSIpIG9yCiAgICAoIjHopo/liYcxLTI95pyJ5aGr6I2354i+6JKZ5Y+X6auUKEhSKeaqoua4rOizh+aWmSIgYW5kIFJldXNhYmxlLiJFUuaqoua4rOizh+aWmeWtmOWcqCIgYW5kIFJldXNhYmxlLiJQUuaqoua4rOizh+aWmeWtmOWcqCIgYW5kIG5vdCAiMeimj+WJhzEtMj3kvZzngrrojbfniL7okpnlj5fpq5QoSFIp6Zm95oCnKEVS5oiWUFI+MzAlKSIpIG9yCiAgICAoIjHopo/liYcxLTM95pyJ5aGrSEVSMuaqoua4rOizh+aWmSIgYW5kIFJldXNhYmxlLiJIRVIy5qqi5ris6LOH5paZ5a2Y5ZyoIiBhbmQgbm90ICIx6KaP5YmHMS0zPeesrOS6jOWei+S6uumhnuihqOearueUn+mVt+WboOWtkOWPl+mrlChIRVIyKemZsOaApyIpIG9yCiAgICAoIjHopo/liYcxLTQtMT3mnInloavlvbHlg4/loLHlkYros4fmlpkiIGFuZCBub3QgIjHopo/liYcxLTQtMT025YCL5pyI5YWn5b2x5YOP5aCx5ZGKIikgb3IKICAgICgiMeimj+WJhzEtNC0yPeacieWhq+eZjOeXh+WIhuacn+izh+aWmSIgYW5kIFJldXNhYmxlLiLnmYznl4fliIbmnJ/os4fmlpnlrZjlnKgiIGFuZCBub3QgIjHopo/liYcxLTQtMj3nmYznl4fliIbmnJ/liIbmlbjmiJbntZDmnpzngrpOPj0xIikgb3IKICAgICgiMeimj+WJhzEtNC0zPeacieWhq+a3i+W3tOe1kOaqouafpeWgseWRiuizh+aWmSIgYW5kIG5vdCAiMeimj+WJhzEtNC0zPTblgIvmnIjlhafmt4vlt7TntZDpmb3mgKfmqqLmn6XloLHlkYoiKSBvcgogICAgKCIx6KaP5YmHMS01PemrmOW+qeeZvOmiqOmaquWIpOaWt+izh+aWmeWtmOWcqCIgYW5kIG5vdCAiMeimj+WJhzEtNT3pq5jlvqnnmbzpoqjpmqrkuYvml6nmnJ/kubPnmYwiKSBvcgogICAgKCIx6KaP5YmHMS02PeaAp+WIpeiIh+W5tOm9oeizh+aWmeWtmOWcqCIgYW5kIG5vdCAiMeimj+WJhzEtNj3miJDlubTlpbPmgKciKSBvcgogICAgKCIx6KaP5YmHMj3mqJnmupbljJblrbjlj4rmlL7lsITovJTliqnmsrvnmYLos4fmlpnlrZjlnKgiIGFuZCBub3QgIjHopo/liYcyPeS9v+eUqEFiZW1hY2ljbGli5YmN77yM6ZyA5o6l5Y+X5qiZ5rqW5LmL5YyW5a245Y+K5pS+5bCE6LyU5Yqp5rK755mCIikgb3IKICAgICgiMeimj+WJhzMtMT3kvb/nlKjliY3lhafliIbms4zmsrvnmYLos4fmlpnlrZjlnKgiIGFuZCBub3QgIjHopo/liYczLTE95L2/55SoQWJlbWFjaWNsaWLliY3vvIzlg4Xog73mjqXlj5fmnIDlpJoxMumAseeahOWFp+WIhuazjOayu+eZgiIpIG9yCiAgICAoIjHopo/liYczLTI95pyJ5aGr5omL6KGT5YiH6Zmk57SA6YyEIiBhbmQgbm90ICIx6KaP5YmHMy0yPeaHieaWvOaJi+ihk+WIh+mZpOW+jDE25YCL5pyI5YWn5o6l5Y+X5pys5ZOB5rK755mCIikKICApCiAgICB0aGVuICc85Li76KaB6KaP5a6a5LiA77ya5Yid5qyh5L2/55So5qKd5Lu2PlxuJyArCiAgICAgICAgIChpZiAi5Li76KaB55a+55eFSUNE6LOH5paZ5a2Y5ZyoIiBhbmQgUmV1c2FibGUuIuS4u+imgeeWvueXhUlDROiouuaWt+izh+aWmeWtmOWcqCIgYW5kIG5vdCBSZXVzYWJsZS4iSUNELTEw5L2/55SoQzUwIgogICAgICAgICAgIHRoZW4gJ+KWsiAx5qKd5Lu2SUNE5Luj56K85qqi5qC477ya5Li76KaB55a+55eF5LmLSUNE5Luj56K85pyq5L2/55SoQzUwXG4nIGVsc2UgJycpICsKICAgICAgICAgKGlmICIx6KaP5YmHMS0xPUFiZW1hY2ljbGli5L2155So5YWn5YiG5rOM55mC5rOV6LOH5paZ5a2Y5ZyoIiBhbmQgbm90ICIx6KaP5YmHMS0xPUFiZW1hY2ljbGli5L2155So5YWn5YiG5rOM55mC5rOVKHRhbW94aWZlbuaIluiKs+mmmeeSsOmFtuaKkeWItuWKkSkiCiAgICAgICAgICAgdGhlbiAn4payIDHopo/liYcxLTHvvJpBYmVtYWNpY2xpYuiIh+WFp+WIhuazjOeZguazlemGq+S7pOacn+mWk+acqumHjeeWiuaIlumGq+S7pOmhnuWIpeS4jeesplxuJyBlbHNlICcnKSArCiAgICAgICAgIChpZiAiMeimj+WJhzEtMj3mnInloavojbfniL7okpnlj5fpq5QoSFIp5qqi5ris6LOH5paZIiBhbmQgUmV1c2FibGUuIkVS5qqi5ris6LOH5paZ5a2Y5ZyoIiBhbmQgUmV1c2FibGUuIlBS5qqi5ris6LOH5paZ5a2Y5ZyoIiBhbmQgbm90ICIx6KaP5YmHMS0yPeS9nOeCuuiNt+eIvuiSmeWPl+mrlChIUinpmb3mgKcoRVLmiJZQUj4zMCUpIgogICAgICAgICAgIHRoZW4gJ+KWsiAx6KaP5YmHMS0y77ya6I2354i+6JKZ5Y+X6auUKEhSKeacqumBlOmZveaAp+aomea6lihFUuaIllBSPjMwJSlcbicgZWxzZSAnJykgKwogICAgICAgICAoaWYgIjHopo/liYcxLTM95pyJ5aGrSEVSMuaqoua4rOizh+aWmSIgYW5kIFJldXNhYmxlLiJIRVIy5qqi5ris6LOH5paZ5a2Y5ZyoIiBhbmQgbm90ICIx6KaP5YmHMS0zPeesrOS6jOWei+S6uumhnuihqOearueUn+mVt+WboOWtkOWPl+mrlChIRVIyKemZsOaApyIKICAgICAgICAgICB0aGVuICfilrIgMeimj+WJhzEtM++8mkhFUjLmqqLmuKzntZDmnpzpnZ7pmbDmgKfmiJbpnZ5ORFxuJyBlbHNlICcnKSArCiAgICAgICAgIChpZiAiMeimj+WJhzEtNC0xPeacieWhq+W9seWDj+WgseWRiuizh+aWmSIgYW5kIG5vdCAiMeimj+WJhzEtNC0xPTblgIvmnIjlhaflvbHlg4/loLHlkYoiCiAgICAgICAgICAgdGhlbiAn4payIDHopo/liYcxLTQtMe+8muacquespuWQiOOAjOS4ieWAi+aciOWFp+S4lOS7o+eivOato+eiuuOAjeS5i+W9seWDj+aIluaqouafpeWgseWRiuaineS7tlxuJyBlbHNlICcnKSArCiAgICAgICAgIChpZiAiMeimj+WJhzEtNC0yPeacieWhq+eZjOeXh+WIhuacn+izh+aWmSIgYW5kIFJldXNhYmxlLiLnmYznl4fliIbmnJ/os4fmlpnlrZjlnKgiIGFuZCBub3QgIjHopo/liYcxLTQtMj3nmYznl4fliIbmnJ/liIbmlbjmiJbntZDmnpzngrpOPj0xIgogICAgICAgICAgIHRoZW4gJ+KWsiAx6KaP5YmHMS00LTLvvJrnmYznl4fliIbmnJ/mnKrpgZROPj0xXG4nIGVsc2UgJycpICsKICAgICAgICAgKGlmICIx6KaP5YmHMS00LTM95pyJ5aGr5reL5be057WQ5qqi5p+l5aCx5ZGK6LOH5paZIiBhbmQgbm90ICIx6KaP5YmHMS00LTM9NuWAi+aciOWFp+a3i+W3tOe1kOmZveaAp+aqouafpeWgseWRiiIKICAgICAgICAgICB0aGVuICfilrIgMeimj+WJhzEtNC0z77ya5pyq56ym5ZCI44CM5LiJ5YCL5pyI5YWn5LiU5Luj56K85q2j56K644CN5LmL5b2x5YOP5oiW5qqi5p+l5aCx5ZGK5qKd5Lu2XG4nIGVsc2UgJycpICsKICAgICAgICAgKGlmICIx6KaP5YmHMS01PemrmOW+qeeZvOmiqOmaquWIpOaWt+izh+aWmeWtmOWcqCIgYW5kIG5vdCAiMeimj+WJhzEtNT3pq5jlvqnnmbzpoqjpmqrkuYvml6nmnJ/kubPnmYwiCiAgICAgICAgICAgdGhlbiAn4payIDHopo/liYcxLTXvvJrmnKrnrKblkIjpq5jlvqnnmbzpoqjpmqrmop3ku7bvvIjpnIDnrKblkIhwQUxO55u46Zec5qiZ5rqW5LmL5LiA77yJXG4nIGVsc2UgJycpICsKICAgICAgICAgKGlmICIx6KaP5YmHMS02PeaAp+WIpeiIh+W5tOm9oeizh+aWmeWtmOWcqCIgYW5kIG5vdCAiMeimj+WJhzEtNj3miJDlubTlpbPmgKciCiAgICAgICAgICAgdGhlbiAn4payIDHopo/liYcxLTbvvJrpnZ7miJDlubTlpbPmgKfmiJbmgKfliKXkuI3nrKZcbicgZWxzZSAnJykgKwogICAgICAgICAoaWYgIjHopo/liYcyPeaomea6luWMluWtuOWPiuaUvuWwhOi8lOWKqeayu+eZguizh+aWmeWtmOWcqCIgYW5kIG5vdCAiMeimj+WJhzI95L2/55SoQWJlbWFjaWNsaWLliY3vvIzpnIDmjqXlj5fmqJnmupbkuYvljJblrbjlj4rmlL7lsITovJTliqnmsrvnmYIiCiAgICAgICAgICAgdGhlbiAn4payIDHopo/liYcy77ya5qiZ5rqW5LmL5YyW5a245Y+K5pS+5bCE6LyU5Yqp5rK755mC5pyq5pep5pa85pys5qyhQWJlbWFjaWNsaWLnlLPoq4vmiJbphqvku6TpoZ7liKXkuI3nrKZcbicgZWxzZSAnJykgKwogICAgICAgICAoaWYgIjHopo/liYczLTE95L2/55So5YmN5YWn5YiG5rOM5rK755mC6LOH5paZ5a2Y5ZyoIiBhbmQgbm90ICIx6KaP5YmHMy0xPeS9v+eUqEFiZW1hY2ljbGli5YmN77yM5YOF6IO95o6l5Y+X5pyA5aSaMTLpgLHnmoTlhafliIbms4zmsrvnmYIiCiAgICAgICAgICAgdGhlbiAn4payIDHopo/liYczLTHvvJrkvb/nlKhBYmVtYWNpY2xpYuWJjeWFp+WIhuazjOayu+eZgui2hemBjjEy6YCxXG4nIGVsc2UgJycpICsKICAgICAgICAgKGlmICIx6KaP5YmHMy0yPeacieWhq+aJi+ihk+WIh+mZpOe0gOmMhCIgYW5kIG5vdCAiMeimj+WJhzMtMj3mh4nmlrzmiYvooZPliIfpmaTlvowxNuWAi+aciOWFp+aOpeWPl+acrOWTgeayu+eZgiIKICAgICAgICAgICB0aGVuICfilrIgMeimj+WJhzMtMu+8mui2hemBjuaJi+ihk+WIh+mZpOW+jDE25YCL5pyI5omN5o6l5Y+X5pys5ZOB5rK755mCXG4nIGVsc2UgJycpICsKICAgICAgICAgJ1xuJwogICAgZWxzZSAnJykgKwogIAogIC8vIOS4u+imgeimj+WumuS4ie+8muiXpeWTgeS9v+eUqOimj+WJhyAtIOizh+aWmeW3suWhq+S9huaineS7tuaIluS7o+eivOS4jeespuWQiAogIChpZiAoIjPopo/liYczLTE95q+P5pel5YqR6YeP6LOH5paZ5a2Y5ZyoIiBhbmQgbm90ICIz6KaP5YmHMS0xPeavj+aXpeiHs+WkmuS9v+eUqDLpjKAiKQogICAgb3IgKCIz6KaP5YmHMy0yPeeZgueoi+acn+mWk+izh+aWmeWtmOWcqCIgYW5kIG5vdCAiM+imj+WJhzEtMj3kvb/nlKjkuI3lvpfotoXpgY4y5bm0IikKICAgIHRoZW4gJzzkuLvopoHopo/lrprkuInvvJrol6Xlk4Hkvb/nlKjopo/liYc+XG4nICsKICAgICAgICAgKGlmICIz6KaP5YmHMy0xPeavj+aXpeWKkemHj+izh+aWmeWtmOWcqCIgYW5kIG5vdCAiM+imj+WJhzEtMT3mr4/ml6Xoh7PlpJrkvb/nlKgy6YygIgogICAgICAgICAgIHRoZW4gJ+KWsiAz6KaP5YmHMe+8muavj+aXpeWKkemHj+i2hemBjjLpjKDvvIjlj4PogIPos4foqIrvvIlcbicgZWxzZSAnJykgKwogICAgICAgICAoaWYgIjPopo/liYczLTI955mC56iL5pyf6ZaT6LOH5paZ5a2Y5ZyoIiBhbmQgbm90ICIz6KaP5YmHMS0yPeS9v+eUqOS4jeW+l+i2hemBjjLlubQiCiAgICAgICAgICAgdGhlbiAn4payIDPopo/liYcy77ya5L2/55So57i955mC56iL6LaF6YGOMuW5tCg3MzDlpKkp77yI5Y+D6ICD6LOH6KiK77yJXG4nIGVsc2UgJycpCiAgICBlbHNlICcnKQoKLy89PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQovLyDliJflh7rjgIzkuI3nrKblkIjjgI3poIXnm67liKTmlrflvI8gLSDlv4XopoHos4fmlpnmnKrloavlr6sKLy89PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQoKZGVmaW5lIGZ1bmN0aW9uICLkuI3nrKblkIjpoIXnm65f5b+F6KaB6LOH5paZ5pyq5aGr5a+rIigpOgogIChpZiBSZXVzYWJsZS4i55Sz6KuL6aGe5Z6L5pyq55+lIgogICAgdGhlbiAn4payIOeUs+iri+mhnuWei++8muacquaPkOS+m+WPr+WIpOWumuWIneasoeS9v+eUqOaIlue6jOeUqOS5i+eUs+iri+iou+iomFxuXG4nCiAgICBlbHNlICcnKSArCiAgLy8g5Li76KaB6KaP5a6a5LiA77ya5Yid5qyh5L2/55So5qKd5Lu2IC0g5b+F6KaB6LOH5paZ5pyq5aGr5a+rCiAgKGlmIFJldXNhYmxlLiLliJ3mrKHnlLPoq4siIGFuZCAoCiAgICBub3QgIuS4u+imgeeWvueXhUlDROizh+aWmeWtmOWcqCIgb3IKICAgIG5vdCAiMeimj+WJhzEtMT1BYmVtYWNpY2xpYuS9teeUqOWFp+WIhuazjOeZguazleizh+aWmeWtmOWcqCIgb3IKICAgIG5vdCAiMeimj+WJhzEtMj3mnInloavojbfniL7okpnlj5fpq5QoSFIp5qqi5ris6LOH5paZIiBvcgogICAgbm90IFJldXNhYmxlLiJIRVIy5qqi5ris6LOH5paZ5a2Y5ZyoIiBvcgogICAgbm90ICIx6KaP5YmHMS00LTE95pyJ5aGr5b2x5YOP5aCx5ZGK6LOH5paZIiBvcgogICAgbm90IFJldXNhYmxlLiLnmYznl4fliIbmnJ/os4fmlpnlrZjlnKgiIG9yCiAgICBub3QgIjHopo/liYcxLTQtMz3mnInloavmt4vlt7TntZDmqqLmn6XloLHlkYros4fmlpkiIG9yCiAgICBub3QgIjHopo/liYcxLTY95oCn5Yil6IiH5bm06b2h6LOH5paZ5a2Y5ZyoIiBvcgogICAgbm90ICIx6KaP5YmHMj3mqJnmupbljJblrbjlj4rmlL7lsITovJTliqnmsrvnmYLos4fmlpnlrZjlnKgiIG9yCiAgICBub3QgIjHopo/liYczLTE95L2/55So5YmN5YWn5YiG5rOM5rK755mC6LOH5paZ5a2Y5ZyoIiBvcgogICAgbm90ICIx6KaP5YmHMy0yPeacieWhq+aJi+ihk+WIh+mZpOe0gOmMhCIKICApCiAgICB0aGVuICc85Li76KaB6KaP5a6a5LiA77ya5Yid5qyh5L2/55So5qKd5Lu2PlxuJyArCiAgICAgICAgIChpZiBub3QgIuS4u+imgeeWvueXhUlDROizh+aWmeWtmOWcqCIKICAgICAgICAgICB0aGVuICfilrIgMeaineS7tklDROS7o+eivOaqouaguO+8muacquaPkOS+m+S4u+imgeeWvueXhUlDROiouuaWt+izh+aWmVxuJyBlbHNlICcnKSArCiAgICAgICAgIChpZiBub3QgIjHopo/liYcxLTE9QWJlbWFjaWNsaWLkvbXnlKjlhafliIbms4znmYLms5Xos4fmlpnlrZjlnKgiCiAgICAgICAgICAgdGhlbiAn4payIDHopo/liYcxLTHvvJrmnKrmj5DkvptBYmVtYWNpY2xpYueUs+iri+mGq+S7pOaIluWFp+WIhuazjOeZguazlemGq+S7pOizh+aWmSh0YW1veGlmZW7miJboirPpppnnkrDphbbmipHliLblipEpXG4nIGVsc2UgJycpICsKICAgICAgICAgKGlmIG5vdCAiMeimj+WJhzEtMj3mnInloavojbfniL7okpnlj5fpq5QoSFIp5qqi5ris6LOH5paZIgogICAgICAgICAgIHRoZW4gJ+KWsiAx6KaP5YmHMS0y77ya5pyq5o+Q5L6b6I2354i+6JKZ5Y+X6auUKEhSKeaqoua4rOizh+aWmShFUuaIllBSKVxuJyBlbHNlICcnKSArCiAgICAgICAgIChpZiBub3QgUmV1c2FibGUuIkhFUjLmqqLmuKzos4fmlpnlrZjlnKgiCiAgICAgICAgICAgdGhlbiAn4payIDHopo/liYcxLTPvvJrmnKrmj5DkvptIRVIy5qqi5ris6LOH5paZXG4nIGVsc2UgJycpICsKICAgICAgICAgKGlmIG5vdCAiMeimj+WJhzEtNC0xPeacieWhq+W9seWDj+WgseWRiuizh+aWmSIKICAgICAgICAgICB0aGVuICfilrIgMeimj+WJhzEtNC0x77ya5pyq5o+Q5L6b5b2x5YOP5aCx5ZGK6LOH5paZXG4nIGVsc2UgJycpICsKICAgICAgICAgKGlmIG5vdCBSZXVzYWJsZS4i55mM55eH5YiG5pyf6LOH5paZ5a2Y5ZyoIgogICAgICAgICAgIHRoZW4gJ+KWsiAx6KaP5YmHMS00LTLvvJrmnKrmj5DkvpvnmYznl4fliIbmnJ/liIbmlbjmiJbntZDmnpzos4fmlplcbicgZWxzZSAnJykgKwogICAgICAgICAoaWYgbm90ICIx6KaP5YmHMS00LTM95pyJ5aGr5reL5be057WQ5qqi5p+l5aCx5ZGK6LOH5paZIgogICAgICAgICAgIHRoZW4gJ+KWsiAx6KaP5YmHMS00LTPvvJrmnKrmj5Dkvpvmt4vlt7TntZDmqqLmn6XloLHlkYros4fmlplcbicgZWxzZSAnJykgKwogICAgICAgICAoaWYgbm90ICIx6KaP5YmHMS02PeaAp+WIpeiIh+W5tOm9oeizh+aWmeWtmOWcqCIKICAgICAgICAgICB0aGVuICfilrIgMeimj+WJhzEtNu+8muacquaPkOS+m+aAp+WIpeOAgeWHuueUn+aXpeacn+aIluacrOasoeeUs+iri+aXpeacn+izh+aWmVxuJyBlbHNlICcnKSArCiAgICAgICAgIChpZiBub3QgIjHopo/liYcyPeaomea6luWMluWtuOWPiuaUvuWwhOi8lOWKqeayu+eZguizh+aWmeWtmOWcqCIKICAgICAgICAgICB0aGVuICfilrIgMeimj+WJhzLvvJrmnKrmj5DkvpvmqJnmupbkuYvljJblrbjlj4rmlL7lsITovJTliqnmsrvnmYLntIDpjIRcbicgZWxzZSAnJykgKwogICAgICAgICAoaWYgbm90ICIx6KaP5YmHMy0xPeS9v+eUqOWJjeWFp+WIhuazjOayu+eZguizh+aWmeWtmOWcqCIKICAgICAgICAgICB0aGVuICfilrIgMeimj+WJhzMtMe+8muacquaPkOS+m+S9v+eUqEFiZW1hY2ljbGli5YmN5YWn5YiG5rOM5rK755mC57SA6YyEXG4nIGVsc2UgJycpICsKICAgICAgICAgKGlmIG5vdCAiMeimj+WJhzMtMj3mnInloavmiYvooZPliIfpmaTntIDpjIQiCiAgICAgICAgICAgdGhlbiAn4payIDHopo/liYczLTLvvJrmnKrmj5DkvpvmiYvooZPliIfpmaTntIDpjIRcbicgZWxzZSAnJykgKwogICAgICAgICAnXG4nCiAgICBlbHNlICcnKSArCiAgCiAgLy8g5Li76KaB6KaP5a6a5LqM77ya57qM55So5qKd5Lu2IC0g5b+F6KaB6LOH5paZ5pyq5aGr5a+rCiAgKGlmIFJldXNhYmxlLiLnuoznlKjnlLPoq4siIGFuZCAoCiAgICBub3QgIjLopo/liYcxLTE95q+PMjTpgLHpoIjlho3mrKHnlLPoq4vkuKbmqqLpmYTnmYLmlYjoqZXkvLDos4fmlpkiIG9yIAogICAgbm90ICIy6KaP5YmHMS0yPeeWvueXheacieaDoeWMluaDheW9oumgiOWBnOatouS9v+eUqCIKICApCiAgICB0aGVuICc85Li76KaB6KaP5a6a5LqM77ya57qM55So5qKd5Lu277yN5rK755mC5oyB57qM57Wm5LuYPlxuJyArCiAgICAgICAgIChpZiBub3QgIjLopo/liYcxLTE95q+PMjTpgLHpoIjlho3mrKHnlLPoq4vkuKbmqqLpmYTnmYLmlYjoqZXkvLDos4fmlpkiIAogICAgICAgICAgIHRoZW4gJ+KWsiAy6KaP5YmHMS0x77ya5pyq5pa8MjTpgLHlhaflho3mrKHnlLPoq4vmiJbmnKrmqqLpmYTnmYLmlYjoqZXkvLDos4fmlplcbicgZWxzZSAnJykgKwogICAgICAgICAoaWYgbm90ICIy6KaP5YmHMS0yPeeWvueXheacieaDoeWMluaDheW9oumgiOWBnOatouS9v+eUqCIgCiAgICAgICAgICAgdGhlbiAn4payIDLopo/liYcxLTLvvJrmnKrmj5DkvpvliY3mrKHmsrvnmYLlvozlvbHlg4/lrbjloLHlkYros4fmlplcbicgZWxzZSAnJykgKwogICAgICAgICAnXG4nCiAgICBlbHNlICcnKSArCgogIC8vIOS4u+imgeimj+WumuS4ie+8muiXpeWTgeS9v+eUqOimj+WJhyAtIOW/heimgeizh+aWmeacquWhq+WvqwogIChpZiAobm90ICIz6KaP5YmHMy0xPeavj+aXpeWKkemHj+izh+aWmeWtmOWcqCIgb3Igbm90ICIz6KaP5YmHMy0yPeeZgueoi+acn+mWk+izh+aWmeWtmOWcqCIpCiAgICB0aGVuICc85Li76KaB6KaP5a6a5LiJ77ya6Jel5ZOB5L2/55So6KaP5YmHPlxuJyArCiAgICAgICAgIChpZiBub3QgIjPopo/liYczLTE95q+P5pel5YqR6YeP6LOH5paZ5a2Y5ZyoIgogICAgICAgICAgIHRoZW4gJ+KWsiAz6KaP5YmHMe+8muacquaPkOS+m+avj+aXpeWKkemHj+izh+aWme+8iOWPg+iAg+izh+ioiu+8iVxuJyBlbHNlICcnKSArCiAgICAgICAgIChpZiBub3QgIjPopo/liYczLTI955mC56iL5pyf6ZaT6LOH5paZ5a2Y5ZyoIgogICAgICAgICAgIHRoZW4gJ+KWsiAz6KaP5YmHMu+8muacquaPkOS+m+eZgueoi+i1t+i/hOaXpeacn+izh+aWme+8iOWPg+iAg+izh+ioiu+8iVxuJyBlbHNlICcnKSArCiAgICAgICAgICdcbicKICAgIGVsc2UgJycpCgovLz09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09Ci8vIOWvqeaguOe1kOaenAovLz09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CgpkZWZpbmUgIuS5s+eZjEFiZW1hY2ljbGli55Sz6KuL57WQ5p6cX+W4g+aelyI6CiAgY2FzZQogICAgd2hlbiBSZXVzYWJsZS4i5Yid5qyh55Sz6KuLIiB0aGVuICgKICAgICAgIjHopo/liYcxIiBhbmQKICAgICAgIjHopo/liYcyPeS9v+eUqEFiZW1hY2ljbGli5YmN77yM6ZyA5o6l5Y+X5qiZ5rqW5LmL5YyW5a245Y+K5pS+5bCE6LyU5Yqp5rK755mCIiBhbmQKICAgICAgIjHopo/liYczPeS9v+eUqOWJje+8jOWDheiDveaOpeWPl+acgOWkmjEy6YCx55qE5YWn5YiG5rOM5rK755mC77yM5LiU5oeJ5pa85omL6KGT5YiH6Zmk5b6MMTblgIvmnIjlhafmjqXlj5fmnKzlk4HmsrvnmYLjgIIiCiAgICApCiAgICB3aGVuIFJldXNhYmxlLiLnuoznlKjnlLPoq4siIHRoZW4gKAogICAgICAiMuimj+WJhzEtMT3mr48yNOmAsemgiOWGjeasoeeUs+iri+S4puaqoumZhOeZguaViOipleS8sOizh+aWmSIgYW5kCiAgICAgICIy6KaP5YmHMS0yPeeWvueXheacieaDoeWMluaDheW9oumgiOWBnOatouS9v+eUqCIKICAgICkKICAgIGVsc2UgZmFsc2UKICBlbmQKCmRlZmluZSAi5Lmz55mMQWJlbWFjaWNsaWLnlLPoq4vkuYtDUUzmqqLmoLjntZDmnpwiOgogIGlmIFJldXNhYmxlLiLliJ3mrKHnlLPoq4siIGFuZCAi5Lmz55mMQWJlbWFjaWNsaWLnlLPoq4vntZDmnpxf5biD5p6XIgogIHRoZW4gJ+Kck+mAmumBju+8muWIneasoeS9v+eUqO+8jeS5s+eZjCBBYmVtYWNpY2xpYiDnlKjol6XnlLPoq4snCgogIGVsc2UgaWYgUmV1c2FibGUuIue6jOeUqOeUs+iriyIgYW5kICLkubPnmYxBYmVtYWNpY2xpYueUs+iri+e1kOaenF/luIPmnpciCiAgdGhlbiAn4pyT6YCa6YGO77ya57qM55So77yN5Lmz55mMIEFiZW1hY2ljbGliIOeUqOiXpeeUs+iriycKICBlbHNlIGlmIFJldXNhYmxlLiLliJ3mrKHnlLPoq4siCiAgdGhlbiAn4pyW5LiN6YCa6YGO77ya5Yid5qyh5L2/55So77yN5Lmz55mMIEFiZW1hY2ljbGliIOeUqOiXpeeUs+iriycKICBlbHNlIGlmIFJldXNhYmxlLiLnuoznlKjnlLPoq4siCiAgdGhlbiAn4pyW5LiN6YCa6YGO77ya57qM55So77yN5Lmz55mMIEFiZW1hY2ljbGliIOeUqOiXpeeUs+iriycKICBlbHNlICfinJbkuI3pgJrpgY7vvJrnhKHms5XliKTlrprnlLPoq4vpoZ7lnovvvI3kubPnmYwgQWJlbWFjaWNsaWIg55So6Jel55Sz6KuLJwoKLy89PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQovLyDloLHlkYrnuL3ntZAKLy89PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQoKZGVmaW5lICLloLHlkYrnuL3ntZAiOgogICdcbj09PSDkubPnmYzkuYsgQWJlbWFjaWNsaWIg55Sz6KuL5a+p5qC45aCx5ZGKID09PVxuJyArCiAgJ1xu4oC7IOWCmeiou++8muaomeekuueCuuOAjOWPg+iAg+izh+ioiuOAjeS5i+aqouaguOmgheebru+8jOS/guS+m+WvqeaguOWPg+mFjOS9v+eUqO+8jOS4jeS9nOeCuuacgOe1guOAkOeUs+iri+e1kOaenOOAkeWIpOWumuS5i+S+neaTmuOAglxuJyArCiAgJ1xu44CQ55Sz6KuL6aGe5Z6L44CRJyArIFJldXNhYmxlLiLnlLPoq4vpoZ7lnosiICsgJ1xuJyArCiAgJ1xu44CQ5bm06b2h5qqi5qC444CRJyArCiAgJ+eUs+iri+aXpeaZgueXheS6uuW5tOm9oeatsuaVuO+8micgKwogIENvYWxlc2NlKFRvU3RyaW5nKCLnlLPoq4vml6XmmYLnl4XkurrlubTpvaHmrbLmlbgiKSwgJ+eEoeazleioiOeulycpICsgJ1xuJyArCiAgJ1xu44CQ4peP56ym5ZCI6aCF55uu44CRXG4nICsKICAoaWYgIuespuWQiOmgheebriIoKSA9ICcnIHRoZW4gJ+eEoVxuJyBlbHNlICLnrKblkIjpoIXnm64iKCkpICsKICAnXG7jgJDilrLkuI3nrKblkIjpoIXnm64gLSDlv4XopoHos4fmlpnmnKrloavlr6vjgJFcbicgKwogIChpZiAi5LiN56ym5ZCI6aCF55uuX+W/heimgeizh+aWmeacquWhq+WvqyIoKSA9ICcnIHRoZW4gJ+eEoVxuJyBlbHNlICLkuI3nrKblkIjpoIXnm65f5b+F6KaB6LOH5paZ5pyq5aGr5a+rIigpKSArCiAgJ1xu44CQ4pay5LiN56ym5ZCI6aCF55uuIC0g5qKd5Lu25oiW5Luj56K85LiN56ym5ZCI44CRXG4nICsKICAoaWYgIuS4jeespuWQiOmgheebrl/mop3ku7bmiJbku6PnorzkuI3nrKblkIgiKCkgPSAnJyB0aGVuICfnhKFcbicgZWxzZSAi5LiN56ym5ZCI6aCF55uuX+aineS7tuaIluS7o+eivOS4jeespuWQiCIoKSkgKwogICdcbuOAkOeUs+iri+e1kOaenOOAkVxuJyArCiAgIuS5s+eZjEFiZW1hY2ljbGli55Sz6KuL5LmLQ1FM5qqi5qC457WQ5p6cIiArCiAgJ1xuPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT1cbicK"
+  }
+ ]
+}
