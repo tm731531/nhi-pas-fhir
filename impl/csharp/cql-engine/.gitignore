@@ -1,0 +1,3 @@
+# The engine itself is installed via `npm install` (versions pinned in package.json /
+# package-lock.json). We do NOT commit node_modules — it is reproducible from the lockfile.
+node_modules/

@@ -1,0 +1,14 @@
+{
+  "name": "nhi-pas-cql-engine",
+  "version": "0.0.1",
+  "private": true,
+  "type": "commonjs",
+  "description": "CQL/ELM execution sidecar for the NHI PAS framework — runs the official NHI pre-check rules against a Bundle we produced. See README.md.",
+  "scripts": {
+    "run": "node run.js"
+  },
+  "dependencies": {
+    "cql-execution": "3.3.2",
+    "cql-exec-fhir": "2.2.0"
+  }
+}

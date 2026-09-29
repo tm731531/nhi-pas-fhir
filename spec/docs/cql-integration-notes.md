@@ -1,5 +1,8 @@
 # CQL 整合筆記 — 送前核刪自查(維度3 的「查 Bundle」)
 
+> 🟢 **先看白話版:** 沒碰過 CQL/FHIR → 先讀 [`cql-explained.md`](cql-explained.md)(用 10 個問答把觀念想通)。
+> 本文是「怎麼接程式」的技術面;引擎本體在 [`impl/csharp/cql-engine/`](../../impl/csharp/cql-engine/)。
+>
 > 官方預檢規則 IG:`tw.gov.mohw.nhi.cql`(build.fhir.org/ig/TWNHIFHIR/cql,**v0.0.1 draft**)。
 > 77 Library ≈ 66 條藥品給付規則(BC 乳癌 / LC 肺癌 / HCC 肝癌 / CRC 大腸癌 / PC 攝護腺癌)。
 > 這是產品核心價值(核刪防呆)。本文件是「未來接引擎」的起跑點,已對抗驗證過理解。
