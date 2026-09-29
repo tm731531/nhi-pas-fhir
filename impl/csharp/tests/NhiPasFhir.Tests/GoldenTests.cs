@@ -30,6 +30,13 @@ public class GoldenTests
     [Fact] public void SelfAssessment_reproduces_golden()
         => AssertReproducesGolden(Samples.SelfAssessmentCase(), "self-assessment.golden.json");
 
+    [Fact] public void UuidStyle_reproduces_golden()
+    {
+        var expected = File.ReadAllText(GoldenPath("uuid.golden.json"));
+        var actual = NhiPas.ToJson(NhiPas.ToUuidStyle(NhiPas.Build(Samples.SelfAssessmentCase())));
+        Assert.Equal(expected, actual);
+    }
+
     [Fact] public void Response_reproduces_golden()
     {
         var expected = File.ReadAllText(GoldenPath("response.golden.json"));

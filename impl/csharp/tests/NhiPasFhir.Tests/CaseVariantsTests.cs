@@ -32,6 +32,15 @@ public class CaseVariantsTests
         Assert.Equal("AB", enc.ServiceType.Coding[0].Code);
     }
 
+    [Fact] public void UuidStyle_rewrites_fullUrls_and_references_to_urn_uuid()
+    {
+        var b = NhiPas.ToUuidStyle(NhiPas.Build(Samples.SelfAssessmentCase()));   // = official Bundle-bun-uuid-example style
+        Assert.All(b.Entry, e => Assert.StartsWith("urn:uuid:", e.FullUrl));
+        var claim = ClaimOf(b);
+        Assert.StartsWith("urn:uuid:", claim.Patient.Reference);                  // internal ref rewritten
+        Assert.DoesNotContain(b.Entry, e => e.FullUrl!.Contains("/Patient/"));    // no Resource/id fullUrls left
+    }
+
     [Fact] public void Response_builds_searchset_bundle_with_decision()
     {
         var b = NhiPas.BuildResponse(Samples.ResponseCase());

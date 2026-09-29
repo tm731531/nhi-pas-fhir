@@ -10,6 +10,9 @@
 | 免疫製劑(bun-imm) | 送核 | 一般 | 36 | ✅ 全 36 資源,0 errors,可吃 PACase |
 | **申復(bun-3)** | **申復** | 一般 | 26 | ✅ 0 errors(subtype_code=3 + old_acpt_no invariant) |
 | **自主審查(bun-self)** | 送核 | **自主審查** | 30 | ✅ 0 errors(priority_code=3 + 自動塞 self-assessment) |
+| **自主審查·urn:uuid(bun-uuid)** | 送核 | 自主審查 | 29 | ✅ 0 errors(`NhiPas.ToUuidStyle` — urn:uuid 引用風格) |
+
+**官方 6 個範例 bundle 全數複製 + 0 errors。**
 
 **申報別×案件別矩陣已由 `subtype_code`(1-5)×`priority_code`(1/3/4)參數化** → 送核/送核補件/申復/爭議審議/申復補件 × 一般/自主審查/緊急報備 皆可組(補件類自動要求 old_acpt_no)。申復/自主審查即癌藥完整版的參數變體,皆 0 errors。
 

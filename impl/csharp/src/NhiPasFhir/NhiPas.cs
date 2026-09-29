@@ -15,5 +15,8 @@ public static class NhiPas
     /// <summary>Build an OperationOutcome-twpas (錯誤回報) for a submission that cannot be processed.</summary>
     public static OperationOutcome BuildOutcome(params OutcomeIssue[] issues) => OutcomeBuilder.Build(issues);
 
+    /// <summary>Rewrite a bundle to urn:uuid entry-referencing style (Bundle-bun-uuid-example).</summary>
+    public static Bundle ToUuidStyle(Bundle bundle) => UuidStyle.ToUuidStyle(bundle);
+
     public static string ToJson(Resource r) => r.ToJson();
 }
