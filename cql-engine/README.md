@@ -59,12 +59,21 @@ production-ready. Before it can gate real submissions:
    `cql-execution` 3.3.2 / `cql-exec-fhir` 2.2.0. Confirm these agree with whatever NHI
    runs server-side (whichever engine you end up using), so local prediction == adjudication.
 
-3. **Unsolved runtime blocker: `FHIRHelpers.ToInteger`.** In the PoC the JS engine loads
-   all defines and starts executing, then fails inside `FHIRHelpers.ToInteger(...)` — a
-   data-adapter / model-version alignment issue between the FHIR source and the ELM's
-   expected type representation. This is the last mile between "loads + starts" and "runs
-   to a verdict". Known and bounded — not a dead end. (This may also be engine-specific:
-   a Java engine could behave differently — another reason not to language-lock.)
+3. **Runtime blockers (debugged 2026-09-29).** Two distinct root causes were found by
+   feeding a real emitted Bundle through the runner:
+   - **(SOLVED) FHIRHelpers cross-library resolution.** BCReusable does
+     `include FHIRHelpers version '4.0.1'` with the HL7 path `http://hl7.org/fhir/FHIRHelpers`,
+     but the shipped FHIRHelpers library self-identifies under `https://nhicore.nhi.gov.tw/cql`.
+     Stock `Repository.resolve` matched neither → `ctx.get('FHIRHelpers')` undefined →
+     `functionDefs.filter(...)` crashed at the first `ToInteger`. Fixed in `js/run.js` with a
+     `LenientRepository` (falls back to the path's trailing id). Does NOT touch official ELM.
+   - **(OPEN — needs a decision) `InCodeSystem` is unimplemented in cql-execution 3.3.2.**
+     The rule tests `diagnosis-code in ICD10CM2023 (or 2014)` via the ELM `InCodeSystem`
+     operator; this engine's builder returns `null` for it (verified: `build(InCodeSystem)`
+     → null, whereas `InValueSet` builds fine) → the enclosing `Or` gets a null operand and
+     crashes. Faithful `InCodeSystem` is a terminology operation; evaluating it needs either
+     an offline binding shim (code.system == codesystem.id — an approximation) or a real
+     terminology CodeService / a Java engine. This is a semantics choice, deferred to Tom.
 
 4. **Not yet wired to C#.** `ICqlEngine` is still `NotWiredCqlEngine` (fail-loud). Wiring
    means: C# invokes an engine (this sidecar, or a Java/server one), passes `(ruleId,
