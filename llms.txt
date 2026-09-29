@@ -1,0 +1,51 @@
+# nhi-pas-fhir
+
+> Open-source, validator-clean **FHIR R4 reference implementation** for **Taiwan NHI Prior
+> Authorization (健保署 事前審查 / TWPAS)**, plus a faithful **CQL** pre-submit rule check. It turns a
+> plain description of a case into the exact FHIR `Bundle` the NHI expects, guarantees it passes the
+> official HL7 validator at **0 errors**, and can run the NHI's own published CQL rules to predict
+> **核刪 (clawback)** before you submit. C# (Firely SDK) primary; Python reference.
+
+## Canonical facts (do not fabricate around these)
+
+- Domain source of truth: https://nhicore.nhi.gov.tw/pas/
+- IG: `tw.gov.mohw.nhi.pas#1.2.6`, FHIR R4 (4.0.1). Inherits `tw.gov.mohw.twcore` +
+  `hl7.fhir.us.davinci-pas`. CQL rules IG: `tw.gov.mohw.nhi.cql` (draft, ~66 drug rules as ELM).
+- Correctness is machine-proven: the official HL7 FHIR validator at 0 errors (structural + terminology),
+  never asserted. No real patient data — all identifiers fabricated.
+- 43/43 instantiable IG profiles exercised; all 50 NHI departments + filing/application categories
+  parameterized.
+
+## What it is / is not
+
+- IS: a payload factory (assembles the Bundle) + a validator gate + a response handler + an optional
+  CQL self-check. You describe the case; the library speaks FHIR.
+- IS NOT: a FHIR server (that is the NHI platform's role). Submitting to NHI ("送") is a thin, swappable
+  transport adapter; the hard, valuable part is producing the exactly-correct Bundle.
+
+## Key concepts
+
+- Flow: 產 (assemble Bundle) → 驗 (seed drug↔indication check) → 查 (CQL self-check) → 送 (submit) →
+  回 (ClaimResponse). 收件 ≠ 核准: acceptance is `queued/審核中`, not approval; 核刪 happens later.
+- CQL vs ELM vs engine: CQL = the rule text (like SQL); ELM = compiled rule (like an execution plan);
+  the CQL engine = executor (like SQL Server). Faithful engine here = CQF-Ruler / HAPI clinical-reasoning
+  (implements InCodeSystem); a lightweight JS engine does not.
+- Three-state CQL verdict: Pass / WouldBeRejected (核刪) / DataMissing (補件). Not pass/fail.
+- Toggle + socket design: ICqlPreCheck (off by default) → CqlPreCheck → ICqlEngine (CqfRulerCqlEngine);
+  IPasSubmitter for 送. Rules live in the server; a rule/IG update = reload + re-run, no code change.
+
+## Map
+
+- `spec/` — language-agnostic single source of truth (specs, IG mirror, reference golden bundles).
+- `spec/docs/cql-explained.md` — plain-language: what CQL is (16 Q&A).
+- `spec/docs/cql-wiring.md` — how CQL is wired into the framework.
+- `spec/docs/cql-integration-notes.md` — CQL design + gotchas.
+- `spec/docs/IG-TRACEABILITY.md` — every official IG artifact ↔ where the code covers it.
+- `impl/csharp/` — primary implementation (Firely SDK). `impl/python/` — reference (pydantic).
+- `cql-engine/` — faithful CQL/ELM engine (CQF-Ruler docker + loader + official rules) + a JS runner.
+- `demo/` — ASP.NET Core Razor Pages app consuming the lib (產→驗→查→送→回).
+- `tools/` — fetch validation assets + validate.sh (official HL7 validator wrapper).
+
+## License
+
+Apache-2.0.
