@@ -157,6 +157,14 @@
                                 <li>@r</li>
                             }
                         </ul>
+                        @if (Model.Cql.Outcome != NhiPasFhir.Core.CqlOutcome.Pass)
+                        {
+                            <div class="alert alert-info small mt-3 mb-0">
+                                ⚠️ <strong>「送出去沒事」是陷阱:</strong>這些問題健保<u>收件當下不會擋</u>(POST 會成功、看似沒事),
+                                是<strong>事後審查才核刪、把錢扣回去</strong>。<br>
+                                送前自查(這一步)就是把「事後才會爆」的問題<strong>提前在送出前</strong>抓出來,先補齊再送 → 不被核刪。
+                            </div>
+                        }
                     }
                 </div>
             </div>
