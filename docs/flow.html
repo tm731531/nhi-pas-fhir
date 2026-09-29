@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bundle 為脊椎 — nhi-pas-fhir 框架 flow</title>
+<style>
+  :root{
+    --ground:#f4f6f8; --panel:#ffffff; --ink:#111820; --muted:#5c6b7a; --line:#dde3e9;
+    --spine:#0e8f9c; --spine-soft:#0e8f9c22; --ok:#1f9d55; --pending:#c47f16; --scope:#7a8794;
+    --shadow:0 1px 2px #0b141c0d,0 8px 24px #0b141c0f;
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC",sans-serif;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --ground:#0d141b; --panel:#141d26; --ink:#e7edf3; --muted:#8b9aa8; --line:#243039;
+    --spine:#33c5d3; --spine-soft:#33c5d322; --ok:#43c07a; --pending:#e0a648; --scope:#6b7885;
+    --shadow:0 1px 2px #0006,0 10px 30px #0007;
+  }}
+  :root[data-theme="light"]{
+    --ground:#f4f6f8; --panel:#ffffff; --ink:#111820; --muted:#5c6b7a; --line:#dde3e9;
+    --spine:#0e8f9c; --spine-soft:#0e8f9c22; --ok:#1f9d55; --pending:#c47f16; --scope:#7a8794;
+    --shadow:0 1px 2px #0b141c0d,0 8px 24px #0b141c0f;
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d141b; --panel:#141d26; --ink:#e7edf3; --muted:#8b9aa8; --line:#243039;
+    --spine:#33c5d3; --spine-soft:#33c5d322; --ok:#43c07a; --pending:#e0a648; --scope:#6b7885;
+    --shadow:0 1px 2px #0006,0 10px 30px #0007;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
+    line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1060px;margin:0 auto;padding:40px 22px 72px}
+  header .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--spine);margin:0 0 10px}
+  h1{font-size:clamp(26px,4vw,38px);line-height:1.12;margin:0 0 12px;letter-spacing:-.02em;text-wrap:balance;font-weight:760}
+  h1 em{font-style:normal;color:var(--spine)}
+  .lede{max-width:60ch;color:var(--muted);font-size:16px;margin:0}
+  .lede b{color:var(--ink);font-weight:640}
+
+  /* flow spine */
+  .flow{margin:34px 0 8px;display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:stretch}
+  .col{display:flex;flex-direction:column;gap:14px;justify-content:center}
+  .spinecol{display:flex;align-items:center;justify-content:center;padding:0 clamp(8px,3vw,30px)}
+  .verb{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .node{width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:13px;
+    padding:14px 15px;cursor:pointer;box-shadow:var(--shadow);transition:transform .12s ease,border-color .12s ease;
+    color:inherit;font:inherit;display:block}
+  .node:hover{transform:translateY(-2px);border-color:var(--spine)}
+  .node:focus-visible{outline:2.5px solid var(--spine);outline-offset:2px}
+  .node[aria-pressed="true"]{border-color:var(--spine);box-shadow:0 0 0 1px var(--spine),var(--shadow)}
+  .node .nt{font-weight:680;font-size:15px;margin:2px 0 3px;display:flex;align-items:center;gap:8px}
+  .node .nd{font-size:12.5px;color:var(--muted);line-height:1.4}
+  .dot{width:8px;height:8px;border-radius:50%;flex:none}
+  .dot.ok{background:var(--ok)} .dot.pending{background:var(--pending)} .dot.spine{background:var(--spine)}
+  .dot.scope{background:var(--scope)}
+
+  /* the bundle hub */
+  .hub{width:clamp(150px,20vw,186px);aspect-ratio:1;border-radius:20px;
+    background:linear-gradient(160deg,var(--spine-soft),transparent);border:1.5px solid var(--spine);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;
+    box-shadow:var(--shadow);transition:transform .12s ease;padding:14px;text-align:center;color:inherit;font:inherit}
+  .hub:hover{transform:scale(1.03)} .hub:focus-visible{outline:2.5px solid var(--spine);outline-offset:3px}
+  .hub[aria-pressed="true"]{box-shadow:0 0 0 2px var(--spine),var(--shadow)}
+  .hub .star{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--spine);text-transform:uppercase}
+  .hub .bname{font-family:var(--mono);font-weight:700;font-size:19px;color:var(--ink)}
+  .hub .bcount{font-size:12.5px;color:var(--muted);line-height:1.35}
+  .hub .bcount b{color:var(--spine);font-family:var(--mono)}
+
+  .legend{display:flex;flex-wrap:wrap;gap:16px;margin:18px 2px 0;font-size:12px;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+
+  /* detail panel */
+  .detail{margin-top:26px;background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:22px 22px 20px;box-shadow:var(--shadow);min-height:220px}
+  .detail .head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:4px}
+  .detail h2{font-size:19px;margin:0;letter-spacing:-.01em}
+  .detail .tag{font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:999px;border:1px solid var(--line);
+    color:var(--muted);letter-spacing:.04em}
+  .detail .verb-does{color:var(--spine);font-family:var(--mono);font-size:12.5px;margin:0 0 14px}
+  .detail p.sum{margin:0 0 16px;color:var(--muted);max-width:70ch;font-size:14.5px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:640px){.grid2{grid-template-columns:1fr}}
+  .block h3{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);
+    margin:0 0 8px;font-weight:600}
+  ul.facts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+  ul.facts li{font-size:13.5px;display:flex;gap:9px;align-items:flex-start}
+  ul.facts li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--spine);margin-top:7px;flex:none}
+  code,.mono{font-family:var(--mono);font-size:12.5px}
+  code{background:var(--spine-soft);color:var(--ink);padding:1.5px 6px;border-radius:6px}
+  .status{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:12.5px;
+    padding:5px 11px;border-radius:999px;border:1px solid var(--line);margin-bottom:14px}
+  .status.ok{color:var(--ok);border-color:var(--ok)} .status.pending{color:var(--pending);border-color:var(--pending)}
+  .status.scope{color:var(--scope);border-color:var(--scope)}
+  .rescloud{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+  .chip{font-family:var(--mono);font-size:11.5px;padding:3px 8px;border-radius:7px;border:1px solid var(--line);
+    color:var(--muted);white-space:nowrap}
+  .chip b{color:var(--spine)}
+  footer{margin-top:26px;color:var(--muted);font-size:12px;font-family:var(--mono);line-height:1.6}
+  .hint{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin:10px 2px 0}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">nhi-pas-fhir · 框架總覽</p>
+    <h1>一切繞著 <em>Bundle</em> 轉 — 框架 = 一條「產 → 驗 → 查 → 送 → 回」的生產線</h1>
+    <p class="lede">健保事前審查申請被打包成**一份 FHIR Bundle**(一個 JSON,裝著病人/申請單/檢驗/報告…)。框架每一站都對這同一顆 Bundle 做事。<b>點任一站看它對到的真實 class、檔案與數字</b> — 全部從 repo 實抓,非杜撰。</p>
+  </header>
+
+  <div class="flow">
+    <div class="col">
+      <div>
+        <div class="verb">① 產 · Assemble</div>
+        <button class="node" data-k="produce" aria-pressed="false">
+          <div class="nt"><span class="dot spine"></span>組裝器 → 產出 Bundle</div>
+          <div class="nd">PACase → Factory → Assembler。癌藥 28 資源、免疫 36 資源。</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="spinecol">
+      <button class="hub" data-k="bundle" aria-pressed="true">
+        <span class="star">★ 脊椎 ★</span>
+        <span class="bname">Bundle</span>
+        <span class="bcount">一份事前審查申請<br><b>28</b> 筆資源打包成 1 個 JSON</span>
+      </button>
+    </div>
+
+    <div class="col">
+      <div>
+        <div class="verb">② 驗 · Validate</div>
+        <button class="node" data-k="validate" aria-pressed="false">
+          <div class="nt"><span class="dot ok"></span>官方 validator 驗 Bundle</div>
+          <div class="nd">tools/validate.sh → <b>0 errors</b>。31 xunit tests 鎖住。</div>
+        </button>
+      </div>
+      <div>
+        <div class="verb">③ 查 · Pre-check</div>
+        <button class="node" data-k="precheck" aria-pressed="false">
+          <div class="nt"><span class="dot pending"></span>核刪規則查 Bundle</div>
+          <div class="nd">PreCheck(2 種子) + CQL 66 條(引擎待接)。</div>
+        </button>
+      </div>
+      <div>
+        <div class="verb">④ 送 · Submit</div>
+        <button class="node" data-k="submit" aria-pressed="false">
+          <div class="nt"><span class="dot scope"></span>POST Bundle 到甲方平台</div>
+          <div class="nd">健保 FHIR API(Server)。傳輸不在本 lib。</div>
+        </button>
+      </div>
+      <div>
+        <div class="verb">⑤ 回 · Respond</div>
+        <button class="node" data-k="respond" aria-pressed="false">
+          <div class="nt"><span class="dot spine"></span>核定回應</div>
+          <div class="nd">ClaimResponse / OperationOutcome。已可產。</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><span class="dot spine"></span> 已做且是主幹</span>
+    <span><span class="dot ok"></span> 已驗證 0 errors</span>
+    <span><span class="dot pending"></span> 部分 / 待接引擎</span>
+    <span><span class="dot scope"></span> 甲方平台責任(非本 lib)</span>
+  </div>
+  <p class="hint">↑ 點任一站(或 ★Bundle★)。以下面板顯示該站的真實對照。</p>
+
+  <section class="detail" id="detail" aria-live="polite"></section>
+
+  <footer id="foot"></footer>
+</div>
+
+<script>
+const D = {
+  bundle:{
+    title:"Bundle — 框架的脊椎", tag:"資料 · 主角", status:["ok","6/6 官方範例 bundle 全複製 · 全 0 errors"],
+    does:"每一站的受詞都是它:產它 · 驗它 · 查它 · 送它 · 審它。",
+    sum:"一個 resourceType=Bundle、type=collection 的 JSON,把「一次申請」需要的所有 FHIR 資源打包成一包 —— 主檔 Claim + 病人 + 醫師 + 醫院 + 檢驗/報告/影像 + 用藥醫令 + 健保身分。這就是我們 POST 給健保、也是 CQL 拿去查的「那個病人的資料庫」。",
+    left:{h:"癌藥 Bundle 真實組成(pa-bundle.cs.json,28 筆)",cloud:[
+      ["Claim",1],["Patient",1],["Practitioner",1],["Organization",3],["Encounter",1],["Observation",6],
+      ["DiagnosticReport",2],["ImagingStudy",1],["Media",1],["Specimen",1],["DocumentReference",4],
+      ["MedicationRequest",3],["Procedure",1],["Substance",1],["Coverage",1]]},
+    right:{h:"覆蓋(對抗審計實測)",facts:[
+      "Profiles <code>40 / 40</code> — 官方每個可實例化 profile 都產得出",
+      "Extensions <code>3 / 3</code>",
+      "官方範例 bundle <code>6 / 6</code>:癌藥 / 免疫 / 申復 / 自主 / 回應 / urn:uuid",
+      "值變體 <code>7</code>、OperationOutcome <code>1</code>",
+      "全部過官方 validator <code>0 errors</code>"]}
+  },
+  produce:{
+    title:"① 產 · 組裝器", tag:"我們的 class", status:["ok","Interface → Abstract → Impl + Factory"],
+    does:"對 Bundle:產出它。",
+    sum:"呼叫端填一個中性的 PACase(病人/藥/診斷…,不碰 FHIR),Factory 依案件類型挑對應 Assembler,用 Firely 組出完整 Bundle、套 profile、填固定值 —— 絕不瞎掰欄位。",
+    left:{h:"對應的真實檔案",facts:[
+      "<code>Core/AbstractCaseAssembler.cs</code> — 共用臨床層 + 預設組裝",
+      "<code>Plugins/CancerDrugAssembler.cs</code> — 癌藥,28 資源",
+      "<code>Plugins/ImmunologicAssembler.cs</code> — 免疫製劑,36 資源",
+      "<code>Core/AssemblerFactory.cs</code> — (ig,case)→Assembler",
+      "<code>Core/PACase.cs</code> — 中性輸入"]},
+    right:{h:"重點",facts:[
+      "加案件類型 = 一個子類別 + 註冊,框架/工廠不動",
+      "同殼套預設 Assemble;異殼(免疫)覆寫 Assemble",
+      "50 科別 × 5 申報別 × 3 案件別 皆參數化(PACase.Data)"]}
+  },
+  validate:{
+    title:"② 驗 · 官方 validator", tag:"外部工具", status:["ok","Success: 0 errors"],
+    does:"對 Bundle:驗它,證明合規。",
+    sum:"以官方 HL7 FHIR validator 驗證(結構 + 術語),0 errors 才算「正確」——不是「看起來對」。含 TW Core ICD terminology patch(修上游 0.3.2 CodeSystem url 錯位)。",
+    left:{h:"對應",facts:[
+      "<code>tools/validate.sh</code> — 一鍵驗(-ig pas-package + tx-patch)",
+      "<code>tools/fetch_validation_assets.sh</code> — 抓 package + 建 patch",
+      "<code>spec/docs/validation/</code> — 0 errors 證據"]},
+    right:{h:"實測數字",facts:[
+      "免疫 36 資源:<code>Success: 0 errors</code>",
+      "七類輸出全部 0 errors",
+      "<code>31</code> xunit tests(含 byte-for-byte golden 回歸)全綠"]}
+  },
+  precheck:{
+    title:"③ 查 · 核刪預檢", tag:"我們的插槽 + 官方規則", status:["pending","架構已留插槽;CQL 引擎待接"],
+    does:"對 Bundle:查它,判會不會被核刪。",
+    sum:"這一站問「這包 Bundle 湊起來符不符合給付條件」。現有 PreCheck 只 seed 2 條 drug↔適應症;完整的 66 條核刪規則是健保用 CQL(FHIR 版 SQL)寫的外部規則,要接一台 CQL 引擎來跑 —— 我們不重寫規則,只當引擎宿主。",
+    left:{h:"現有 + 對應",facts:[
+      "<code>Core/PreCheck.cs</code> — drug↔適應症(seed 2 條)",
+      "<code>Core/Pipeline.cs</code> — Run = 檢查 → 組裝 gate",
+      "未來:<code>ICqlEngine</code> 插在此,吃 Bundle 跑官方 Library"]},
+    right:{h:"CQL PoC(實測)",facts:[
+      "官方 IG <code>tw.gov.mohw.nhi.cql</code> v0.0.1 <b>draft</b>",
+      "<code>77</code> Library ≈ <b>66 條藥品規則</b>(BC/LC/HCC/CRC/PC)",
+      "PoC:<code>BCAbemaciclibRule1</code> 的 <b>68 個 define 全載入、引擎有執行</b>",
+      "卡點:<code>FHIRHelpers.ToInteger</code> 資料型別對接未對齊(可解)"]}
+  },
+  submit:{
+    title:"④ 送 · POST 到甲方平台", tag:"甲方責任", status:["scope","本 lib 只產 payload,不做傳輸"],
+    does:"對 Bundle:把它送出去。",
+    sum:"甲方平台 = 健保署自己那台 FHIR 伺服器(共通傳輸平台),官方 Server CapabilityStatement 規定它要支援對 Bundle/Claim/… 的 create/read/update。我們是 Client,負責產合格 Bundle;實際 HTTP 傳輸由接本 lib 的系統做。",
+    left:{h:"官方規格(甲方的)",facts:[
+      "<code>CapabilityStatement-...Server.json</code> — 甲方平台要支援的互動",
+      "<code>CapabilityStatement-...Client.json</code> — Client 端",
+      "17 個 SearchParameter = 那台 API 的查詢條件(甲方實作)"]},
+    right:{h:"定位",facts:[
+      "我們 = Client:<code>create</code>(POST)Bundle 進去",
+      "Server / SearchParameter / SMART = 甲方平台的事,不是本 lib",
+      "傳輸層(HTTP)= 接本 lib 的系統的薄薄一層"]}
+  },
+  respond:{
+    title:"⑤ 回 · 核定回應", tag:"我們的 class", status:["ok","已可產出"],
+    does:"對 Bundle:健保審完,回一份針對它的結果。",
+    sum:"健保審完回一份 ClaimResponse(核准/駁回/補件…)。我們已能產出回應側(NHI 核定 + 自主審查自評 + 錯誤回報)。讀回應解析(Client read-back)尚未做。",
+    left:{h:"對應",facts:[
+      "<code>Response.cs</code> → ClaimResponse-twpas / self-assessment",
+      "<code>Outcome.cs</code> → OperationOutcome-twpas(錯誤回報)",
+      "<code>NhiPas.BuildResponse / BuildOutcome</code>"]},
+    right:{h:"核定意見碼(nhi-approve-comment)",facts:[
+      "<code>1</code> 同意 · <code>2</code> 不予同意 · <code>3</code> 部份同意",
+      "<code>4</code> 補件 · <code>5</code> 退件 · <code>7</code> 改核",
+      "尚缺:讀入 ClaimResponse 解析(維度3,規劃中)"]}
+  }
+};
+
+const detail = document.getElementById('detail');
+function render(k){
+  const d = D[k];
+  const st = d.status;
+  const cloud = d.left.cloud ? '<div class="rescloud">'+d.left.cloud.map(([n,c])=>`<span class="chip">${n} <b>×${c}</b></span>`).join('')+'</div>' : '';
+  const lfacts = d.left.facts ? '<ul class="facts">'+d.left.facts.map(f=>`<li>${f}</li>`).join('')+'</ul>' : '';
+  detail.innerHTML = `
+    <div class="head"><h2>${d.title}</h2><span class="tag">${d.tag}</span></div>
+    <p class="verb-does">${d.does}</p>
+    <span class="status ${st[0]}">${st[1]}</span>
+    <p class="sum">${d.sum}</p>
+    <div class="grid2">
+      <div class="block"><h3>${d.left.h}</h3>${cloud}${lfacts}</div>
+      <div class="block"><h3>${d.right.h}</h3><ul class="facts">${d.right.facts.map(f=>`<li>${f}</li>`).join('')}</ul></div>
+    </div>`;
+  document.querySelectorAll('[data-k]').forEach(b=>b.setAttribute('aria-pressed', b.dataset.k===k ? 'true':'false'));
+}
+document.querySelectorAll('[data-k]').forEach(b=>{
+  b.addEventListener('click',()=>render(b.dataset.k));
+});
+render('bundle');
+
+document.getElementById('foot').textContent =
+  '根據 repo 實抓:impl/csharp/build/*.cs.json · tools/validate.sh 輸出 · dotnet test(31) · tw.gov.mohw.nhi.cql#0.0.1 · 對抗審計 7-agent 結果。數字非杜撰。';
+</script>
+</body>
+</html>

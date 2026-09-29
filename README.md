@@ -70,6 +70,10 @@ tools/validate.sh impl/csharp/build/pa-bundle.cs.json
 C# usage: [impl/csharp/README.md](impl/csharp/README.md) (English) · [中文](impl/csharp/README.zh.md) ·
 per-case manual: [impl/csharp/MANUAL.md](impl/csharp/MANUAL.md).
 
+## Overview diagram
+[`docs/flow.html`](docs/flow.html) — interactive, Bundle-centric flow (產→驗→查→送→回); each station
+maps to the real class/file/numbers. Open it locally, or serve it from GitHub Pages / your own host.
+
 ## Docs
 
 - [EXPLAINER](spec/docs/EXPLAINER.md) — what FHIR is, for a systems owner (not a FHIR expert)
