@@ -44,6 +44,6 @@ the rules never touches this project (Tom's replaceability invariant).
 
 ## Host it under your own domain
 
-To keep it up and expose it at `https://<your-subdomain>` through the existing Cloudflare tunnel, see
-`host/EXPOSE-under-tomting.md` (the ingress line to add on the <edge-host>) and
-`host/nhi-pas-demo.service` (a systemd user unit so :5099 stays up on .48).
+To keep it up and expose it at `https://<your-subdomain>` through a Cloudflare tunnel, see
+`host/EXPOSE-via-cloudflare-tunnel.md` (the ingress rule to add on your tunnel host) and
+`host/nhi-pas-demo.service` (a systemd user unit so :5099 stays up).

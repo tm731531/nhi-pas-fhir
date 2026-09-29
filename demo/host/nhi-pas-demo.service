@@ -1,5 +1,5 @@
 # systemd USER service so the demo stays up on :5099 (so the tunnel always has something to hit).
-# Install (on <DEMO_HOST_IP>, as tom):
+# Install (on the host running the demo, as your user):
 #   dotnet build ~/Desktop/nhi-pas-fhir/demo/NhiPasDemo        # produce the DLL
 #   mkdir -p ~/.config/systemd/user
 #   cp ~/Desktop/nhi-pas-fhir/demo/host/nhi-pas-demo.service ~/.config/systemd/user/
