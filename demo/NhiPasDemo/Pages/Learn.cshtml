@@ -1,0 +1,20 @@
+@page
+@model LearnModel
+@{
+    ViewData["Title"] = "CQL & FHIR 問答";
+}
+
+<div class="mb-3">
+    <a asp-page="/Index" class="btn btn-sm btn-outline-secondary">← 回 Demo</a>
+</div>
+
+@if (Model.Missing is not null)
+{
+    <p class="text-danger">找不到說明檔:<code>@Model.Missing</code></p>
+}
+else
+{
+    <article class="markdown-body">
+        @Model.Html
+    </article>
+}

@@ -35,6 +35,8 @@ public class IndexModel : PageModel
     public string? CqlError { get; private set; }
     public string BundleJson { get; private set; } = "";
     public int EntryCount { get; private set; }
+    public IReadOnlyList<(string Type, int Count)> ResourceCounts { get; private set; } =
+        Array.Empty<(string, int)>();
 
     private static PACase CaseFor(string key) => key switch
     {
@@ -80,6 +82,13 @@ public class IndexModel : PageModel
         {
             EntryCount = result.Bundle.Entry.Count;
             BundleJson = Prettify(NhiPas.ToJson(result.Bundle));
+            ResourceCounts = result.Bundle.Entry
+                .Where(e => e.Resource is not null)
+                .GroupBy(e => e.Resource.TypeName)
+                .Select(g => (g.Key, g.Count()))
+                .OrderByDescending(x => x.Item2)
+                .ThenBy(x => x.Key)
+                .ToList();
         }
         HasResult = true;
     }

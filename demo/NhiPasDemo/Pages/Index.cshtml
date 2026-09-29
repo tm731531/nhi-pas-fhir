@@ -16,6 +16,25 @@
         NhiPasFhir.Core.CqlOutcome.DataMissing => "缺資料待補件 (DataMissing)",
         _ => "未評估 (NotEvaluated)",
     };
+    string ResourceHint(string t) => t switch
+    {
+        "Bundle" => "整份卷宗",
+        "Claim" => "申請單本體(要申請什麼藥、診斷)",
+        "Patient" => "病人",
+        "Practitioner" => "醫師",
+        "PractitionerRole" => "醫師的執業角色",
+        "Organization" => "醫院 / 機構",
+        "Coverage" => "健保身分",
+        "Encounter" => "就醫事件",
+        "Condition" => "診斷(ICD)",
+        "Procedure" => "處置 / 手術",
+        "Observation" => "檢驗 / 檢查結果",
+        "MedicationRequest" => "用藥醫令",
+        "DiagnosticReport" => "影像 / 病理報告",
+        "Specimen" => "檢體",
+        "ClaimResponse" => "核定回應",
+        _ => "FHIR 資源",
+    };
 }
 
 <div class="mb-4">
@@ -116,6 +135,25 @@
                         </ul>
                     }
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header fw-semibold">FHIR 各個體制 — 這份 Bundle 裡的資源</div>
+        <div class="card-body">
+            <p class="small text-muted">
+                一份 Bundle 是把一筆申請需要的所有資料「釘成一疊」。每一種 resourceType 是 FHIR 的一個「體制」,
+                各司其職。這個案子用到:
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+                @foreach (var rc in Model.ResourceCounts)
+                {
+                    <span class="badge rounded-pill bg-light text-dark border" title="@ResourceHint(rc.Type)">
+                        <strong>@rc.Type</strong> ×@rc.Count
+                        <span class="text-muted">· @ResourceHint(rc.Type)</span>
+                    </span>
+                }
             </div>
         </div>
     </div>

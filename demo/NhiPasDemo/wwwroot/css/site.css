@@ -20,3 +20,12 @@ html {
 body {
   margin-bottom: 60px;
 }
+/* markdown-rendered 問答頁 */
+.markdown-body { max-width: 900px; line-height: 1.7; }
+.markdown-body h1 { font-size: 1.7rem; margin-top: 1.5rem; }
+.markdown-body h2 { font-size: 1.3rem; margin-top: 2rem; border-bottom: 1px solid #eee; padding-bottom: .3rem; }
+.markdown-body table { border-collapse: collapse; margin: 1rem 0; width: 100%; }
+.markdown-body th, .markdown-body td { border: 1px solid #dee2e6; padding: .4rem .6rem; }
+.markdown-body th { background: #f8f9fa; }
+.markdown-body code { background: #f1f3f5; padding: .1rem .3rem; border-radius: .2rem; }
+.markdown-body blockquote { border-left: 4px solid #adb5bd; padding-left: 1rem; color: #555; }
