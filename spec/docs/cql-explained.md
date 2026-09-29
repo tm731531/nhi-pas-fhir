@@ -157,12 +157,13 @@ Bundle 是這條流水線上**從頭到尾被傳遞、被加工的那個東西**
 
 不是遠方的神祕東西 —— PoC 已經在這台機器上跑起來過了,現在正式收進 repo:
 
-- **位置**:[`impl/csharp/cql-engine/`](../../impl/csharp/cql-engine/)
-- **引擎本尊**:`cql-execution`(cqframework 出的參考級 JS 引擎)+ `cql-exec-fhir`(把 Bundle
-  餵進去的轉接器)。
-- **狀態**:已能載入規則、開始執行,卡在一個叫 `FHIRHelpers.ToInteger` 的型別對齊問題 ——
+- **位置**:[`cql-engine/`](../../cql-engine/)(放在 repo 根目錄,不綁 C#)。
+- **語言中立的核心是 ELM 規則**(`cql-engine/elm/`)—— 任何合規的 CQL 引擎都能跑同一批。
+  引擎**可換**:我們先放一支 JS 參考 runner(`cql-engine/js/`,用 `cql-execution`),但也能改用
+  Java(cqframework)或 CQF-Ruler server。**「引擎」不等於「那支 JS」,ELM 才是真正的資產。**
+- **狀態**:JS runner 已能載入規則、開始執行,卡在一個叫 `FHIRHelpers.ToInteger` 的型別對齊問題 ——
   這是「開始跑」和「跑到出結論」之間**最後一哩**,是已知、有邊界的問題,不是死路。
-- 還要做什麼、為什麼還沒 production-ready → 看那個資料夾的 `README.md`。
+- 還要做什麼、為什麼還沒 production-ready → 看 `cql-engine/README.md`。
 
 ---
 

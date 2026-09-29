@@ -1,7 +1,10 @@
 const cql = require('cql-execution');
 const cqlfhir = require('cql-exec-fhir');
 const fs = require('fs');
-const load = n => JSON.parse(fs.readFileSync(`elm/${n}.json`, 'utf8'));
+const path = require('path');
+// ELM lives in the language-neutral ../elm folder (this js/ dir is just one engine binding).
+const elmDir = path.join(__dirname, '..', 'elm');
+const load = n => JSON.parse(fs.readFileSync(path.join(elmDir, `${n}.json`), 'utf8'));
 (async () => {
   const lib = new cql.Library(load('BCAbemaciclibRule1'), new cql.Repository({
     FHIRHelpers: load('FHIRHelpers'), BCCodeConcept: load('BCCodeConcept'), BCReusable: load('BCReusable') }));
