@@ -33,3 +33,17 @@ The CQL server base URL is configurable via `Cql:BaseUrl` (default `http://local
 
 The demo holds no FHIR/CQL logic of its own — it only calls the lib. Swapping the engine or updating
 the rules never touches this project (Tom's replaceability invariant).
+
+## Pages
+
+- `/` (Demo) — 這是什麼 + 怎麼用 + the 產→驗→查 flow, the three-state verdict, the FHIR resource
+  breakdown (各個體制), and the assembled Bundle.
+- `/Learn` (CQL & FHIR 問答) — renders `spec/docs/cql-explained.md` (15 Q&A: what it is).
+- `/Wiring` (CQL 怎麼串) — renders `spec/docs/cql-wiring.md` (how CQL is wired: the line from
+  「跑一次」to a verdict, the toggle + the socket, where the four pieces live).
+
+## Host it under your own domain
+
+To keep it up and expose it at `https://<your-subdomain>` through the existing Cloudflare tunnel, see
+`host/EXPOSE-under-tomting.md` (the ingress line to add on the <edge-host>) and
+`host/nhi-pas-demo.service` (a systemd user unit so :5099 stays up on .48).

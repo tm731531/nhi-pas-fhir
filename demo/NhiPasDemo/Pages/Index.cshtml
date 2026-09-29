@@ -37,13 +37,37 @@
     };
 }
 
-<div class="mb-4">
-    <h1 class="h3">健保事前審查 (TWPAS) — 送核 Demo</h1>
-    <p class="text-muted mb-1">
-        這個 sample 吃 <code>NhiPasFhir</code> lib:選一個案子 → 組出 FHIR Bundle(產)→ 跑 pipeline
-        的種子檢查(驗)→ 可選地送官方 CQL 規則自查(查)→ 顯示三態判決。
+<div class="p-4 mb-4 rounded-3" style="background:#f0f4ff;border:1px solid #dce4ff;">
+    <h1 class="h4 mb-2">健保事前審查 (TWPAS) — 送核 Demo</h1>
+    <p class="mb-3">
+        <strong>這是什麼:</strong>一個把「送健保審查前的申請」自動組成國際標準 FHIR 格式、
+        並用<strong>健保官方的規則先自我對答案</strong>的示範。目的:<strong>該補的先補、會被退的先擋</strong>,少送冤枉件。
     </p>
-    <p class="text-muted small mb-0">產(Assemble) → 驗(Pre-check) → 查(CQL self-check) → 送(POST) → 回(ClaimResponse)。此頁做到「查」。</p>
+    <div class="mb-3">
+        <strong>怎麼用:</strong>
+        <ol class="mb-0">
+            <li>下面選一個<strong>案子</strong>(例:癌症藥物送核)</li>
+            <li>勾<strong>「送 CQL 自查」</strong>(要看健保規則判決就勾;背後有一台規則引擎在跑)</li>
+            <li>按<strong>「跑一次」</strong> → 看下面長出:組好的資料、檢查、三態判決</li>
+        </ol>
+    </div>
+    <div class="d-flex flex-wrap align-items-center gap-2 small">
+        <span class="badge bg-primary">① 產</span><span>組出 FHIR Bundle</span>
+        <span class="text-muted">→</span>
+        <span class="badge bg-primary">② 驗</span><span>藥↔適應症檢查</span>
+        <span class="text-muted">→</span>
+        <span class="badge bg-primary">③ 查</span><span>官方 CQL 規則自查</span>
+        <span class="text-muted">→</span>
+        <span class="badge bg-secondary">④ 送</span><span class="text-muted">POST 給健保</span>
+        <span class="text-muted">→</span>
+        <span class="badge bg-secondary">⑤ 回</span><span class="text-muted">核定回應</span>
+        <span class="ms-1 text-muted">(此頁做到 ①②③)</span>
+    </div>
+    <div class="mt-3 small">
+        看不懂上面在說什麼?→
+        <a asp-page="/Learn">CQL &amp; FHIR 問答</a>(它是什麼)‧
+        <a asp-page="/Wiring">CQL 怎麼串</a>(背後怎麼運作)
+    </div>
 </div>
 
 <form method="post" class="card card-body mb-4">
