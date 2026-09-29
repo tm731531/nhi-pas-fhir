@@ -18,6 +18,8 @@ impl/python/build/
 impl/csharp/**/bin/
 impl/csharp/**/obj/
 impl/csharp/build/
+demo/**/bin/
+demo/**/obj/
 
 # internal AI-dev config (local only, not project source)
 CLAUDE.md

@@ -1,0 +1,135 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "NHI 事前審查 — Demo";
+    string OutcomeBadge(NhiPasFhir.Core.CqlOutcome o) => o switch
+    {
+        NhiPasFhir.Core.CqlOutcome.Pass => "bg-success",
+        NhiPasFhir.Core.CqlOutcome.WouldBeRejected => "bg-danger",
+        NhiPasFhir.Core.CqlOutcome.DataMissing => "bg-warning text-dark",
+        _ => "bg-secondary",
+    };
+    string OutcomeText(NhiPasFhir.Core.CqlOutcome o) => o switch
+    {
+        NhiPasFhir.Core.CqlOutcome.Pass => "通過 (Pass)",
+        NhiPasFhir.Core.CqlOutcome.WouldBeRejected => "會被核刪 (WouldBeRejected)",
+        NhiPasFhir.Core.CqlOutcome.DataMissing => "缺資料待補件 (DataMissing)",
+        _ => "未評估 (NotEvaluated)",
+    };
+}
+
+<div class="mb-4">
+    <h1 class="h3">健保事前審查 (TWPAS) — 送核 Demo</h1>
+    <p class="text-muted mb-1">
+        這個 sample 吃 <code>NhiPasFhir</code> lib:選一個案子 → 組出 FHIR Bundle(產)→ 跑 pipeline
+        的種子檢查(驗)→ 可選地送官方 CQL 規則自查(查)→ 顯示三態判決。
+    </p>
+    <p class="text-muted small mb-0">產(Assemble) → 驗(Pre-check) → 查(CQL self-check) → 送(POST) → 回(ClaimResponse)。此頁做到「查」。</p>
+</div>
+
+<form method="post" class="card card-body mb-4">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-6">
+            <label class="form-label fw-semibold">案子 (Case)</label>
+            <select class="form-select" asp-for="SelectedCase">
+                @foreach (var c in IndexModel.Cases)
+                {
+                    <option value="@c.Key">@c.Label</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-4">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" asp-for="RunCql" id="runCql">
+                <label class="form-check-label" for="runCql">送 CQL 自查(需 CQF-Ruler server :8095)</label>
+            </div>
+        </div>
+        <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-primary">跑一次</button>
+        </div>
+    </div>
+</form>
+
+@if (Model.HasResult)
+{
+    <div class="alert @(Model.Blocked ? "alert-danger" : "alert-success") d-flex align-items-center">
+        <strong class="me-2">@(Model.Blocked ? "⛔ 擋下 (Blocked)" : "✅ 放行 (Clear)")</strong>
+        <span class="small">@Model.Advisory</span>
+    </div>
+
+    @if (Model.CqlError is not null)
+    {
+        <div class="alert alert-warning small">
+            CQL 自查未執行(已改為只組裝):@Model.CqlError
+        </div>
+    }
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header fw-semibold">驗 — 種子檢查 (drug ↔ indication)</div>
+                <div class="card-body">
+                    @if (Model.Findings.Count == 0)
+                    {
+                        <p class="text-muted mb-0">無 finding。</p>
+                    }
+                    else
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var f in Model.Findings)
+                            {
+                                <li class="list-group-item px-0">
+                                    <span class="badge @(f.Severity == "error" ? "bg-danger" : "bg-warning text-dark") me-2">@f.Severity</span>
+                                    <code>@f.DrugCode</code> @(f.IndicationCode is null ? "" : $"↔ {f.IndicationCode}")
+                                    <div class="small text-muted">@f.Message</div>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header fw-semibold">查 — CQL 送前自查</div>
+                <div class="card-body">
+                    @if (Model.Cql is null || Model.Cql.Outcome == NhiPasFhir.Core.CqlOutcome.NotEvaluated)
+                    {
+                        <p class="mb-1"><span class="badge bg-secondary">未評估</span></p>
+                        <p class="small text-muted mb-0">
+                            @(Model.RunCql ? "此案無對應 CQL 規則,或引擎未回結果。" : "未勾選 CQL 自查。勾選並確保 :8095 server 有跑。")
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="mb-2"><span class="badge @OutcomeBadge(Model.Cql.Outcome)">@OutcomeText(Model.Cql.Outcome)</span></p>
+                        @if (!string.IsNullOrEmpty(Model.Cql.RuleIds))
+                        {
+                            <p class="small mb-2">規則:<code>@Model.Cql.RuleIds</code></p>
+                        }
+                        <ul class="small mb-0">
+                            @foreach (var r in Model.Cql.Reasons)
+                            {
+                                <li>@r</li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header d-flex justify-content-between">
+            <span class="fw-semibold">產 — 組出的 FHIR Bundle</span>
+            <span class="text-muted small">@Model.EntryCount entries</span>
+        </div>
+        <div class="card-body">
+            <details>
+                <summary class="mb-2" style="cursor:pointer">展開 Bundle JSON</summary>
+                <pre style="max-height:520px; overflow:auto; background:#0d1117; color:#c9d1d9; padding:1rem; border-radius:.5rem;"><code>@Model.BundleJson</code></pre>
+            </details>
+        </div>
+    </div>
+}
