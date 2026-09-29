@@ -1,0 +1,16 @@
+# CQF-Ruler — a faithful CQL/ELM engine as a standalone FHIR server (option C).
+# Tom's replaceability invariant: our contract is (Bundle in -> verdict out). The rules live
+# in THIS server, not in our C# code. So a rule/IG update = reload the package here and re-run
+# the SAME Bundle — no C# change. Swapping the engine = swap only the ICqlEngine HTTP adapter.
+#
+# 8080/8090 are taken on this host, so we expose on 8095.
+services:
+  cqf-ruler:
+    image: contentgroup/cqf-ruler:latest
+    container_name: nhi-pas-cqf-ruler
+    ports:
+      - "8095:8080"
+    environment:
+      # keep it modest; this is a dev/pre-check engine, not a production data store
+      JAVA_OPTS: "-Xmx2g"
+    restart: unless-stopped

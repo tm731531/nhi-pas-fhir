@@ -41,3 +41,26 @@
 6. 逐 library 確認是否需 terminology server。
 
 **狀態:CQL IG 仍 v0.0.1 draft(規則會變)。框架插槽已備好;接引擎待其穩定或商業需要時投入。**
+
+## 6. 落地進度 — 選 C:CQF-Ruler 忠實引擎(2026-09-29)
+
+決策(decision-server):(1) 補 InCodeSystem 選 **B=接忠實引擎**;(2) 實現方式選 **C=CQF-Ruler / HAPI
+clinical-reasoning 整台 FHIR server(docker),C# 打它 API**。理由:最乾淨分離、可獨立換。
+
+**Tom 的替換不變量:契約 = 「Bundle 進 → 三態出」。規則住在 server 不住在 C# code。** 故規則/IG 改版 =
+重載 package + 拿同一份 Bundle **重跑**(C# 不改);換引擎 = 只換 `ICqlEngine` 那個 HTTP 轉接器。
+
+已驗證(`cql-engine/server/`):
+- ✅ `docker compose up` 起 cqf-ruler(HAPI FHIR 7.4.2 / R4),`http://localhost:8095/fhir`。operation:`$cql`、`Library/$evaluate`。
+- ✅ 引擎會跑(`$cql` `5+3`→8)。
+- ✅ **關鍵驗證:這版引擎忠實實作 `InCodeSystem`** —— 存一個 `text/cql` 的最小 library
+  `Code 'C90.00' from ICD2023 in ICD2023` → `$evaluate` 回 **true**,且**不必先載整包 terminology**。
+  這正是 cql-execution 3.3.2 做不到(build→null)、選忠實引擎要解的那點。**證實成立。**
+- ✅ `load-libraries.mjs` 可重跑:把 `../elm/*.json` 包成 Library resource 載入(url 對齊 include canonical,
+  FHIRHelpers→HL7 path,呼應 JS 端 LenientRepository 的同一個 mismatch)。
+
+**唯一剩下的(有邊界):** HAPI-CR 的 `Library/$evaluate` 是從 **CQL 文字(text/cql)** 載 source,不吃我們
+vendored 的 raw `application/elm+json`(真規則噴 "Could not load source … version null";text/cql 版就成功)。
+我們當初只抽了 4 個 ELM、沒帶 `.cql`。→ **下一步:從官方 `tw.gov.mohw.nhi.cql` package 抓規則的 `.cql` 文字
+一起 vendor 進 `cql-engine/elm/`(或新 `cql/`),再走已證實可行的 text/cql 路徑,即可讓真規則跑出核准/核刪。**
+(或改用 HAPI-CR 吃 elm+json 的設定,但取得 .cql 較直接。)
