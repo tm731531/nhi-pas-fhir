@@ -58,10 +58,10 @@
         <span class="text-muted">→</span>
         <span class="badge bg-primary">③ 查</span><span>官方 CQL 規則自查</span>
         <span class="text-muted">→</span>
-        <span class="badge bg-secondary">④ 送</span><span class="text-muted">POST 給健保</span>
+        <span class="badge bg-primary">④ 送</span><span>送到(假)收件端</span>
         <span class="text-muted">→</span>
-        <span class="badge bg-secondary">⑤ 回</span><span class="text-muted">核定回應</span>
-        <span class="ms-1 text-muted">(此頁做到 ①②③)</span>
+        <span class="badge bg-primary">⑤ 回</span><span>收件回應(審核中)</span>
+        <span class="ms-1 text-muted">(③④ 勾選才示範;④ 送的是假收件端,非真健保)</span>
     </div>
     <div class="mt-3 small">
         看不懂上面在說什麼?→
@@ -84,7 +84,11 @@
         <div class="col-md-4">
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" asp-for="RunCql" id="runCql">
-                <label class="form-check-label" for="runCql">送 CQL 自查(需 CQF-Ruler server :8095)</label>
+                <label class="form-check-label" for="runCql">③ 查:送 CQL 自查(需 :8095 引擎)</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" asp-for="DoSubmit" id="doSubmit">
+                <label class="form-check-label" for="doSubmit">④ 送:送到(假)健保收件端</label>
             </div>
         </div>
         <div class="col-md-2 d-grid">
@@ -170,6 +174,39 @@
             </div>
         </div>
     </div>
+
+    @if (Model.Submitted)
+    {
+        <div class="card mt-4 border-info">
+            <div class="card-header fw-semibold">送 → 回 — 送到(假)健保收件端</div>
+            <div class="card-body">
+                <p class="mb-2">
+                    <span class="badge @(Model.SubmitAccepted ? "bg-info text-dark" : "bg-danger")">
+                        @(Model.SubmitAccepted ? "④ 已送出 · 收件端已收下" : "④ 送出失敗")
+                    </span>
+                    @if (Model.SubmitAccepted)
+                    {
+                        <span class="badge bg-warning text-dark ms-1">⑤ 回:@(Model.SubmitStatus) · 審核中</span>
+                    }
+                </p>
+                <p class="small mb-2">@Model.SubmitMessage</p>
+                @if (Model.SubmitAccepted)
+                {
+                    <div class="alert alert-warning small mb-2">
+                        ⚠️ <strong>收下 ≠ 核准。</strong>收件端回的是 <code>queued(審核中)</code> —— 只是「受理了」;
+                        真正的核定(核准 / 核刪 / 補件)是<strong>事後</strong>才有。這正是為什麼要在送之前先做 ③ 查。
+                    </div>
+                }
+                @if (Model.SubmitResponseJson is not null)
+                {
+                    <details>
+                        <summary class="mb-2" style="cursor:pointer">展開 健保回應 Bundle(ClaimResponse)</summary>
+                        <pre style="max-height:420px; overflow:auto; background:#0d1117; color:#c9d1d9; padding:1rem; border-radius:.5rem;"><code>@Model.SubmitResponseJson</code></pre>
+                    </details>
+                }
+            </div>
+        </div>
+    }
 
     <div class="card mt-4">
         <div class="card-header fw-semibold">FHIR 各個體制 — 這份 Bundle 裡的資源</div>

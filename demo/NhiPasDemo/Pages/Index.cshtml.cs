@@ -26,6 +26,7 @@ public class IndexModel : PageModel
 
     [BindProperty] public string SelectedCase { get; set; } = "cancer";
     [BindProperty] public bool RunCql { get; set; }
+    [BindProperty] public bool DoSubmit { get; set; }
 
     public bool HasResult { get; private set; }
     public bool Blocked { get; private set; }
@@ -37,6 +38,13 @@ public class IndexModel : PageModel
     public int EntryCount { get; private set; }
     public IReadOnlyList<(string Type, int Count)> ResourceCounts { get; private set; } =
         Array.Empty<(string, int)>();
+
+    // 送 / 回
+    public bool Submitted { get; private set; }
+    public bool SubmitAccepted { get; private set; }
+    public string SubmitStatus { get; private set; } = "";
+    public string SubmitMessage { get; private set; } = "";
+    public string? SubmitResponseJson { get; private set; }
 
     private static PACase CaseFor(string key) => key switch
     {
@@ -89,6 +97,26 @@ public class IndexModel : PageModel
                 .OrderByDescending(x => x.Item2)
                 .ThenBy(x => x.Key)
                 .ToList();
+
+            // ④ 送 → ⑤ 回 — POST the assembled Bundle to the (fake) NHI receiver via the lib's submitter.
+            if (DoSubmit)
+            {
+                var endpoint = _config["Submit:Endpoint"] ?? "http://localhost:5099/fake-nhi/submit";
+                var submitter = new HttpPasSubmitter(_httpFactory.CreateClient(), endpoint);
+                try
+                {
+                    var sr = submitter.Submit(result.Bundle);
+                    Submitted = true;
+                    SubmitAccepted = sr.Accepted;
+                    SubmitStatus = sr.Status;
+                    SubmitMessage = sr.Message;
+                    if (sr.Response is not null) SubmitResponseJson = Prettify(NhiPas.ToJson(sr.Response));
+                }
+                catch (Exception ex)
+                {
+                    Submitted = true; SubmitAccepted = false; SubmitMessage = ex.Message;
+                }
+            }
         }
         HasResult = true;
     }
