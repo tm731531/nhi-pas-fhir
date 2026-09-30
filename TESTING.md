@@ -45,12 +45,14 @@ re-blessed. This is what stops silent regressions between edits. (`GoldenTests`,
 
 ### 1. Live end-to-end integration
 `CqfRulerIntegrationTests` runs the real CQL engine (CQF-Ruler :8095) against a real emitted bundle.
-It **self-skips when the server is absent**, so CI stays green without the sidecar; the same adapter
-shape is covered offline by the transport stubs above.
+It uses **`[SkippableFact]`** — when the server is absent the test reports as **SKIPPED, not passed**
+(honest: a no-op that counts as green would lie), so CI stays green without the sidecar while telling
+the truth; the same adapter shape is covered offline by the transport stubs above.
 
 ## Two languages, one source of truth
 `impl/python/tests/` mirrors the core contracts (framework, pipeline, pre-check, bundle, smoke) so the
-language-agnostic `spec/` is proven by more than one implementation.
+language-agnostic `spec/` is proven by more than one implementation. **Both run in CI** — a `test` job
+(`dotnet test`) and a `python` job (`pytest`) — so neither language's contract can regress unnoticed.
 
 ## What is deliberately NOT claimed
 - The **CQL rules IG is v0.0.1 DRAFT**; the vendored rules are a snapshot and the drug→rule map currently

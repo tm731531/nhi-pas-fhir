@@ -7,8 +7,8 @@ using Xunit;
 
 /// <summary>維度3 end-to-end against the REAL faithful engine (option C). Requires the CQF-Ruler
 /// server up with the rules loaded:  cd cql-engine/server && docker compose up -d && node load-libraries.mjs
-/// If the server isn't reachable the tests no-op (so CI without the server stays green). This is the
-/// live counterpart to CqlTests.cs, which fakes the engine.</summary>
+/// If the server isn't reachable the tests report as SKIPPED (not passed) via [SkippableFact], so CI
+/// without the server stays green while telling the truth. Live counterpart to CqlTests.cs (fakes the engine).</summary>
 public class CqfRulerIntegrationTests
 {
     private const string BaseUrl = "http://localhost:8095/fhir";
@@ -20,10 +20,10 @@ public class CqfRulerIntegrationTests
         catch { return false; }
     }
 
-    [Fact]
+    [SkippableFact]
     public async System.Threading.Tasks.Task Engine_runs_the_real_rule_and_returns_named_results()
     {
-        if (!ServerUp()) return; // server not running — skip
+        Skip.IfNot(ServerUp(), "CQF-Ruler not reachable on :8095 — start it to run the live CQL test");
 
         var engine = new CqfRulerCqlEngine(Http, BaseUrl);
         var bundle = NhiPas.Build(Samples.CancerDrugCase());
@@ -36,10 +36,10 @@ public class CqfRulerIntegrationTests
         Assert.Equal(true, results["主要疾病ICD資料存在"]); // InCodeSystem membership evaluated
     }
 
-    [Fact]
+    [SkippableFact]
     public async System.Threading.Tasks.Task PreCheck_blocks_the_myeloma_bundle_against_the_breast_cancer_rule()
     {
-        if (!ServerUp()) return; // server not running — skip
+        Skip.IfNot(ServerUp(), "CQF-Ruler not reachable on :8095 — start it to run the live CQL test");
 
         var engine = new CqfRulerCqlEngine(Http, BaseUrl);
         var cql = new CqlPreCheck(engine,
