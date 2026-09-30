@@ -38,16 +38,23 @@ public class CqlTests
         Assert.False(r.Blocked);
     }
 
+    // The 補件/核刪 split is read from the rule's OWN 報告總結 sections (its branch-correct classifier),
+    // not re-derived — so the fakes here carry a realistic 報告總結 with the rule's two labelled sections.
+    private const string MissingReport =
+        "【▲不符合項目 - 必要資料未填寫】\n▲ 1規則1-2：未提供荷爾蒙受體(HR)檢測資料\n";
+    private const string ConditionReport =
+        "【▲不符合項目 - 條件或代碼不符合】\n▲ 1條件ICD代碼檢核：主要疾病之ICD代碼未使用C50\n";
+
     [Fact] public async Task On_data_missing_blocks_as_補件()
-    {   // final boolean false + a missing-data flag false → 補件
-        var cql = Enabled(new() { ["乳癌Abemaciclib申請結果_布林"] = false, ["1規則1-2=有填荷爾蒙受體(HR)檢測資料"] = false });
+    {   // boolean false + a 必要資料未填寫 item, no condition failure → 補件
+        var cql = Enabled(new() { ["乳癌Abemaciclib申請結果_布林"] = false, ["報告總結"] = MissingReport });
         var r = await Pipeline.RunAsync(Samples.CancerDrugCase(), cql: cql);
         Assert.Equal(CqlOutcome.DataMissing, r.Cql!.Outcome);
         Assert.True(r.Blocked);
     }
 
     [Fact] public async Task On_pass_ignores_a_false_alternative_leg()
-    {   // final boolean true wins even if an unused intermediate 有填 leg is false → NOT 補件
+    {   // final boolean true wins even if an unused intermediate leg is false → NOT 補件
         var cql = Enabled(new() { ["乳癌Abemaciclib申請結果_布林"] = true, ["1規則1-2-1=有填ER檢測資料"] = false });
         var r = await Pipeline.RunAsync(Samples.CancerDrugCase(), cql: cql);
         Assert.Equal(CqlOutcome.Pass, r.Cql!.Outcome);
@@ -63,12 +70,22 @@ public class CqlTests
     }
 
     [Fact] public async Task On_condition_not_met_blocks_as_核刪()
-    {
-        var cql = Enabled(new() { ["乳癌Abemaciclib申請結果_布林"] = false, ["報告總結"] = "HER2 未達陰性" });
+    {   // a 條件或代碼不符合 item → 核刪
+        var cql = Enabled(new() { ["乳癌Abemaciclib申請結果_布林"] = false, ["報告總結"] = ConditionReport });
         var r = await Pipeline.RunAsync(Samples.CancerDrugCase(), cql: cql);
         Assert.Equal(CqlOutcome.WouldBeRejected, r.Cql!.Outcome);
-        Assert.Contains("HER2", string.Join("", r.Cql.Reasons));
+        Assert.Contains("C50", string.Join("", r.Cql.Reasons));
         Assert.True(r.Blocked);
+    }
+
+    [Fact] public async Task When_both_sections_present_核刪_wins_and_no_reason_is_dropped()
+    {   // both missing-data AND a condition failure → 核刪 (harder gate), and BOTH reasons surface
+        var cql = Enabled(new() { ["乳癌Abemaciclib申請結果_布林"] = false, ["報告總結"] = ConditionReport + MissingReport });
+        var r = await Pipeline.RunAsync(Samples.CancerDrugCase(), cql: cql);
+        Assert.Equal(CqlOutcome.WouldBeRejected, r.Cql!.Outcome);
+        var reasons = string.Join("\n", r.Cql.Reasons);
+        Assert.Contains("C50", reasons);        // 核刪 reason not dropped
+        Assert.Contains("荷爾蒙受體", reasons);  // 補件 reason still listed
     }
 
     [Fact] public async Task NotWired_engine_fails_loud()

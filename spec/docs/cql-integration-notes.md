@@ -29,7 +29,10 @@
 - **`NoCqlPreCheck`**(off,預設)/ **`CqlPreCheck`**(on)。
 - **`CqlOutcome`** 三態:`Pass` / `WouldBeRejected`(核刪)/ `DataMissing`(補件)+ `NotEvaluated`。
 - **`ICqlEngine`** — ELM 執行引擎介面;已由 `CqfRulerCqlEngine` 實作(見 §6)。`NotWiredCqlEngine` 未接時 fail-loud。
-- `CqlPreCheck` 編碼了盲點 2/3:1:N 藥碼→規則、逐規則呼叫引擎、把具名輸出詮釋成三態(慣例:`…申請結果_布林`、`…報告總結`、`…資料存在/有填…`)。
+- `CqlPreCheck` 編碼了盲點 2/3:1:N 藥碼→規則、逐規則呼叫引擎、把具名輸出詮釋成三態。**判定法**:先看 `…申請結果_布林`
+  (true=通過,無此 key=NotEvaluated 不預設核刪);為 false 時,**補件/核刪的分類直接讀規則自己在 `…報告總結` 裡列的兩段**
+  (`【▲不符合項目 - 必要資料未填寫】`=補件、`【▲不符合項目 - 條件或代碼不符合】`=核刪,`（參考資訊）`不計判定),
+  而非自己用中間旗標猜 —— 因為規則已按初次/續用分支正確分類,且真正的分類旗標在 `BCReusable`、`$evaluate` 不回傳。核刪優先。
 - 測試:`CqlTests.cs`(off 無結果 / on 三態 / fail-loud)用假引擎驗膠水,不需真 runtime。
 
 ## 5. 未做(接真引擎時的工作)

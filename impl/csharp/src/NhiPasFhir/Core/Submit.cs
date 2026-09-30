@@ -42,8 +42,8 @@ public sealed class HttpPasSubmitter : IPasSubmitter
     public async Task<SubmitResult> SubmitAsync(Bundle claimBundle)
     {
         var body = new StringContent(FhirJson.Serialize(claimBundle), Encoding.UTF8, "application/fhir+json");
-        var resp = await _http.PostAsync(_endpoint, body);
-        var text = await resp.Content.ReadAsStringAsync();
+        var resp = await _http.PostAsync(_endpoint, body).ConfigureAwait(false);
+        var text = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         if (!resp.IsSuccessStatusCode)
             return new(false, ((int)resp.StatusCode).ToString(), null,

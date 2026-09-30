@@ -36,8 +36,8 @@ public sealed class CqfRulerCqlEngine : ICqlEngine
         input.Parameter.Add(new Parameters.ParameterComponent { Name = "data", Resource = bundle });
 
         var body = new StringContent(FhirJson.Serialize(input), Encoding.UTF8, "application/fhir+json");
-        var resp = await _http.PostAsync($"{_baseUrl}/Library/{ruleId}/$evaluate", body);
-        var text = await resp.Content.ReadAsStringAsync();
+        var resp = await _http.PostAsync($"{_baseUrl}/Library/{ruleId}/$evaluate", body).ConfigureAwait(false);
+        var text = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         // Fail loud on transport error, with the actual HTTP status (not a downstream parse error).
         if (!resp.IsSuccessStatusCode)

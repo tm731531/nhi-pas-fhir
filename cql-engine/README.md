@@ -12,6 +12,14 @@ cql-engine/
   README.md   ← you are here
 ```
 
+## Provenance & license of the vendored rules
+
+The `elm/` and `rules/Library-*.json` files are **official artifacts extracted from the NHI CQL
+Implementation Guide** (`tw.gov.mohw.nhi.cql`, published by 衛福部/健保署 at build.fhir.org). They are
+redistributed here for reference/testing under **NHI/MOHW's own terms**, and are **not** covered by this
+repository's Apache-2.0 license (which applies to our code). Re-sync them from the official IG; do not
+treat them as our work.
+
 ## The engine is not tied to one language
 
 The rules are shipped as **ELM** (CQL compiled to JSON) — a language-neutral format. *Any*

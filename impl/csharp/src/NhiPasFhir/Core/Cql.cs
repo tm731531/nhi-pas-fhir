@@ -78,27 +78,47 @@ public sealed class CqlPreCheck : ICqlPreCheck
     }
 
     /// <summary>把引擎回的『具名 expression 值』詮釋成三態。命名慣例取自實際規則的輸出 define:
-    /// 「…申請結果_布林」= 最終核准布林;「…報告總結」= 人可讀總結;「…資料存在 / 有填…」= 中間資料旗標。
-    /// 關鍵:先看『最終布林』。$evaluate 會回所有中間 define,而規則的布林代數本就允許某些 alt-path 腿為 false
-    /// (例:HR 走 ER 或 PR 任一即可)。若拿任一中間腿 false 就判補件,會把『其實會過』的案子誤報 → 先判布林。</summary>
+    /// 「…申請結果_布林」= 最終核准布林;「…報告總結」= 規則自己算好的人可讀分類報告。
+    /// 先看『最終布林』(true=通過,即使某些用不到的中間腿 false;無此 key=無法判定,絕不預設核刪)。
+    /// 布林為假時,**補件/核刪的分類直接讀規則自己在報告總結列的兩段**(規則已按初次/續用分支正確分類、附人話),
+    /// 不用 substring heuristic 自己猜中間旗標 —— 那會對續用案列出初次才要的資料、又看不到 Reusable 層旗標。
+    /// 「條件或代碼不符合」= 核刪(補件補不回,優先);「必要資料未填寫」= 補件;`（參考資訊）` 不計入判定但仍列出。</summary>
     private static (CqlOutcome, IReadOnlyList<string>) Interpret(string ruleId, IReadOnlyDictionary<string, object?> named)
     {
         var verdict = named.Where(kv => kv.Key.Contains("申請結果_布林")).Select(kv => kv.Value).ToList();
-
-        // 找不到最終布林 → 無法判定;絕不預設成核刪(那會誤把未知當拒絕)。
         if (verdict.Count == 0)
             return (CqlOutcome.NotEvaluated, new[] { $"[{ruleId}] 找不到『申請結果_布林』輸出,無法判定。" });
-
-        // 最終布林為真 = 通過(即使某些用不到的中間腿為 false)。
         if (verdict.Any(v => v is true)) return (CqlOutcome.Pass, new[] { $"[{ruleId}] 通過" });
 
-        // 布林為假才分辨:有必要資料未填 → 補件;否則 → 條件不符(核刪)。
-        var missing = named.Where(kv => (kv.Key.Contains("資料存在") || kv.Key.Contains("有填")) && kv.Value is false)
-                           .Select(kv => $"[{ruleId}] 缺:{kv.Key}").ToList();
-        if (missing.Count > 0) return (CqlOutcome.DataMissing, missing);
+        var report = named.FirstOrDefault(kv => kv.Key.Contains("報告總結")).Value as string;
+        if (string.IsNullOrEmpty(report))
+            return (CqlOutcome.WouldBeRejected, new[] { $"[{ruleId}] 條件不符:見規則(無報告總結)" });
 
-        var summary = named.FirstOrDefault(kv => kv.Key.Contains("報告總結")).Value as string;
-        return (CqlOutcome.WouldBeRejected, new[] { $"[{ruleId}] 條件不符:{summary ?? "見規則"}" });
+        var missing = ReportSection(report, "必要資料未填寫");
+        var condition = ReportSection(report, "條件或代碼不符合");
+        var reasons = condition.Select(x => $"[{ruleId}] 核刪:{x}")
+                     .Concat(missing.Select(x => $"[{ruleId}] 補件:{x}")).ToList();
+
+        static bool Counts(string item) => !item.Contains("參考資訊"); // 備註明載參考資訊不作最終判定依據
+        if (condition.Any(Counts)) return (CqlOutcome.WouldBeRejected, reasons); // 核刪優先:補件補不回
+        if (missing.Any(Counts)) return (CqlOutcome.DataMissing, reasons);
+        return (CqlOutcome.WouldBeRejected, reasons.Count > 0 ? reasons : new[] { $"[{ruleId}] 條件不符:見規則" });
+    }
+
+    /// <summary>Pull the `▲` item lines under a 報告總結 section whose header contains <paramref name="headerContains"/>
+    /// (e.g. 「必要資料未填寫」/「條件或代碼不符合」), stopping at the next 【…】 header. This is the rule's OWN
+    /// branch-correct classification + human text — we read it, we don't re-derive it.</summary>
+    private static List<string> ReportSection(string report, string headerContains)
+    {
+        var items = new List<string>();
+        var inSection = false;
+        foreach (var raw in report.Replace("\r", "").Split('\n'))
+        {
+            var line = raw.Trim();
+            if (line.StartsWith("【")) inSection = line.Contains(headerContains);
+            else if (inSection && line.StartsWith("▲")) items.Add(line.TrimStart('▲', ' '));
+        }
+        return items;
     }
 }
 
@@ -106,7 +126,9 @@ public sealed class CqlPreCheck : ICqlPreCheck
 public sealed class NotWiredCqlEngine : ICqlEngine
 {
     public Task<IReadOnlyDictionary<string, object?>> EvaluateAsync(string ruleId, Bundle bundle)
-        => throw new NotSupportedException(
+        // Surface via a faulted Task (not a synchronous throw) so Task.WhenAll / deferred-await
+        // composition sees the failure at the right point.
+        => Task.FromException<IReadOnlyDictionary<string, object?>>(new NotSupportedException(
             "CQL 引擎尚未接上。請接一個 sidecar(JS cql-execution / Java cqframework / CQF-Ruler)," +
-            "載入規則 ELM 的完整依賴閉包後執行。見 spec/docs/cql-integration-notes.md。");
+            "載入規則 ELM 的完整依賴閉包後執行。見 spec/docs/cql-integration-notes.md。"));
 }
