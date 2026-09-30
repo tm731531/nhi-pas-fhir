@@ -75,6 +75,16 @@ public static class Samples
         Created: "2024-01-01",
         Data: new Dictionary<string, object>());
 
+    /// <summary>電子處方箋 (nhi.empd) — reproduces the official example Bundle-bun-ep. Fabricated data.</summary>
+    public static PACase EPrescriptionCase() => new(
+        Ig: "tw.gov.mohw.nhi.empd#0.1.0", CaseType: "e-prescription",
+        Patient: new Dictionary<string, string>
+        { ["id_card"] = "Z199999829", ["name"] = "甄○康", ["gender"] = "female", ["birth_date"] = "1985-01-02" },
+        Provider: new Dictionary<string, string>(),
+        Vitals: new Dictionary<string, double>(),
+        Created: "2024-02-19",
+        Data: new Dictionary<string, object>());
+
     /// <summary>NHI decision (核定回應) — fabricated. Claim-level 同意 (approve-comment "1"), with two
     /// medical orders as item.detail[] (exercises the item(1)+detail(N) cardinality of ClaimResponse-twpas).</summary>
     public static ResponseCase ResponseCase() => new(

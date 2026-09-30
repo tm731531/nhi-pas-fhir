@@ -85,4 +85,21 @@ public static class Sys
     public const string Tpech = "https://tpech.gov.taipei";           // 院內病歷號 assigning authority (example)
     public const string BcpImg = "urn:ietf:bcp:13";                    // image media type
     public const string RfcUri = "urn:ietf:rfc:3986";                  // DICOM SOP class as URI
+    public const string CondCategory = "http://terminology.hl7.org/CodeSystem/condition-category";
+
+    // --- 電子處方箋與調劑 (nhi.empd 0.1.0) — transcribed from the official example Bundle-bun-ep. ---
+    public const string EmpdBase = "https://nhicore.nhi.gov.tw/empd";
+    public const string EmpdSd = EmpdBase + "/StructureDefinition";
+    public const string EmpdCaseType = EmpdBase + "/CodeSystem/CaseType-cs";
+    public const string EmpdPaymentCategory = EmpdBase + "/CodeSystem/PaymentCategory-cs";
+    public const string EmpdTypeOfPrescription = EmpdBase + "/CodeSystem/TypeOfPrescription-cs";
+    public const string EmpdOrderType = EmpdBase + "/CodeSystem/OrderType-cs";
+    public const string EmpdSelfpayStatus = EmpdBase + "/CodeSystem/SelfpayStatus-cs";
+    public const string EmpdExtTotalDuration = EmpdSd + "/Extension-TotalDuration";
+    public const string MoiSlash = "http://www.moi.gov.tw/";           // note: empd uses a trailing slash
+    public const string Hpio = "http://ns.electronichealth.net.au/id/hi/hpio/1.0";  // Org identifier (example)
+    public const string MohwSlash = "https://www.mohw.gov.tw/";        // practitioner qualification id
+    public const string ExtPersonAge = TwcoreSd + "/person-age";
+    public const string MedicationNhiTw = "https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/medication-nhi-tw";
+    public const string MedicationPathTw = "https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/medication-path-tw";
 }
