@@ -40,17 +40,26 @@ patient's case; the library speaks FHIR.** It is a payload factory + validator g
 | 核定回應 (NHI decision / ClaimResponse) | — | Bundle-bun-response |
 | OperationOutcome (error report) | — | error-example |
 
-Filing category (送核/補件/申復/爭議/申復補件) × application category (一般/自主/緊急) and all 50 NHI
-departments are parameterized. **43/43 instantiable IG profiles** are exercised. See
-[spec/docs/COVERAGE.md](spec/docs/COVERAGE.md).
+Filing category (送核/補件/申復/爭議/申復補件) × application category (一般/自主/緊急) are parameterized,
+and the department field accepts any NHI department code. **40/40 profiles + 3/3 extensions** of the PAS
+IG are exercised (logical models are non-instantiable). See [spec/docs/COVERAGE.md](spec/docs/COVERAGE.md).
+
+> **Scope today:** this repo implements **one** IG — 事前審查 (`nhi.pas`) — with **two** case assemblers
+> (癌藥 · 免疫製劑). The other published Taiwan IGs (重大傷病, 電子處方箋, NGS, EMR, 傳染病…) are on the
+> roadmap, built the same way, one at a time. 長照 has **no published FHIR IG yet**. We never claim what
+> isn't built.
 
 ## CQL pre-submit self-check (送前核刪自查)
 
 The NHI publishes its reimbursement rules as **CQL** (Clinical Quality Language, IG
-`tw.gov.mohw.nhi.cql`, ~66 drug rules compiled to **ELM**). Before you POST, this framework can run the
-**same official rules** against your Bundle and predict the outcome — so you send only what will pass and
-hold back what would be **核刪 (post-payment clawback)** or needs **補件 (missing data)**. Three-state
-output: **Pass / WouldBeRejected / DataMissing** (not a naive pass/fail).
+`tw.gov.mohw.nhi.cql`, ~66 drug rules compiled to **ELM**). Before you POST, this framework runs the NHI's
+**own official rules** — faithfully, on a real engine — against your Bundle and predicts the outcome, so
+you send only what will pass and hold back what would be **核刪 (post-payment clawback)** or needs **補件
+(missing data)**. Three-state output: **Pass / WouldBeRejected / DataMissing** (not a naive pass/fail).
+
+> **Scope today:** proven **end-to-end on one rule** (乳癌 Abemaciclib). "~66" is the size of the NHI
+> catalogue, **not** what this repo has vendored — loading more rules is a data task (see
+> [cql-integration-notes.md](spec/docs/cql-integration-notes.md)), tracked, in progress.
 
 - Faithful engine: a **CQF-Ruler / HAPI clinical-reasoning** server runs the ELM (it implements
   `InCodeSystem`, which lightweight engines do not) — `cql-engine/` (docker + loader + official rules).
@@ -128,7 +137,7 @@ This is AI-assisted code, so correctness is **machine-proven in layers**, not as
 is in **[TESTING.md](TESTING.md)**. In short:
 
 - **6 bundle types × `0 errors`** against the **official HL7 validator** (an authority outside the AI).
-- **14 byte-for-byte golden baselines** + **48 test cases** (`dotnet test`) — pipeline, CQL three-state,
+- **14 byte-for-byte golden baselines** + **48 test cases** (46 CI-enforced + 2 live-integration) (`dotnet test`) — pipeline, CQL three-state,
   transport adapters, fail-loud seams, live engine integration; mirrored by Python tests.
 - **3 independent adversarial review passes** (IG conformance, CQL conformance, architecture/security) —
   the layer that catches "plausible but wrong", which unit tests miss.

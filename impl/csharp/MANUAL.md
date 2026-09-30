@@ -148,7 +148,7 @@ Bundle b = NhiPas.BuildResponse(resp);
 
 ```bash
 export PATH="$HOME/.dotnet:$PATH"
-dotnet test                                    # 20 tests(含 byte-for-byte golden 回歸)
+dotnet test                                    # 見 TESTING.md(48 test cases)
 dotnet run --project samples/Emit              # 產出 build/*.cs.json
 tools/validate.sh impl/csharp/build/pa-bundle.cs.json   # 官方 validator:0 errors = 合規
 ```
@@ -157,7 +157,7 @@ tools/validate.sh impl/csharp/build/pa-bundle.cs.json   # 官方 validator:0 err
 
 ## 12. 完成的定義
 每個案件「done」= `dotnet test` 全綠 **且** bundle 過官方 validator **0 errors**(結構+術語)。
-目前 20 tests 綠、五種 bundle 全 0 errors。
+測試策略見 TESTING.md;五種 bundle 全 0 errors。
 
 ## 13. 尚未涵蓋(見 `spec/docs/COVERAGE.md`)
 讀回應解析(Client 端)· pre-check 完整規則 · Server/SearchParameter(是甲方平台的事,乙方 lib 不做)。

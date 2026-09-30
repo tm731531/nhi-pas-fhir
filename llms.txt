@@ -13,7 +13,7 @@
   `hl7.fhir.us.davinci-pas`. CQL rules IG: `tw.gov.mohw.nhi.cql` (draft, ~66 drug rules as ELM).
 - Correctness is machine-proven: the official HL7 FHIR validator at 0 errors (structural + terminology),
   never asserted. No real patient data — all identifiers fabricated.
-- 43/43 instantiable IG profiles exercised; all 50 NHI departments + filing/application categories
+- 40/40 profiles + 3/3 extensions exercised; the department field + filing/application categories
   parameterized.
 
 ## What it is / is not
