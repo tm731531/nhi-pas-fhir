@@ -1,0 +1,10 @@
+# Synthetic 門診 medical-expense media-declaration record — FABRICATED identifiers only.
+# Keyed by the OFFICIAL field IDs (t/d/p) from the spec (版更 112.08.25). This is a readable
+# stand-in: the real filing is fixed-width / XML per the spec — this file demonstrates the FIELD
+# MAPPING, not the byte-level parser. One line per segment: <seg>|<id>=<value>|...
+# See spec/docs/media-declaration-to-fhir.md for every field's meaning and its FHIR target.
+
+t|t1=10|t2=1234567890|t3=11305|t4=2|t5=1|t6=1130610
+d|d1=01|d2=000001|d3=A123456789|d11=0850312|d8=03|d9=1130520|d10=1130520|d19=E1140|d20=I10|d29=0001|d30=B234567890|d15=000
+p|p3=1|p13=001|p4=BC12345100|p5=1|p7=TIDPC|p9=PO|p1=30|p10=30|p11=5|p12=150
+p|p3=2|p13=002|p4=47029C|p10=1|p11=200|p12=200|p16=B234567890

@@ -125,6 +125,7 @@ maps to the real class/file/numbers. Open it locally, or serve it from GitHub Pa
 ## Docs
 
 - [NHI↔FHIR MIGRATION](spec/docs/nhi-fhir-migration.md) — how 健保 data maps to/from FHIR (媒體申報 · FHIR IG · 長照 三個世界), and how an existing HIS/EMR migrates in stages
+- [MEDIA-DECLARATION↔FHIR](spec/docs/media-declaration-to-fhir.md) — the mainstream 醫療費用申報 media/XML format (總表段/點數清單段/醫令清單段, real field IDs) mapped to a FHIR Claim graph, with a reference converter
 - [EXPLAINER](spec/docs/EXPLAINER.md) — what FHIR is, for a systems owner (not a FHIR expert)
 - [ARCHITECTURE](spec/docs/ARCHITECTURE.md) — interface → abstract → implementation + factory
 - [CASE-CATALOG](spec/docs/CASE-CATALOG.md) — every case type, lifecycle, class hierarchy
