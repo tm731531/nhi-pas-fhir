@@ -75,6 +75,25 @@ FHIR 把一筆申請拆成「一份文件（Bundle）裝很多資源（Resource�
 程式對應:`NhiPas.Build(case)` 產 Bundle、`Pipeline.RunAsync(case, cql:)` 跑產→驗→查。你只給一個中性的
 `PACase`（完全不碰 FHIR),工具把它翻成 FHIR。**這就是「既有系統怎麼接」的答案:你的系統給資料,工具講 FHIR。**
 
+### 「真的打」一台真 server（免憑證,可現在就做）
+
+真送健保要 HCA 憑證 + VPN(見第七節),但你**現在就能把產出真的 POST 到公開 FHIR 測試 server**
+證明它是真 server 收得下的合法 FHIR:`tools/post-to-public-server.sh <bundle.json>`（預設打
+公開 HAPI R4,`FHIR_BASE` 可換）。它會印回每個 resource 的真實 server id + 可點連結。
+
+⚠️ **這條路教會的真實規矩**(把一份 collection bundle 真的送上 server 會遇到的):
+1. **collection 直接 POST** → 整包存成一個 `Bundle` resource,裡面的 `Claim` **不會**變成可查詢的
+   top-level 資源。要讓每個資源各自落地,得送 **transaction**。
+2. **單獨 POST 一個帶參照的資源** → 真 server 退件(HAPI `Resource ... not found in path Claim.provider`):
+   被指到的 `Organization` 還沒建 → **參照完整性**。解法:transaction 一次建完、參照一起解。
+3. **transaction 要用 `POST` + `urn:uuid` fullUrl、且 body 不要帶 `id`** → 讓 server 配新 id、自己解
+   內部參照;用固定 `Type/id` 在共享 server 會**跨 run 撞名**。
+4. **真 server 常對 business identifier 去重**(HAPI:同 identifier 第二次 → `HAPI-2840 duplicate`)→
+   測試時每次 run 要換 identifier(工具已自動加隨機尾碼,因全是假資料)。
+
+**但要誠實**:通用 HAPI/Firely server **不驗台灣 IG**(把 `meta.profile` 當標籤存、不強制),所以
+「真的被收下」≠「過台灣 IG」——後者仍是 `tools/validate.sh` 用官方 validator 的活,兩回事。
+
 ---
 
 ## 五、另一個方向:媒體申報 XML ↔ FHIR（研究中）

@@ -24,7 +24,7 @@ Flow: **產 (assemble) → 驗 (seed check) → 查 (CQL) → 送 (submit) → �
 | `impl/python/` | Reference implementation (pydantic). |
 | `cql-engine/` | The CQL engine: `rules/` (official Library resources, text/cql), `elm/` (compiled), `server/` (CQF-Ruler docker + loader), `js/` (a historical JS runner). |
 | `demo/NhiPasDemo/` | ASP.NET Core Razor Pages app consuming the library (the whole flow). |
-| `tools/` | `fetch_validation_assets.sh` (validator + IG package), `validate.sh` (official HL7 validator wrapper). |
+| `tools/` | `fetch_validation_assets.sh` (validator + IG package), `validate.sh` (official HL7 validator wrapper), `post-to-public-server.sh` (really POST a bundle to a live public FHIR server — no creds). |
 | `docs/` | GitHub Pages: `index.html` landing + `flow.html` interactive diagram. |
 
 ## Setup / build / test / run (copy-paste)
