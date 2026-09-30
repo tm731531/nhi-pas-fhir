@@ -124,6 +124,7 @@ maps to the real class/file/numbers. Open it locally, or serve it from GitHub Pa
 
 ## Docs
 
+- [NHI↔FHIR MIGRATION](spec/docs/nhi-fhir-migration.md) — how 健保 data maps to/from FHIR (媒體申報 · FHIR IG · 長照 三個世界), and how an existing HIS/EMR migrates in stages
 - [EXPLAINER](spec/docs/EXPLAINER.md) — what FHIR is, for a systems owner (not a FHIR expert)
 - [ARCHITECTURE](spec/docs/ARCHITECTURE.md) — interface → abstract → implementation + factory
 - [CASE-CATALOG](spec/docs/CASE-CATALOG.md) — every case type, lifecycle, class hierarchy
