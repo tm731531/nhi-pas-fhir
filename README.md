@@ -122,6 +122,19 @@ maps to the real class/file/numbers. Open it locally, or serve it from GitHub Pa
 - [IG-TRACEABILITY](spec/docs/IG-TRACEABILITY.md) — every official IG artifact ↔ where we cover it (change detector)
 - [CONTRACTS-and-TESTS](spec/docs/CONTRACTS-and-TESTS.md) — the contracts and test plan
 
+## Quality & testing
+
+This is AI-assisted code, so correctness is **machine-proven in layers**, not asserted — the full story
+is in **[TESTING.md](TESTING.md)**. In short:
+
+- **6 bundle types × `0 errors`** against the **official HL7 validator** (an authority outside the AI).
+- **14 byte-for-byte golden baselines** + **48 test cases** (`dotnet test`) — pipeline, CQL three-state,
+  transport adapters, fail-loud seams, live engine integration; mirrored by Python tests.
+- **3 independent adversarial review passes** (IG conformance, CQL conformance, architecture/security) —
+  the layer that catches "plausible but wrong", which unit tests miss.
+
+[![CI](https://github.com/tm731531/nhi-pas-fhir/actions/workflows/ci.yml/badge.svg)](https://github.com/tm731531/nhi-pas-fhir/actions/workflows/ci.yml)
+
 ## Principles
 
 - **Never fabricate FHIR fields** — every value is transcribed from the authoritative IG package.
