@@ -42,8 +42,7 @@ public class CqfRulerIntegrationTests
         Skip.IfNot(ServerUp(), "CQF-Ruler not reachable on :8095 — start it to run the live CQL test");
 
         var engine = new CqfRulerCqlEngine(Http, BaseUrl);
-        var cql = new CqlPreCheck(engine,
-            new Dictionary<string, IReadOnlyList<string>> { ["BC27730100"] = new[] { "BCAbemaciclibRule1" } });
+        var cql = new CqlPreCheck(engine, DrugRuleMap.Default);   // the committed 藥碼→規則 map
 
         var r = await Pipeline.RunAsync(Samples.CancerDrugCase(), cql: cql);
 

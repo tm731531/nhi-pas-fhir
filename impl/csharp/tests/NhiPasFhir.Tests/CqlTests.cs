@@ -30,6 +30,20 @@ public class CqlTests
         Assert.NotNull(r.Bundle);
     }
 
+    [Fact] public void DrugRuleMap_has_the_verified_rule()
+    {
+        Assert.Equal(new[] { "BCAbemaciclibRule1" }, DrugRuleMap.Default["BC27730100"]);
+        Assert.Contains("BC27730100", DrugRuleMap.CoveredDrugs);
+    }
+
+    [Fact] public async Task Uncovered_drug_is_NotEvaluated_never_fabricated()
+    {
+        // A drug with no loaded rule must fail loud (NotEvaluated), not guess a verdict.
+        var cql = new CqlPreCheck(new FakeEngine(new()), DrugRuleMap.Default);
+        var result = await cql.EvaluateAsync(NhiPas.Build(Samples.CancerDrugCase()), "ZZ99999999");
+        Assert.Equal(CqlOutcome.NotEvaluated, result.Outcome);
+    }
+
     [Fact] public async Task On_pass_when_result_bool_true()
     {
         var cql = Enabled(new() { ["乳癌Abemaciclib申請結果_布林"] = true });

@@ -66,8 +66,7 @@ public class IndexModel : PageModel
             var baseUrl = _config["Cql:BaseUrl"] ?? "http://localhost:8095/fhir";
             var engine = new CqfRulerCqlEngine(_httpFactory.CreateClient(), baseUrl);
             // drug → rule(s). Only the cancer sample's drug is mapped in this demo; others → NotEvaluated.
-            var map = new Dictionary<string, IReadOnlyList<string>> { ["BC27730100"] = new[] { "BCAbemaciclibRule1" } };
-            cql = new CqlPreCheck(engine, map);
+            cql = new CqlPreCheck(engine, DrugRuleMap.Default);   // single source of truth for 藥碼→規則
         }
 
         PipelineResult result;

@@ -5,7 +5,7 @@ FHIR — is output that is **plausible but wrong**: it compiles, it looks right,
 a bundle the NHI will 核刪 (claw back payment for). So correctness here is never asserted; it is
 **machine-proven, in layers**, against an authority outside the AI. This page is that story.
 
-Run everything with: `dotnet test impl/csharp/NhiPasFhir.sln` (61 test cases: 59 CI-enforced + 2 live-integration). See also the detailed
+Run everything with: `dotnet test impl/csharp/NhiPasFhir.sln` (63 test cases: 61 CI-enforced + 2 live-integration). See also the detailed
 plan in [`spec/docs/CONTRACTS-and-TESTS.md`](spec/docs/CONTRACTS-and-TESTS.md).
 
 ## The layers (weakest guarantee at the bottom, strongest at the top)

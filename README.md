@@ -65,9 +65,12 @@ The NHI publishes its reimbursement rules as **CQL** (Clinical Quality Language,
 you send only what will pass and hold back what would be **核刪 (post-payment clawback)** or needs **補件
 (missing data)**. Three-state output: **Pass / WouldBeRejected / DataMissing** (not a naive pass/fail).
 
-> **Scope today:** proven **end-to-end on one rule** (乳癌 Abemaciclib). "~66" is the size of the NHI
-> catalogue, **not** what this repo has vendored — loading more rules is a data task (see
-> [cql-integration-notes.md](spec/docs/cql-integration-notes.md)), tracked, in progress.
+> **Scope today:** proven **end-to-end on one rule** (乳癌 Abemaciclib), indexed in the committed
+> 藥碼→規則 map (`Core/DrugRuleMap`, the single source of truth the 查 step reads). "~66" is the size of
+> the NHI catalogue, **not** what this repo has vendored — the draft CQL IG (`nhi.cql` v0.0.1) is not yet
+> distributed as a fetchable package, so loading more is a data task, not fabrication: drop the official
+> `Library-*.json` into `cql-engine/rules/`, verify it runs, add its row to `DrugRuleMap`. An uncovered
+> drug returns **NotEvaluated** (fail-loud), never a guessed verdict.
 
 - Faithful engine: a **CQF-Ruler / HAPI clinical-reasoning** server runs the ELM (it implements
   `InCodeSystem`, which lightweight engines do not) — `cql-engine/` (docker + loader + official rules).
@@ -147,7 +150,7 @@ This is AI-assisted code, so correctness is **machine-proven in layers**, not as
 is in **[TESTING.md](TESTING.md)**. In short:
 
 - **6 bundle types × `0 errors`** against the **official HL7 validator** (an authority outside the AI).
-- **14 byte-for-byte golden baselines** + **61 test cases** (59 CI-enforced + 2 live-integration) (`dotnet test`) — pipeline, CQL three-state,
+- **14 byte-for-byte golden baselines** + **63 test cases** (61 CI-enforced + 2 live-integration) (`dotnet test`) — pipeline, CQL three-state,
   transport adapters, fail-loud seams, live engine integration; mirrored by Python tests.
 - **3 independent adversarial review passes** (IG conformance, CQL conformance, architecture/security) —
   the layer that catches "plausible but wrong", which unit tests miss.
