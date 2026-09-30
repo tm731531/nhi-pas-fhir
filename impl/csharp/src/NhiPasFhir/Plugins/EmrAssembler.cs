@@ -41,7 +41,7 @@ public sealed class EmrAssembler : ICaseAssembler
         var suffixExt = new Extension { Url = Sys.ExtIdentifierSuffix };
         suffixExt.Extension.Add(new Extension("suffix", new FhirString("TWN")));
         suffixExt.Extension.Add(new Extension("valueSet", new Canonical(Sys.Iso3166_1_3)));
-        nnxxx.CodeElement.Extension.Add(suffixExt);
+        nnxxx.CodeElement!.Extension.Add(suffixExt);   // CodeElement is set by the Coding(system, code) ctor
         var patient = new Patient
         {
             Id = "IC-Pat2", Meta = P("InspectionCheckPatient"),
