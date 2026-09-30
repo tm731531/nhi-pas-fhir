@@ -20,7 +20,7 @@ Flow: **產 (assemble) → 驗 (seed check) → 查 (CQL) → 送 (submit) → �
 |---|---|
 | `spec/` | Language-agnostic source of truth: IG mirror, reference golden bundles, architecture/coverage/traceability docs. |
 | `spec/docs/cql-explained.md` · `cql-wiring.md` · `cql-integration-notes.md` | Plain-language + technical CQL docs. |
-| `impl/csharp/` | **Primary** implementation (Firely). Library in `src/NhiPasFhir/` (incl. `MediaDeclaration/` — 醫療費用申報 ↔ FHIR), tests in `tests/`, emitter in `samples/Emit`, media CLI in `samples/MediaTool` (`media-tool to-fhir/to-media`). |
+| `impl/csharp/` | **Primary** implementation (Firely). Library in `src/NhiPasFhir/` — 7 IG assemblers in `Plugins/`, `MediaDeclaration/` (醫療費用申報 ↔ FHIR), `Ltc/` (長照 non-FHIR: Barthel/IADL/給付). Tests in `tests/`, emitter in `samples/Emit`, media CLI in `samples/MediaTool`. |
 | `impl/python/` | Reference implementation (pydantic). |
 | `cql-engine/` | The CQL engine: `rules/` (official Library resources, text/cql), `elm/` (compiled), `server/` (CQF-Ruler docker + loader), `js/` (a historical JS runner). |
 | `demo/NhiPasDemo/` | ASP.NET Core Razor Pages app consuming the library (the whole flow). |
@@ -33,7 +33,7 @@ The layered test strategy (external validator + goldens + contract/integration +
 is in [`TESTING.md`](TESTING.md) — read it to understand what proves correctness before you change code.
 
 ```bash
-# 1) Build + test the library (only .NET 8 SDK needed). 63 test cases (61 CI + 2 live-integration) incl. byte-for-byte golden regression.
+# 1) Build + test the library (only .NET 8 SDK needed). 67 test cases (65 CI + 2 live-integration) incl. byte-for-byte golden regression.
 dotnet test impl/csharp/NhiPasFhir.sln
 
 # 2) Emit the sample bundles, then validate against the OFFICIAL HL7 validator (larger download).

@@ -54,8 +54,9 @@ IG are exercised (logical models are non-instantiable). See [spec/docs/COVERAGE.
 > and 電子病歷交換單張 (`emr`) — each validated 0 errors against its official example. `nhi.base` was
 > evaluated: it is a 健保 foundation **profile library** (Claim/Patient-twnhibase…) with no instantiable
 > bundle, so there is no case to build (see [spec/docs/validation/base-evaluation.md](spec/docs/validation/base-evaluation.md)). It also
-> maps the mainstream 醫療費用申報 media/XML billing format to FHIR (see docs). 長照 has **no published FHIR
-> IG yet**. We never claim what isn't built.
+> maps the mainstream 醫療費用申報 media/XML billing format to FHIR (see docs). 長照 (LTC) has **no published
+> FHIR IG**, so it is modelled the non-FHIR way it actually runs — standard scales (Barthel ADL / Lawton
+> IADL) + the published 給付 table (see [spec/docs/ltc-model.md](spec/docs/ltc-model.md)). We never claim what isn't built.
 
 ## CQL pre-submit self-check (送前核刪自查)
 
@@ -137,6 +138,7 @@ maps to the real class/file/numbers. Open it locally, or serve it from GitHub Pa
 
 - [NHI↔FHIR MIGRATION](spec/docs/nhi-fhir-migration.md) — how 健保 data maps to/from FHIR (媒體申報 · FHIR IG · 長照 三個世界), and how an existing HIS/EMR migrates in stages
 - [MEDIA-DECLARATION↔FHIR](spec/docs/media-declaration-to-fhir.md) — the mainstream 醫療費用申報 media/XML format (總表段/點數清單段/醫令清單段, real field IDs) mapped to a FHIR Claim graph, with a reference converter
+- [LTC MODEL](spec/docs/ltc-model.md) — 長照 (non-FHIR): Barthel ADL + Lawton IADL scales + the published 給付 table, and why 失能等級 is not computed from ADL
 - [EXPLAINER](spec/docs/EXPLAINER.md) — what FHIR is, for a systems owner (not a FHIR expert)
 - [ARCHITECTURE](spec/docs/ARCHITECTURE.md) — interface → abstract → implementation + factory
 - [CASE-CATALOG](spec/docs/CASE-CATALOG.md) — every case type, lifecycle, class hierarchy
@@ -150,7 +152,7 @@ This is AI-assisted code, so correctness is **machine-proven in layers**, not as
 is in **[TESTING.md](TESTING.md)**. In short:
 
 - **6 bundle types × `0 errors`** against the **official HL7 validator** (an authority outside the AI).
-- **14 byte-for-byte golden baselines** + **63 test cases** (61 CI-enforced + 2 live-integration) (`dotnet test`) — pipeline, CQL three-state,
+- **14 byte-for-byte golden baselines** + **67 test cases** (65 CI-enforced + 2 live-integration) (`dotnet test`) — pipeline, CQL three-state,
   transport adapters, fail-loud seams, live engine integration; mirrored by Python tests.
 - **3 independent adversarial review passes** (IG conformance, CQL conformance, architecture/security) —
   the layer that catches "plausible but wrong", which unit tests miss.
