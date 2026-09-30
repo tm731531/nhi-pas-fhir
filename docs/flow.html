@@ -133,14 +133,14 @@
         <div class="verb">② 驗 · Validate</div>
         <button class="node" data-k="validate" aria-pressed="false">
           <div class="nt"><span class="dot ok"></span>官方 validator 驗 Bundle</div>
-          <div class="nd">tools/validate.sh → <b>0 errors</b>。31 xunit tests 鎖住。</div>
+          <div class="nd">tools/validate.sh → <b>0 errors</b>。47 xunit tests 鎖住。</div>
         </button>
       </div>
       <div>
         <div class="verb">③ 查 · Pre-check</div>
         <button class="node" data-k="precheck" aria-pressed="false">
-          <div class="nt"><span class="dot pending"></span>核刪規則查 Bundle</div>
-          <div class="nd">PreCheck(2 種子) + CQL 66 條(引擎待接)。</div>
+          <div class="nt"><span class="dot ok"></span>核刪規則查 Bundle</div>
+          <div class="nd">PreCheck(2 種子) + CQL 引擎已接(CqfRulerCqlEngine,跑官方規則)。</div>
         </button>
       </div>
       <div>
@@ -163,7 +163,7 @@
   <div class="legend">
     <span><span class="dot spine"></span> 已做且是主幹</span>
     <span><span class="dot ok"></span> 已驗證 0 errors</span>
-    <span><span class="dot pending"></span> 部分 / 待接引擎</span>
+    <span><span class="dot pending"></span> 部分完成</span>
     <span><span class="dot scope"></span> 甲方平台責任(非本 lib)</span>
   </div>
   <p class="hint">↑ 點任一站(或 ★Bundle★)。以下面板顯示該站的真實對照。</p>
@@ -219,18 +219,18 @@ const D = {
       "<code>31</code> xunit tests(含 byte-for-byte golden 回歸)全綠"]}
   },
   precheck:{
-    title:"③ 查 · 核刪預檢", tag:"我們的插槽 + 官方規則", status:["pending","架構已留插槽;CQL 引擎待接"],
+    title:"③ 查 · 核刪預檢", tag:"我們的插槽 + 官方規則", status:["ok","CQL 引擎已接(CqfRulerCqlEngine),跑官方規則"],
     does:"對 Bundle:查它,判會不會被核刪。",
-    sum:"這一站問「這包 Bundle 湊起來符不符合給付條件」。現有 PreCheck 只 seed 2 條 drug↔適應症;完整的 66 條核刪規則是健保用 CQL(FHIR 版 SQL)寫的外部規則,要接一台 CQL 引擎來跑 —— 我們不重寫規則,只當引擎宿主。",
+    sum:"這一站問「這包 Bundle 湊起來符不符合給付條件」。PreCheck 仍 seed 2 條 drug↔適應症;完整的 66 條核刪規則是健保用 CQL(FHIR 版 SQL)寫的外部規則 —— 已接一台 CQF-Ruler / HAPI clinical-reasoning server 當引擎來跑,我們不重寫規則,只當引擎宿主。",
     left:{h:"現有 + 對應",facts:[
       "<code>Core/PreCheck.cs</code> — drug↔適應症(seed 2 條)",
-      "<code>Core/Pipeline.cs</code> — Run = 檢查 → 組裝 gate",
-      "未來:<code>ICqlEngine</code> 插在此,吃 Bundle 跑官方 Library"]},
-    right:{h:"CQL PoC(實測)",facts:[
+      "<code>Core/Pipeline.cs</code> — RunAsync = 檢查 → 組裝 gate",
+      "已接:<code>Core/CqfRulerCqlEngine.cs</code> 實作 <code>ICqlEngine</code>,吃 Bundle 呼叫 CQF-Ruler 跑官方 Library"]},
+    right:{h:"CQL 引擎(已接,實測)",facts:[
       "官方 IG <code>tw.gov.mohw.nhi.cql</code> v0.0.1 <b>draft</b>",
       "<code>77</code> Library ≈ <b>66 條藥品規則</b>(BC/LC/HCC/CRC/PC)",
-      "PoC:<code>BCAbemaciclibRule1</code> 的 <b>68 個 define 全載入、引擎有執行</b>",
-      "卡點:<code>FHIRHelpers.ToInteger</code> 資料型別對接未對齊(可解)"]}
+      "<code>BCAbemaciclibRule1</code> 對 Bundle:<b>68 個 define 全求值</b>,拿到正確三態結果",
+      "CQF-Ruler 忠實實作 <code>InCodeSystem</code>(JS cql-execution 3.3.2 做不到的那點);整合測試綠"]}
   },
   submit:{
     title:"④ 送 · POST 到甲方平台", tag:"甲方責任", status:["scope","本 lib 只產 payload,不做傳輸"],
@@ -283,7 +283,7 @@ document.querySelectorAll('[data-k]').forEach(b=>{
 render('bundle');
 
 document.getElementById('foot').textContent =
-  '根據 repo 實抓:impl/csharp/build/*.cs.json · tools/validate.sh 輸出 · dotnet test(31) · tw.gov.mohw.nhi.cql#0.0.1 · 對抗審計 7-agent 結果。數字非杜撰。';
+  '根據 repo 實抓:impl/csharp/build/*.cs.json · tools/validate.sh 輸出 · dotnet test(47) · tw.gov.mohw.nhi.cql#0.0.1 · 對抗審計 7-agent 結果。數字非杜撰。';
 </script>
 </body>
 </html>

@@ -1,11 +1,11 @@
 # CQL 整合筆記 — 送前核刪自查(維度3 的「查 Bundle」)
 
-> 🟢 **先看白話版:** 沒碰過 CQL/FHIR → 先讀 [`cql-explained.md`](cql-explained.md)(用 10 個問答把觀念想通)。
+> 🟢 **先看白話版:** 沒碰過 CQL/FHIR → 先讀 [`cql-explained.md`](cql-explained.md)(用 16 個問答把觀念想通)。
 > 本文是「怎麼接程式」的技術面;規則(語言中立的 ELM)+ 一支參考 runner 在 [`cql-engine/`](../../cql-engine/)。
 >
 > 官方預檢規則 IG:`tw.gov.mohw.nhi.cql`(build.fhir.org/ig/TWNHIFHIR/cql,**v0.0.1 draft**)。
 > 77 Library ≈ 66 條藥品給付規則(BC 乳癌 / LC 肺癌 / HCC 肝癌 / CRC 大腸癌 / PC 攝護腺癌)。
-> 這是產品核心價值(核刪防呆)。本文件是「未來接引擎」的起跑點,已對抗驗證過理解。
+> 這是產品核心價值(核刪防呆)。接引擎已完成(見 §6);本文件保留設計脈絡與盲點。
 
 ## 1. 定位(一句話)
 **組完 Bundle 後、POST 前,用健保『同一套』官方 CQL 規則對 Bundle 自查一次 → 只送會過的、擋掉會核刪/待補件的。** 高信心「預測」,非保證(最終核定權在健保的 ClaimResponse)。
@@ -25,14 +25,17 @@
 
 ## 4. 已做的框架接點(可開關)
 `impl/csharp/src/NhiPasFhir/Core/Cql.cs` + `Pipeline.cs`:
-- **`ICqlPreCheck`** — 框架面插槽。`Pipeline.Run(case, cql: …)` 傳入才啟動;不傳(預設)= **沒啟動 CQL**(只跑種子 drug↔indication)。
+- **`ICqlPreCheck`** — 框架面插槽。`Pipeline.RunAsync(case, cql: …)` 傳入才啟動;不傳(預設)= **沒啟動 CQL**(只跑種子 drug↔indication)。
 - **`NoCqlPreCheck`**(off,預設)/ **`CqlPreCheck`**(on)。
 - **`CqlOutcome`** 三態:`Pass` / `WouldBeRejected`(核刪)/ `DataMissing`(補件)+ `NotEvaluated`。
-- **`ICqlEngine`** — ELM 執行引擎介面(sidecar 實作;本 lib 不含)。`NotWiredCqlEngine` 未接時 fail-loud。
+- **`ICqlEngine`** — ELM 執行引擎介面;已由 `CqfRulerCqlEngine` 實作(見 §6)。`NotWiredCqlEngine` 未接時 fail-loud。
 - `CqlPreCheck` 編碼了盲點 2/3:1:N 藥碼→規則、逐規則呼叫引擎、把具名輸出詮釋成三態(慣例:`…申請結果_布林`、`…報告總結`、`…資料存在/有填…`)。
 - 測試:`CqlTests.cs`(off 無結果 / on 三態 / fail-loud)用假引擎驗膠水,不需真 runtime。
 
 ## 5. 未做(接真引擎時的工作)
+
+> **已完成(見 §6)。** 以下清單保留作歷史紀錄 — 實際走的路是 §6 的 CQF-Ruler 方案,細節與此處原始規劃(如「JS cql-execution」)不同。
+
 1. **接一個 CQL 引擎 sidecar**(建議先 JS `cql-execution`)。PoC 卡點:`FHIRHelpers.ToInteger` 資料源型別對齊(cql-exec-fhir 版本/模型)。
 2. **實作 `ICqlEngine`** 呼叫該 sidecar,並**載入規則的完整依賴閉包**。
 3. **建 藥碼→規則 1:N 對映表**(從 66 條 Library 的 relatedArtifact/命名建索引)。
@@ -72,7 +75,7 @@ clinical-reasoning 整台 FHIR server(docker),C# 打它 API**。理由:最乾淨
   (subject+useServerData=false+data:Bundle),把具名結果餵回 `CqlPreCheck.Interpret()`。整合測試
   `CqfRulerIntegrationTests.cs`(server 沒開就跳過)綠:引擎回具名值、PreCheck 對骨髓瘤案 Block。
 
-**啟用方式**:`Pipeline.Run(case, cql: new CqlPreCheck(new CqfRulerCqlEngine(http, "http://localhost:8095/fhir"),
+**啟用方式**:`Pipeline.RunAsync(case, cql: new CqlPreCheck(new CqfRulerCqlEngine(http, "http://localhost:8095/fhir"),
 藥碼→規則map))`。不傳 cql = 照舊不啟動。
 
 **仍待做(非阻塞)**:(1) 建完整 藥碼→規則 1:N 對映表(全 66 條);(2) 組裝器補「縱貫病歷」讓續用/回診規則

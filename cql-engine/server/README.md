@@ -39,7 +39,7 @@ Sanity: `curl -s -X POST http://localhost:8095/fhir/\$cql -H 'Content-Type: appl
 - Wired to C#: `impl/csharp/src/NhiPasFhir/Core/CqfRulerCqlEngine.cs` (`ICqlEngine`) POSTs the Bundle
   here and returns the named expressions; `CqfRulerIntegrationTests.cs` (skips if server down) is green.
 
-Enable it: `Pipeline.Run(case, cql: new CqlPreCheck(new CqfRulerCqlEngine(http, ".../fhir"), drugToRules))`.
+Enable it: `Pipeline.RunAsync(case, cql: new CqlPreCheck(new CqfRulerCqlEngine(http, ".../fhir"), drugToRules))`.
 
 ## Remaining (non-blocking)
 

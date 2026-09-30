@@ -12,7 +12,7 @@ HL7 FHIR validator at 0 errors**.
 ```
 ICaseAssembler                      interface  — Assemble(PACase) -> Bundle
   └ AbstractCaseAssembler           abstract   — shared TW Core clinical builders + default Claim-twpas Assemble
-      ├ CancerDrugAssembler         concrete   — 癌藥 case, 9 resources (uses the default Assemble template)
+      ├ CancerDrugAssembler         concrete   — 癌藥 case, 28 resources (full bun-1) (uses the default Assemble template)
       └ ImmunologicAssembler        concrete   — 免疫製劑 case, 36 resources (overrides Assemble: different
                                                  Claim/Bundle profiles + full SOAP note + evidence chain)
 AssemblerFactory                    registry   — ForCase(pacase) picks the impl; unknown = throws

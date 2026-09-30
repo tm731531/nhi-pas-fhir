@@ -97,10 +97,10 @@ class CancerDrugAssembler:  # ← today's logic, moved behind the interface
 | This doc | Today (already built) | Status |
 |---|---|---|
 | FHIR resource entities (2 layers) | `src/nhi_pas/twcore.py` + `pas.py` | ✅ done, validates 0 errors |
-| BundleAssembler (CancerDrug) | logic currently inside `pas.Claim.build` + `examples/build_pa_bundle.py` | ⏭ extract into a `CancerDrugAssembler` class |
-| PACase (domain input) | not yet — inputs are passed ad-hoc in the example | ⏭ define the neutral input model |
+| BundleAssembler (CancerDrug) | `CancerDrugAssembler` (`impl/python/src/nhi_pas/plugins/cancer_drug.py`, `impl/csharp/src/NhiPasFhir/Plugins/CancerDrugAssembler.cs`) | ✅ done |
+| PACase (domain input) | `PACase` (`impl/python/src/nhi_pas/core/interfaces.py`, `impl/csharp/src/NhiPasFhir/Core/PACase.cs`) | ✅ done |
 | Validator | `tools/validate.sh` + `precheck.py` | ✅ exists; ⏭ wrap behind the `Validator` interface |
-| Factory | not yet | ⏭ add once there is a 2nd case type |
+| Factory | `AssemblerFactory` (`impl/python/src/nhi_pas/core/factory.py`, `impl/csharp/src/NhiPasFhir/Core/AssemblerFactory.cs`) — 2nd case type (immunologic) already registered | ✅ done |
 | CaseSource | not yet (capture is a separate feature) | ⏭ later |
 
 ## Platform decision (2026-09-28, owner)

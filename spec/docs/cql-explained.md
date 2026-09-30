@@ -159,11 +159,14 @@ Bundle 是這條流水線上**從頭到尾被傳遞、被加工的那個東西**
 
 - **位置**:[`cql-engine/`](../../cql-engine/)(放在 repo 根目錄,不綁 C#)。
 - **語言中立的核心是 ELM 規則**(`cql-engine/elm/`)—— 任何合規的 CQL 引擎都能跑同一批。
-  引擎**可換**:我們先放一支 JS 參考 runner(`cql-engine/js/`,用 `cql-execution`),但也能改用
-  Java(cqframework)或 CQF-Ruler server。**「引擎」不等於「那支 JS」,ELM 才是真正的資產。**
-- **狀態**:JS runner 已能載入規則、開始執行,卡在一個叫 `FHIRHelpers.ToInteger` 的型別對齊問題 ——
-  這是「開始跑」和「跑到出結論」之間**最後一哩**,是已知、有邊界的問題,不是死路。
-- 還要做什麼、為什麼還沒 production-ready → 看 `cql-engine/README.md`。
+  引擎**可換**:我們一開始試過一支 JS 參考 runner(`cql-engine/js/`,用 `cql-execution`),但它
+  少了 `InCodeSystem`(規則要判斷「這個診斷碼屬不屬於某一版 ICD 系統」時要靠這個)這個能力,
+  算不出忠實結果,所以**已改用 CQF-Ruler / HAPI clinical-reasoning(一台 server)當正式引擎**,
+  JS runner 只留作歷史參考。**「引擎」不等於「那支 JS」,ELM 才是真正的資產。**
+- **狀態**:已接上、跑得動真規則。C# 這邊 `ICqlEngine` 由 `CqfRulerCqlEngine` 實作,呼叫這台
+  server 的 `Library/{ruleId}/$evaluate`,demo 會用到,整合測試是綠的。
+- 細節與仍待補的小事(例如藥碼→規則對映表還不完整)→ 看 `cql-engine/README.md` 和
+  `cql-integration-notes.md` §6。
 
 ---
 
@@ -209,7 +212,7 @@ Bundle 是這條流水線上**從頭到尾被傳遞、被加工的那個東西**
 | **Bundle** | 我們要送出去的那份申請卷宗(JSON) | 要被檢查的那筆資料 |
 | **CQL** | 健保寫好、公開的審查規則(文字) | SQL 原文 |
 | **ELM** | CQL 編譯後、機器跑的版本(JSON,非 binary) | 執行計畫 |
-| **CQL 引擎** | 真正去跑 ELM 的程式(我們接 JS sidecar) | SQL Server |
+| **CQL 引擎** | 真正去跑 ELM 的程式(我們接 CQF-Ruler / HAPI clinical-reasoning server) | SQL Server |
 | **自查(這件事)** | 送出前用官方規則自己審一次,減壓 | 交卷前對標準答案 |
 
 **把這五個擺對位置,CQL 就不神祕了。** 它就是:交卷前,拿老師公開的標準答案,自己先對一次。

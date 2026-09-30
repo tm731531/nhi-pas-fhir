@@ -8,7 +8,7 @@
 |---|---|---|---|---|
 | 一般送核·癌藥(bun-1) | 送核 | 一般 | 28 | ✅ **完整 28 資源**,0 errors(含 Specimen/基因/cancer-stage/影像鏈) |
 | 免疫製劑(bun-imm) | 送核 | 一般 | 36 | ✅ 全 36 資源,0 errors,可吃 PACase |
-| **申復(bun-3)** | **申復** | 一般 | 26 | ✅ 0 errors(subtype_code=3 + old_acpt_no invariant) |
+| **申復(bun-3)** | **申復** | 一般 | 28 | ✅ 0 errors(subtype_code=3 + old_acpt_no invariant) |
 | **自主審查(bun-self)** | 送核 | **自主審查** | 30 | ✅ 0 errors(priority_code=3 + 自動塞 self-assessment) |
 | **自主審查·urn:uuid(bun-uuid)** | 送核 | 自主審查 | 29 | ✅ 0 errors(`NhiPas.ToUuidStyle` — urn:uuid 引用風格) |
 

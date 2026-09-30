@@ -27,7 +27,7 @@ The CQL server base URL is configurable via `Cql:BaseUrl` (default `http://local
 ## How it uses the lib (the only integration points)
 
 - `Samples.CancerDrugCase()` / `ImmunologicCase()` / `AppealCase()` / `SelfAssessmentCase()` → a `PACase`
-- `Pipeline.Run(case, cql: ...)` → `PipelineResult` (Findings / Blocked / Bundle / Cql three-state)
+- `Pipeline.RunAsync(case, cql: ...)` → `PipelineResult` (Findings / Blocked / Bundle / Cql three-state)
 - `new CqfRulerCqlEngine(http, baseUrl)` + `CqlPreCheck(engine, drug→rules)` for the 查 step
 - `NhiPas.ToJson(bundle)` to render the assembled Bundle
 
@@ -38,9 +38,9 @@ the rules never touches this project (Tom's replaceability invariant).
 
 - `/` (Demo) — 這是什麼 + 怎麼用 + the 產→驗→查 flow, the three-state verdict, the FHIR resource
   breakdown (各個體制), and the assembled Bundle.
-- `/Learn` (CQL & FHIR 問答) — renders `spec/docs/cql-explained.md` (15 Q&A: what it is).
+- `/Learn` (CQL & FHIR 問答) — renders `spec/docs/cql-explained.md` (16 Q&A: what it is).
 - `/Wiring` (CQL 怎麼串) — renders `spec/docs/cql-wiring.md` (how CQL is wired: the line from
-  「跑一次」to a verdict, the toggle + the socket, where the four pieces live).
+  「跑一次」to a verdict, the toggle + the socket, where the pieces live).
 
 ## Host it under your own domain
 

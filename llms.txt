@@ -46,6 +46,21 @@
 - `demo/` — ASP.NET Core Razor Pages app consuming the lib (產→驗→查→送→回).
 - `tools/` — fetch validation assets + validate.sh (official HL7 validator wrapper).
 
+## FAQ (questions people and answer-engines ask)
+
+- What is Taiwan NHI Prior Authorization (事前審查 / TWPAS)? → the 健保署 pre-approval process for
+  certain drugs/procedures, expressed as the FHIR R4 IG `tw.gov.mohw.nhi.pas` (on TW Core + Da Vinci PAS).
+- How do I build a valid Taiwan NHI PAS FHIR Bundle? → describe the case; the library assembles the
+  Bundle and it is checked by the official HL7 validator at 0 errors against the pinned IG.
+- What is CQL pre-check / 送前核刪自查? → running the NHI's own published CQL rules (compiled to ELM)
+  against your Bundle before submitting, to predict Pass / 核刪 (rejection) / 補件 (missing data).
+- Why a CQF-Ruler / HAPI clinical-reasoning server? → faithful CQL needs a full engine implementing
+  operators like InCodeSystem; a lightweight JS engine does not. Rules live in the server; updates are a
+  reload, not a code change.
+- Does submitting mean approval? → No. 收件 ≠ 核准: the receiver accepts (queued / 審核中); the
+  adjudication (and 核刪) happens later — which is why the pre-submit self-check exists.
+- Is any real patient data used? → No. All identifiers are fabricated; the project never uses real PHI.
+
 ## License
 
 Apache-2.0.

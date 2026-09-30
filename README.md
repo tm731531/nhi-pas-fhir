@@ -10,7 +10,7 @@ pre-submit rule check · ClaimResponse · reference implementation · C# / Firel
 healthcare interoperability · clinical decision support.
 
 > Domain source of truth: <https://nhicore.nhi.gov.tw/pas/> · IG `tw.gov.mohw.nhi.pas#1.2.6` · FHIR R4
-> (inherits `tw.gov.mohw.twcore` + `hl7.fhir.us.davinci-pas`).
+> (inherits `tw.gov.mohw.twcore` + `hl7.fhir.us.davinci-pas`). Last IG sync: 2026-09-28.
 
 ## What it does
 

@@ -67,17 +67,20 @@ production-ready. Before it can gate real submissions:
      Stock `Repository.resolve` matched neither → `ctx.get('FHIRHelpers')` undefined →
      `functionDefs.filter(...)` crashed at the first `ToInteger`. Fixed in `js/run.js` with a
      `LenientRepository` (falls back to the path's trailing id). Does NOT touch official ELM.
-   - **(OPEN — needs a decision) `InCodeSystem` is unimplemented in cql-execution 3.3.2.**
+   - **(SUPERSEDED — decided) `InCodeSystem` is unimplemented in cql-execution 3.3.2.**
      The rule tests `diagnosis-code in ICD10CM2023 (or 2014)` via the ELM `InCodeSystem`
      operator; this engine's builder returns `null` for it (verified: `build(InCodeSystem)`
      → null, whereas `InValueSet` builds fine) → the enclosing `Or` gets a null operand and
-     crashes. Faithful `InCodeSystem` is a terminology operation; evaluating it needs either
-     an offline binding shim (code.system == codesystem.id — an approximation) or a real
-     terminology CodeService / a Java engine. This is a semantics choice, deferred to Tom.
+     crashes. This blocker was resolved by dropping the JS runner for real use and switching
+     to the **CQF-Ruler / HAPI clinical-reasoning server**, which implements `InCodeSystem`
+     faithfully (verified against a minimal library). The JS runner in `js/` is now kept only
+     as a historical reference, not the wired engine. See
+     `spec/docs/cql-integration-notes.md` §6.
 
-4. **Not yet wired to C#.** `ICqlEngine` is still `NotWiredCqlEngine` (fail-loud). Wiring
-   means: C# invokes an engine (this sidecar, or a Java/server one), passes `(ruleId,
-   Bundle)`, reads back the named expressions. See `spec/docs/cql-integration-notes.md` §5.
+4. **Wired to C#.** `ICqlEngine` is implemented by `Core/CqfRulerCqlEngine.cs`, which calls
+   the CQF-Ruler server's `Library/{ruleId}/$evaluate` operation and feeds the named results
+   back into `CqlPreCheck.Interpret()`. Used by the demo; integration tests
+   (`CqfRulerIntegrationTests.cs`) are green. See `spec/docs/cql-integration-notes.md` §6.
 
 5. **Document `elm/` provenance per file if the set grows.** All 4 here come from the same
    v0.0.1 package; if rules from multiple versions ever coexist, record which version each

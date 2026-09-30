@@ -39,7 +39,8 @@ adjudicated{approved|rejected|need_info} → (resubmit) …`
 |---|---|---|
 | **癌藥 (cancer drug)** | Bundle/Claim/MedicationRequest-apply TWPAS + supporting reports; drug↔適應症 invariants | ✅ verified (0 errors) |
 | **免疫製劑 (immunologic agent)** | Bundle-immunologic-agent-twpas: **36 resources** — full SOAP (Composition-opd + Observation subjective/objective + ClinicalImpression + CarePlan), two Encounters, blood group, allergy, imaging (DiagnosticReport-image + ImagingStudy + Media), exam/lab (incl. CBC components) evidence, procedure/substance + phototherapy, treatment/patient assessment, and **two applied drugs** | ✅ **verified (0 errors, full terminology)** — C# `ImmunologicAssembler` overrides `Assemble` (its Claim/Bundle profiles differ from 癌藥), reuses the shared TW Core layer. Needed a **terminology patch**: TW Core 0.3.2 ships the ICD CodeSystems with a wrong `/ValueSet/` canonical url that breaks CLOSED slicing — the official example itself trips on this; we correct the url and load it via `-ig` (see `docs/validation/`). |
-| **自主審查 (self-assessment)** | ClaimResponse Self Assessment TWPAS (心/肝移植) | 🔶 profile seen; flow TODO |
+| **自主審查 (self-assessment)** | ClaimResponse Self Assessment TWPAS (心/肝移植) | ✅ verified (0 errors) — reproduces golden Bundle-bun-self (29 resources), priority_code=3 + auto-embedded ClaimResponse-self-assessment-twpas |
+| **申復 (appeal)** | Claim.subType=申復 (3) carrying the original acceptance number (old_acpt_no) | ✅ verified (0 errors) — reproduces golden Bundle-bun-3 (28 resources), subtype_code=3 + old_acpt_no invariant |
 
 ### 2b. Other NHI IGs (nhicore.nhi.gov.tw)
 | Case type | IG | Status |
