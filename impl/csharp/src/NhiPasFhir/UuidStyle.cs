@@ -20,6 +20,7 @@ public static class UuidStyle
         var map = new Dictionary<string, string>();
         foreach (var e in bundle.Entry)
         {
+            if (e.Resource is null) continue; // defensive: a public API may be handed a sparse bundle
             var key = $"{e.Resource.TypeName}/{e.Resource.Id}";
             map[key] = "urn:uuid:" + DeterministicUuid(key);
         }
@@ -32,7 +33,7 @@ public static class UuidStyle
             eo["fullUrl"] = map[$"{res["resourceType"]}/{res["id"]}"];
             RewriteReferences(res, map);
         }
-        return new FhirJsonParser().Parse<Bundle>(root.ToJsonString());
+        return Core.FhirJson.Parse<Bundle>(root.ToJsonString());
     }
 
     private static void RewriteReferences(JsonNode? node, IReadOnlyDictionary<string, string> map)

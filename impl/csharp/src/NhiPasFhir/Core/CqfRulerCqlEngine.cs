@@ -1,7 +1,6 @@
 using System.Net.Http;
 using System.Text;
 using Hl7.Fhir.Model;
-using Hl7.Fhir.Serialization;
 
 namespace NhiPasFhir.Core;
 
@@ -15,9 +14,6 @@ namespace NhiPasFhir.Core;
 /// which the JS cql-execution engine does not. See spec/docs/cql-integration-notes.md §6.</summary>
 public sealed class CqfRulerCqlEngine : ICqlEngine
 {
-    private static readonly FhirJsonSerializer Serializer = new();
-    private static readonly FhirJsonParser Parser = new();
-
     private readonly HttpClient _http;
     private readonly string _baseUrl;
 
@@ -25,7 +21,7 @@ public sealed class CqfRulerCqlEngine : ICqlEngine
     public CqfRulerCqlEngine(HttpClient http, string baseUrl)
         => (_http, _baseUrl) = (http, baseUrl.TrimEnd('/'));
 
-    public IReadOnlyDictionary<string, object?> Evaluate(string ruleId, Bundle bundle)
+    public async Task<IReadOnlyDictionary<string, object?>> EvaluateAsync(string ruleId, Bundle bundle)
     {
         var patient = bundle.Entry
             .Select(e => e.Resource)
@@ -39,11 +35,16 @@ public sealed class CqfRulerCqlEngine : ICqlEngine
         input.Add("useServerData", new FhirBoolean(false));
         input.Parameter.Add(new Parameters.ParameterComponent { Name = "data", Resource = bundle });
 
-        var body = new StringContent(Serializer.SerializeToString(input), Encoding.UTF8, "application/fhir+json");
-        var resp = _http.PostAsync($"{_baseUrl}/Library/{ruleId}/$evaluate", body)
-                        .GetAwaiter().GetResult();
-        var text = resp.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-        var outcome = Parser.Parse<Parameters>(text);
+        var body = new StringContent(FhirJson.Serialize(input), Encoding.UTF8, "application/fhir+json");
+        var resp = await _http.PostAsync($"{_baseUrl}/Library/{ruleId}/$evaluate", body);
+        var text = await resp.Content.ReadAsStringAsync();
+
+        // Fail loud on transport error, with the actual HTTP status (not a downstream parse error).
+        if (!resp.IsSuccessStatusCode)
+            throw new NotSupportedException(
+                $"CQL server returned HTTP {(int)resp.StatusCode}: {text[..Math.Min(200, text.Length)]}");
+
+        var outcome = FhirJson.Parse<Parameters>(text);
 
         var results = new Dictionary<string, object?>();
         foreach (var p in outcome.Parameter)
@@ -54,6 +55,7 @@ public sealed class CqfRulerCqlEngine : ICqlEngine
                     "CQL server evaluation error: " +
                     string.Join("; ", oo.Issue.Select(i => i.Details?.Text ?? i.Diagnostics)));
 
+            if (p.Name is null) continue; // FHIR permits a null parameter name; skip it defensively.
             results[p.Name] = p.Value switch
             {
                 FhirBoolean b => b.Value,

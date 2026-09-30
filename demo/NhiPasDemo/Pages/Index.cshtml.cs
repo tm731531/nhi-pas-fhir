@@ -56,7 +56,7 @@ public class IndexModel : PageModel
 
     public void OnGet() { }
 
-    public void OnPost()
+    public async Task OnPostAsync()
     {
         var c = CaseFor(SelectedCase);
 
@@ -73,13 +73,13 @@ public class IndexModel : PageModel
         PipelineResult result;
         try
         {
-            result = Pipeline.Run(c, cql: cql);
+            result = await Pipeline.RunAsync(c, cql: cql);
         }
         catch (Exception ex)
         {
             // CQL server unreachable (or evaluation error) — assemble without CQL and surface it.
             CqlError = ex.Message;
-            result = Pipeline.Run(c);
+            result = await Pipeline.RunAsync(c);
         }
 
         Findings = result.Findings;
@@ -105,7 +105,7 @@ public class IndexModel : PageModel
                 var submitter = new HttpPasSubmitter(_httpFactory.CreateClient(), endpoint);
                 try
                 {
-                    var sr = submitter.Submit(result.Bundle);
+                    var sr = await submitter.SubmitAsync(result.Bundle);
                     Submitted = true;
                     SubmitAccepted = sr.Accepted;
                     SubmitStatus = sr.Status;

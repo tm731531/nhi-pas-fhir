@@ -27,7 +27,7 @@ app.MapPost("/fake-nhi/submit", async (HttpRequest req) =>
 {
     using var reader = new StreamReader(req.Body);
     var text = await reader.ReadToEndAsync();
-    var bundle = new Hl7.Fhir.Serialization.FhirJsonParser().Parse<Hl7.Fhir.Model.Bundle>(text);
+    var bundle = NhiPasFhir.Core.FhirJson.Parse<Hl7.Fhir.Model.Bundle>(text);
 
     Hl7.Fhir.Model.Resource? First(string type) =>
         bundle.Entry.Select(e => e.Resource).FirstOrDefault(r => r?.TypeName == type);
@@ -42,7 +42,8 @@ app.MapPost("/fake-nhi/submit", async (HttpRequest req) =>
         ClaimRef: claim is not null ? $"Claim/{claim.Id}" : "Claim/unknown",
         Created: "2026-09-29",
         Disposition: "【假收件端示範】已受理,審核中 — 這不是真健保,也不是核定結果。",
-        Items: new[] { new NhiPasFhir.ResponseItem(1, "0") }); // 0 = 審核中
+        OverallApproveCode: "0", // 0 = 審核中 (claim-level)
+        Items: new[] { new NhiPasFhir.ResponseItem(1, "0") }); // per-order detail, 0 = 審核中
 
     var respBundle = NhiPasFhir.ResponseBuilder.Build(rc);
     var cr = respBundle.Entry.Select(e => e.Resource).OfType<Hl7.Fhir.Model.ClaimResponse>().First();

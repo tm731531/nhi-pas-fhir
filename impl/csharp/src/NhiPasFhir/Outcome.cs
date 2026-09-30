@@ -1,4 +1,5 @@
 using Hl7.Fhir.Model;
+using Hl7.Fhir.Utility;
 
 namespace NhiPasFhir;
 
@@ -18,8 +19,12 @@ public static class OutcomeBuilder
         foreach (var it in issues)
             oo.Issue.Add(new OperationOutcome.IssueComponent
             {
-                Severity = Enum.Parse<OperationOutcome.IssueSeverity>(it.Severity, true),
-                Code = Enum.Parse<OperationOutcome.IssueType>(it.Code, true),
+                // Parse by FHIR EnumLiteral (handles hyphenated codes like not-found/business-rule),
+                // not by .NET enum member name which would throw on the hyphen.
+                Severity = EnumUtility.ParseLiteral<OperationOutcome.IssueSeverity>(it.Severity.ToLowerInvariant())
+                    ?? throw new ArgumentException($"Unknown issue severity: {it.Severity}"),
+                Code = EnumUtility.ParseLiteral<OperationOutcome.IssueType>(it.Code.ToLowerInvariant())
+                    ?? throw new ArgumentException($"Unknown issue type: {it.Code}"),
                 Details = new CodeableConcept(Sys.OperationOutcomeCs, it.DetailsCode),
             });
         return oo;

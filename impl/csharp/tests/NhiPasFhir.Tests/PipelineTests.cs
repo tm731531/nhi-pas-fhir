@@ -32,17 +32,17 @@ public class PipelineTests
         Assert.False(PreCheck.HasBlocking(new[] { f }));
     }
 
-    [Fact] public void Pipeline_blocks_bad_pair_and_skips_assembly()
+    [Fact] public async System.Threading.Tasks.Task Pipeline_blocks_bad_pair_and_skips_assembly()
     {
-        var r = Pipeline.Run(CaseWith("KC009612B5", "C99X9"));
+        var r = await Pipeline.RunAsync(CaseWith("KC009612B5", "C99X9"));
         Assert.True(r.Blocked);
         Assert.Null(r.Bundle);
         Assert.Contains("does not guarantee", r.Advisory);
     }
 
-    [Fact] public void Pipeline_clear_when_no_indication_assembles()
+    [Fact] public async System.Threading.Tasks.Task Pipeline_clear_when_no_indication_assembles()
     {
-        var r = Pipeline.Run(Samples.CancerDrugCase());
+        var r = await Pipeline.RunAsync(Samples.CancerDrugCase());
         Assert.False(r.Blocked);
         Assert.NotNull(r.Bundle);
         Assert.Equal(28, r.Bundle!.Entry.Count);   // full bun-1 cancer bundle

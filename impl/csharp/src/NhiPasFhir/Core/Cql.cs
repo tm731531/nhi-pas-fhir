@@ -1,4 +1,5 @@
 using Hl7.Fhir.Model;
+using Task = System.Threading.Tasks.Task;
 
 namespace NhiPasFhir.Core;
 
@@ -19,15 +20,16 @@ public sealed record CqlFinding(CqlOutcome Outcome, string RuleIds, IReadOnlyLis
 /// (2) context Patient 對整份 Bundle 執行;(3) 回傳『具名 expression 值』(bool/tuple),不是現成核准/核刪。</summary>
 public interface ICqlEngine
 {
-    /// <summary>對 bundle 跑 ruleId 的 ELM(含依賴閉包),回具名 expression 結果。</summary>
-    IReadOnlyDictionary<string, object?> Evaluate(string ruleId, Bundle bundle);
+    /// <summary>對 bundle 跑 ruleId 的 ELM(含依賴閉包),回具名 expression 結果。Async: the engine call is
+    /// a network round-trip — the whole path is async end-to-end so nothing blocks a thread.</summary>
+    Task<IReadOnlyDictionary<string, object?>> EvaluateAsync(string ruleId, Bundle bundle);
 }
 
 /// <summary>框架面的 CQL 預檢插槽。Enabled=false 代表「沒啟動 CQL」。</summary>
 public interface ICqlPreCheck
 {
     bool Enabled { get; }
-    CqlFinding Evaluate(Bundle bundle, string drugCode);
+    Task<CqlFinding> EvaluateAsync(Bundle bundle, string drugCode);
 }
 
 /// <summary>『沒啟動 CQL』— 預設。無引擎 → 一律回 NotEvaluated(pipeline 照舊只跑種子 PreCheck)。</summary>
@@ -35,8 +37,8 @@ public sealed class NoCqlPreCheck : ICqlPreCheck
 {
     public static readonly NoCqlPreCheck Instance = new();
     public bool Enabled => false;
-    public CqlFinding Evaluate(Bundle bundle, string drugCode)
-        => new(CqlOutcome.NotEvaluated, "", new[] { "CQL 預檢未啟動(未接引擎)。" });
+    public Task<CqlFinding> EvaluateAsync(Bundle bundle, string drugCode)
+        => Task.FromResult(new CqlFinding(CqlOutcome.NotEvaluated, "", new[] { "CQL 預檢未啟動(未接引擎)。" }));
 }
 
 /// <summary>『啟動 CQL』— 接一個 <see cref="ICqlEngine"/> + 藥碼→規則索引。編碼校準後的理解:
@@ -52,7 +54,7 @@ public sealed class CqlPreCheck : ICqlPreCheck
 
     public bool Enabled => true;
 
-    public CqlFinding Evaluate(Bundle bundle, string drugCode)
+    public async Task<CqlFinding> EvaluateAsync(Bundle bundle, string drugCode)
     {
         if (!_drugToRules.TryGetValue(drugCode, out var rules) || rules.Count == 0)
             return new(CqlOutcome.NotEvaluated, "", new[] { $"藥碼 {drugCode} 無對應 CQL 規則。" });
@@ -61,27 +63,39 @@ public sealed class CqlPreCheck : ICqlPreCheck
         var worst = CqlOutcome.Pass;                         // 一藥多規:任一沒過就沒過;資料未填優先於條件不符
         foreach (var ruleId in rules)
         {
-            var named = _engine.Evaluate(ruleId, bundle);    // 引擎載入 ELM + 依賴閉包並執行
+            var named = await _engine.EvaluateAsync(ruleId, bundle); // 引擎載入 ELM + 依賴閉包並執行
             var (outcome, why) = Interpret(ruleId, named);
             reasons.AddRange(why);
+            // severity: DataMissing/WouldBeRejected(blocking) > NotEvaluated(unknown) > Pass.
+            // 「無法判定」不能被當成「通過」。
             if (outcome == CqlOutcome.DataMissing) worst = CqlOutcome.DataMissing;
             else if (outcome == CqlOutcome.WouldBeRejected && worst != CqlOutcome.DataMissing)
                 worst = CqlOutcome.WouldBeRejected;
+            else if (outcome == CqlOutcome.NotEvaluated && worst == CqlOutcome.Pass)
+                worst = CqlOutcome.NotEvaluated;
         }
         return new(worst, string.Join(",", rules), reasons);
     }
 
     /// <summary>把引擎回的『具名 expression 值』詮釋成三態。命名慣例取自實際規則的輸出 define:
-    /// 「…申請結果_布林」= 最終核准布林;「…報告總結」= 人可讀總結;凡「…資料存在 / 有填…」= false → 屬資料未填。</summary>
+    /// 「…申請結果_布林」= 最終核准布林;「…報告總結」= 人可讀總結;「…資料存在 / 有填…」= 中間資料旗標。
+    /// 關鍵:先看『最終布林』。$evaluate 會回所有中間 define,而規則的布林代數本就允許某些 alt-path 腿為 false
+    /// (例:HR 走 ER 或 PR 任一即可)。若拿任一中間腿 false 就判補件,會把『其實會過』的案子誤報 → 先判布林。</summary>
     private static (CqlOutcome, IReadOnlyList<string>) Interpret(string ruleId, IReadOnlyDictionary<string, object?> named)
     {
-        // 必要資料未填 → 補件 (自查最能自動擋的一態)
+        var verdict = named.Where(kv => kv.Key.Contains("申請結果_布林")).Select(kv => kv.Value).ToList();
+
+        // 找不到最終布林 → 無法判定;絕不預設成核刪(那會誤把未知當拒絕)。
+        if (verdict.Count == 0)
+            return (CqlOutcome.NotEvaluated, new[] { $"[{ruleId}] 找不到『申請結果_布林』輸出,無法判定。" });
+
+        // 最終布林為真 = 通過(即使某些用不到的中間腿為 false)。
+        if (verdict.Any(v => v is true)) return (CqlOutcome.Pass, new[] { $"[{ruleId}] 通過" });
+
+        // 布林為假才分辨:有必要資料未填 → 補件;否則 → 條件不符(核刪)。
         var missing = named.Where(kv => (kv.Key.Contains("資料存在") || kv.Key.Contains("有填")) && kv.Value is false)
                            .Select(kv => $"[{ruleId}] 缺:{kv.Key}").ToList();
         if (missing.Count > 0) return (CqlOutcome.DataMissing, missing);
-
-        var result = named.FirstOrDefault(kv => kv.Key.Contains("申請結果_布林")).Value;
-        if (result is true) return (CqlOutcome.Pass, new[] { $"[{ruleId}] 通過" });
 
         var summary = named.FirstOrDefault(kv => kv.Key.Contains("報告總結")).Value as string;
         return (CqlOutcome.WouldBeRejected, new[] { $"[{ruleId}] 條件不符:{summary ?? "見規則"}" });
@@ -91,7 +105,7 @@ public sealed class CqlPreCheck : ICqlPreCheck
 /// <summary>未接引擎時的佔位:啟動 CQL 但還沒接 sidecar → 呼叫時明確 fail-loud,不假裝跑過。</summary>
 public sealed class NotWiredCqlEngine : ICqlEngine
 {
-    public IReadOnlyDictionary<string, object?> Evaluate(string ruleId, Bundle bundle)
+    public Task<IReadOnlyDictionary<string, object?>> EvaluateAsync(string ruleId, Bundle bundle)
         => throw new NotSupportedException(
             "CQL 引擎尚未接上。請接一個 sidecar(JS cql-execution / Java cqframework / CQF-Ruler)," +
             "載入規則 ELM 的完整依賴閉包後執行。見 spec/docs/cql-integration-notes.md。");

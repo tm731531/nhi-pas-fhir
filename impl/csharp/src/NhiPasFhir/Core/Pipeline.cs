@@ -15,7 +15,7 @@ public static class Pipeline
         "Pre-check is decision-support only; it does not guarantee reimbursement. " +
         "Final responsibility rests with the clinician and NHI adjudication.";
 
-    public static PipelineResult Run(PACase c, bool stopOnBlock = true, ICqlPreCheck? cql = null)
+    public static async Task<PipelineResult> RunAsync(PACase c, bool stopOnBlock = true, ICqlPreCheck? cql = null)
     {
         cql ??= NoCqlPreCheck.Instance;
 
@@ -33,7 +33,7 @@ public static class Pipeline
         // ③ CQL self-check — only when enabled — on the assembled Bundle.
         CqlFinding? cqlResult = null;
         if (cql.Enabled && c.Data.TryGetValue("drug_code", out var drug))
-            cqlResult = cql.Evaluate(bundle, (string)drug);
+            cqlResult = await cql.EvaluateAsync(bundle, (string)drug);
 
         var blocked = PreCheck.HasBlocking(findings)
             || cqlResult?.Outcome is CqlOutcome.WouldBeRejected or CqlOutcome.DataMissing;

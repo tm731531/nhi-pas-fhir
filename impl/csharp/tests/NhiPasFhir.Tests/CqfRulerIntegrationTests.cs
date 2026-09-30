@@ -21,14 +21,14 @@ public class CqfRulerIntegrationTests
     }
 
     [Fact]
-    public void Engine_runs_the_real_rule_and_returns_named_results()
+    public async System.Threading.Tasks.Task Engine_runs_the_real_rule_and_returns_named_results()
     {
         if (!ServerUp()) return; // server not running — skip
 
         var engine = new CqfRulerCqlEngine(Http, BaseUrl);
         var bundle = NhiPas.Build(Samples.CancerDrugCase());
 
-        var results = engine.Evaluate("BCAbemaciclibRule1", bundle);
+        var results = await engine.EvaluateAsync("BCAbemaciclibRule1", bundle);
 
         // The rule ran to completion (dozens of defines), and InCodeSystem worked (ICD data seen).
         Assert.True(results.Count > 30);
@@ -37,7 +37,7 @@ public class CqfRulerIntegrationTests
     }
 
     [Fact]
-    public void PreCheck_blocks_the_myeloma_bundle_against_the_breast_cancer_rule()
+    public async System.Threading.Tasks.Task PreCheck_blocks_the_myeloma_bundle_against_the_breast_cancer_rule()
     {
         if (!ServerUp()) return; // server not running — skip
 
@@ -45,7 +45,7 @@ public class CqfRulerIntegrationTests
         var cql = new CqlPreCheck(engine,
             new Dictionary<string, IReadOnlyList<string>> { ["BC27730100"] = new[] { "BCAbemaciclibRule1" } });
 
-        var r = Pipeline.Run(Samples.CancerDrugCase(), cql: cql);
+        var r = await Pipeline.RunAsync(Samples.CancerDrugCase(), cql: cql);
 
         // Our sample is a myeloma case; the breast-cancer Abemaciclib rule must not pass it.
         Assert.NotNull(r.Cql);

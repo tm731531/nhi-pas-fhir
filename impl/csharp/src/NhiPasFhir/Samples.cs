@@ -63,11 +63,16 @@ public static class Samples
         return c with { Data = new Dictionary<string, object>(c.Data) { ["priority_code"] = "3" } };  // 3 = 自主審查
     }
 
-    /// <summary>NHI decision (核定回應) — fabricated. Item 1 = 同意 (approve-comment "1").</summary>
+    /// <summary>NHI decision (核定回應) — fabricated. Claim-level 同意 (approve-comment "1"), with two
+    /// medical orders as item.detail[] (exercises the item(1)+detail(N) cardinality of ClaimResponse-twpas).</summary>
     public static ResponseCase ResponseCase() => new(
         ResponseId: "202505301000002", PatientRef: "Patient/pat-1", HospitalRef: "Organization/org-hosp",
-        ClaimRef: "Claim/cla-1", Created: "2026-09-28", Disposition: "審畢結果",
-        Items: new[] { new ResponseItem(ItemSequence: 1, ApproveCode: "1", ApprovedValue: 2) });
+        ClaimRef: "Claim/cla-1", Created: "2026-09-28", Disposition: "審畢結果", OverallApproveCode: "1",
+        Items: new[]
+        {
+            new ResponseItem(ItemSequence: 1, ApproveCode: "1", ApprovedValue: 2),
+            new ResponseItem(ItemSequence: 2, ApproveCode: "1", ApprovedValue: 2),
+        });
 
     /// <summary>錯誤回報範例(fabricated).</summary>
     public static OutcomeIssue[] ErrorOutcome() => new[] { new OutcomeIssue("error", "processing", "MSG_PARAM_INVALID") };
