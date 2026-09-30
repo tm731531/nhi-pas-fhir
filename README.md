@@ -1,5 +1,6 @@
 # nhi-pas-fhir — Taiwan NHI Prior Authorization (事前審查) FHIR reference implementation
 
+[![Release](https://img.shields.io/github/v/release/tm731531/nhi-pas-fhir?sort=semver)](https://github.com/tm731531/nhi-pas-fhir/releases)
 [![CI](https://github.com/tm731531/nhi-pas-fhir/actions/workflows/ci.yml/badge.svg)](https://github.com/tm731531/nhi-pas-fhir/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![FHIR R4](https://img.shields.io/badge/FHIR-R4%20(4.0.1)-e5462a.svg)](https://hl7.org/fhir/R4/)
