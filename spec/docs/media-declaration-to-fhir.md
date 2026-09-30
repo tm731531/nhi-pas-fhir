@@ -118,6 +118,7 @@ The 媒體申報 record is **three segment types**, nested one-to-many:
                     ├─ Condition × (d19 主 + d20-23 次)      → Claim.diagnosis[]
                     ├─ Procedure × (d24 主 + d25-26 次)       → Claim.procedure[]
                     ├─ Practitioner (d30 醫師, d31 藥師)      → Claim.careTeam[]
+                    ├─ Coverage + Organization(健保 payer)    → Claim.insurance[]  (base R4 requires 1..*)
                     └─ Organization (t2 filer, d17 上游機構)
 醫令清單段 p × N ─►  Claim.item[] (p13 序, p4 碼, p10 量, p12 點)
                     ├─ MedicationRequest  (p3=1 用藥: p4 藥碼, p5/p7/p9 用法)
@@ -142,21 +143,32 @@ handled as the spec notes. The converter does this conversion explicitly (§7).
 
 ---
 
-## 7. Reference converter
+## 7. Converter (both directions)
 
-`tools/media-declaration-to-fhir.py` — a reference converter that parses a 門診 media-declaration
-record (t / d / p segments, pipe-delimited synthetic sample with **fabricated** identifiers) and emits
-a FHIR **transaction Bundle** (Patient + Encounter + Condition + Claim + MedicationRequest). It maps
-the **verified** fields above and marks unverified code tables `TODO`. Prove the output is real FHIR:
+Primary implementation is **C#** (`impl/csharp/src/NhiPasFhir/MediaDeclaration/`), exposed as a CLI tool
+`samples/MediaTool` (`media-tool`), covered by `MediaDeclarationTests`. `tools/media-declaration-to-fhir.py`
+is the Python **reference mirror** (same mapping, forward only). Both map the **verified** fields above and
+mark unverified code tables `TODO`. Every output carries `Coverage` + `Claim.insurance` (健保 payer) so it
+is cardinality-valid base R4.
 
 ```bash
+# C# (primary) — both directions:
+cd impl/csharp
+dotnet run --project samples/MediaTool -- to-fhir  ../../tools/sample-media-declaration.txt > /tmp/claim.json
+dotnet run --project samples/MediaTool -- to-media /tmp/claim.json      # FHIR -> 媒體申報 (reverse)
+
+# Python (mirror) — forward only:
 python3 tools/media-declaration-to-fhir.py tools/sample-media-declaration.txt > /tmp/claim.json
-tools/validate.sh /tmp/claim.json            # base R4 structural (no billing IG exists to bind to)
-tools/post-to-public-server.sh /tmp/claim.json   # 真的打: POST to a live FHIR server (no creds)
+
+# prove the FHIR is real:
+tools/validate.sh /tmp/claim.json                 # base R4 structural (no billing IG exists to bind to)
+tools/post-to-public-server.sh /tmp/claim.json    # 真的打: POST to a live FHIR server (no creds)
 ```
 
-**Direction FHIR → 媒體申報** (for a HIS that keeps FHIR internally and must file with the NHI) is the
-inverse of the tables above, plus **recomputing** the t7–t40 totals from the d/p entries. Not yet built.
+**Direction FHIR → 媒體申報** (`to-media`, for a HIS that keeps FHIR internally but must file with the
+NHI) reconstructs the verified d/p fields and **recomputes** the t-segment totals from the d/p entries
+(t37 件數, t38 點數 = Σ p12 — never trusted inbound). It is a **minimal inverse**: only fields this doc
+maps survive the round-trip; unmapped code-table/dosage fields (§8) are lossy by design.
 
 ---
 

@@ -80,6 +80,18 @@ def convert(rec):
     })
     entries.append(prac)
 
+    # 健保 payer + Coverage — base R4 Claim requires insurance[1..*]. (d14 給付類別 -> Coverage.type: TODO.)
+    nhi, refs["nhi"] = entry({
+        "resourceType": "Organization", "id": "org-nhi",
+        "identifier": [{"system": f"{NHI_ID}/payer", "value": "NHI"}],
+    })
+    entries.append(nhi)
+    cov, refs["cov"] = entry({
+        "resourceType": "Coverage", "id": "cov-1", "status": "active",
+        "beneficiary": {"reference": refs["pat"]}, "payor": [{"reference": refs["nhi"]}],
+    })
+    entries.append(cov)
+
     # d9/d10 就醫/治療結束日期, d8 科別, d29 就醫序號 -> Encounter
     enc = {
         "resourceType": "Encounter", "id": "enc-1", "status": "finished",
@@ -166,6 +178,7 @@ def convert(rec):
         "priority": {"coding": [{"system": "http://terminology.hl7.org/CodeSystem/processpriority", "code": "normal"}]},
         "created": roc_date(t.get("t6")) or roc_date(d.get("d9")),
         "careTeam": [{"sequence": 1, "provider": {"reference": refs["doc"]}}],
+        "insurance": [{"sequence": 1, "focal": True, "coverage": {"reference": refs["cov"]}}],
         "diagnosis": diagnoses,
         "item": items,
         # d1 案件分類 -> subType (TODO: 案件分類 code table, 註11/註19)

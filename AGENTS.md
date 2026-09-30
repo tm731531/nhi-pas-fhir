@@ -20,11 +20,11 @@ Flow: **產 (assemble) → 驗 (seed check) → 查 (CQL) → 送 (submit) → �
 |---|---|
 | `spec/` | Language-agnostic source of truth: IG mirror, reference golden bundles, architecture/coverage/traceability docs. |
 | `spec/docs/cql-explained.md` · `cql-wiring.md` · `cql-integration-notes.md` | Plain-language + technical CQL docs. |
-| `impl/csharp/` | **Primary** implementation (Firely). Library in `src/NhiPasFhir/`, tests in `tests/`, emitter in `samples/Emit`. |
+| `impl/csharp/` | **Primary** implementation (Firely). Library in `src/NhiPasFhir/` (incl. `MediaDeclaration/` — 醫療費用申報 ↔ FHIR), tests in `tests/`, emitter in `samples/Emit`, media CLI in `samples/MediaTool` (`media-tool to-fhir/to-media`). |
 | `impl/python/` | Reference implementation (pydantic). |
 | `cql-engine/` | The CQL engine: `rules/` (official Library resources, text/cql), `elm/` (compiled), `server/` (CQF-Ruler docker + loader), `js/` (a historical JS runner). |
 | `demo/NhiPasDemo/` | ASP.NET Core Razor Pages app consuming the library (the whole flow). |
-| `tools/` | `fetch_validation_assets.sh` (validator + IG package), `validate.sh` (official HL7 validator wrapper), `post-to-public-server.sh` (really POST a bundle to a live public FHIR server — no creds), `media-declaration-to-fhir.py` (健保 醫療費用申報 media/XML format → FHIR Claim graph; sample in `sample-media-declaration.txt`). |
+| `tools/` | `fetch_validation_assets.sh` (validator + IG package), `validate.sh` (official HL7 validator wrapper), `post-to-public-server.sh` (really POST a bundle to a live public FHIR server — no creds), `media-declaration-to-fhir.py` (Python mirror of the C# `media-tool`; 健保 醫療費用申報 → FHIR; sample in `sample-media-declaration.txt`). |
 | `docs/` | GitHub Pages: `index.html` landing + `flow.html` interactive diagram. |
 
 ## Setup / build / test / run (copy-paste)
@@ -33,7 +33,7 @@ The layered test strategy (external validator + goldens + contract/integration +
 is in [`TESTING.md`](TESTING.md) — read it to understand what proves correctness before you change code.
 
 ```bash
-# 1) Build + test the library (only .NET 8 SDK needed). 48 test cases (46 CI + 2 live-integration) incl. byte-for-byte golden regression.
+# 1) Build + test the library (only .NET 8 SDK needed). 56 test cases (54 CI + 2 live-integration) incl. byte-for-byte golden regression.
 dotnet test impl/csharp/NhiPasFhir.sln
 
 # 2) Emit the sample bundles, then validate against the OFFICIAL HL7 validator (larger download).
