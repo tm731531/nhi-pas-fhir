@@ -3,47 +3,71 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>nhi-pas-fhir — Taiwan NHI Prior Authorization (事前審查) FHIR</title>
-<meta name="description" content="Open-source, validator-clean FHIR R4 reference implementation for Taiwan NHI Prior Authorization (健保事前審查 / TWPAS), with a faithful CQL pre-submit rule check. C# (Firely) + Python.">
+<title>nhi-pas-fhir — 送健保事前審查前，先自己對一次答案</title>
+<meta name="description" content="開源工具:把台灣健保『事前審查(TWPAS)』申請自動組成官方標準 FHIR 格式,並用健保官方 CQL 規則在送出前先檢查,把會被核刪/補件的先抓出來。C#(Firely)+ Python。">
 <style>
-  :root{ --bg:#0f1420; --card:#161c2b; --fg:#e6edf6; --mut:#9fb0c8; --acc:#4f8cff; --line:#26304a; }
-  @media (prefers-color-scheme: light){ :root{ --bg:#f6f8fc; --card:#fff; --fg:#182234; --mut:#5a6b85; --acc:#2f6bdb; --line:#e3e9f2; } }
+  :root{ --bg:#0f1420; --card:#171e2e; --fg:#e8eef7; --mut:#9db0cb; --acc:#5b93ff; --ok:#3fb984; --warn:#e0b03a; --bad:#e0685f; --line:#28324c; }
+  @media (prefers-color-scheme: light){ :root{ --bg:#f7f9fc; --card:#fff; --fg:#16233a; --mut:#5a6a85; --acc:#2f6bdb; --ok:#1e9e6a; --warn:#b9861a; --bad:#c9463c; --line:#e5ebf4; } }
   *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);
-    font:16px/1.65 system-ui,-apple-system,"Segoe UI","Noto Sans TC",sans-serif}
-  .wrap{max-width:860px;margin:0 auto;padding:3rem 1.25rem 4rem}
-  h1{font-size:1.9rem;margin:.2rem 0 .4rem;letter-spacing:-.01em}
-  .sub{color:var(--mut);font-size:1.05rem;margin:0 0 1.4rem}
-  .flow{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:1.2rem 0 1.6rem;font-size:.95rem}
-  .flow b{background:var(--acc);color:#fff;border-radius:999px;padding:.15rem .6rem;font-weight:600}
-  .flow span{color:var(--mut)}
-  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.9rem;margin:1.4rem 0}
-  a.card{display:block;background:var(--card);border:1px solid var(--line);border-radius:.7rem;
-    padding:1rem 1.1rem;text-decoration:none;color:inherit;transition:border-color .15s}
-  a.card:hover{border-color:var(--acc)}
-  a.card b{color:var(--acc)} a.card p{margin:.3rem 0 0;color:var(--mut);font-size:.9rem}
-  .kw{color:var(--mut);font-size:.85rem;margin-top:1.6rem;border-top:1px solid var(--line);padding-top:1rem}
-  code{background:var(--line);padding:.1rem .35rem;border-radius:.25rem;font-size:.85em}
+    font:16px/1.7 system-ui,-apple-system,"Segoe UI","Noto Sans TC",sans-serif}
+  .wrap{max-width:820px;margin:0 auto;padding:2.6rem 1.25rem 4rem}
+  h1{font-size:1.75rem;line-height:1.35;margin:.2rem 0 .6rem;letter-spacing:-.01em}
+  h2{font-size:1.15rem;margin:2.2rem 0 .7rem}
+  .lead{font-size:1.08rem;color:var(--fg)}
+  .mut{color:var(--mut)}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:.8rem;padding:1.1rem 1.2rem;margin:1rem 0}
+  .steps{display:grid;gap:.55rem;margin:.6rem 0}
+  .step{display:grid;grid-template-columns:auto 1fr;gap:.7rem;align-items:baseline}
+  .step .n{background:var(--acc);color:#fff;border-radius:999px;padding:.05rem .55rem;font-size:.8rem;font-weight:700;white-space:nowrap}
+  .step b{font-weight:600}
+  .verdict{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.3rem}
+  .pill{font-size:.82rem;border-radius:999px;padding:.1rem .55rem;border:1px solid var(--line)}
+  .pill.ok{color:var(--ok)} .pill.warn{color:var(--warn)} .pill.bad{color:var(--bad)}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.7rem;margin:.8rem 0}
+  a.card{display:block;background:var(--card);border:1px solid var(--line);border-radius:.6rem;padding:.85rem 1rem;text-decoration:none;color:inherit;transition:border-color .15s}
+  a.card:hover{border-color:var(--acc)} a.card b{color:var(--acc)} a.card p{margin:.25rem 0 0;color:var(--mut);font-size:.86rem}
+  .kw{color:var(--mut);font-size:.82rem;margin-top:2rem;border-top:1px solid var(--line);padding-top:1rem}
+  code{background:var(--line);padding:.08rem .32rem;border-radius:.25rem;font-size:.86em}
+  .tag{display:inline-block;font-size:.78rem;color:var(--mut);border:1px solid var(--line);border-radius:999px;padding:.05rem .5rem;margin:0 .3rem .3rem 0}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>nhi-pas-fhir</h1>
-  <p class="sub">台灣健保 <b>事前審查(TWPAS)</b> 的 FHIR R4 參考實作 —— 把申請組成官方驗證 0-errors 的
-    Bundle,並用健保<b>官方 CQL 規則送前自查</b>,擋掉會被核刪 / 補件的。C# (Firely) + Python。</p>
 
-  <div class="flow">
-    <b>① 產</b><span>組 Bundle</span><span>→</span>
-    <b>② 驗</b><span>種子檢查</span><span>→</span>
-    <b>③ 查</b><span>CQL 自查</span><span>→</span>
-    <b>④ 送</b><span>提交</span><span>→</span>
-    <b>⑤ 回</b><span>核定回應</span>
+  <div style="margin-bottom:.4rem">
+    <span class="tag">開源 · Apache-2.0</span><span class="tag">C# (Firely) + Python</span><span class="tag">FHIR R4</span>
   </div>
 
+  <h1>送健保「事前審查」前,先自己對一次答案。</h1>
+  <p class="lead">台灣健保有些藥品和治療,醫療院所要先送<b>「事前審查(TWPAS)」</b>才給付。
+    這個開源專案幫你把申請<b>自動組成健保系統看得懂的國際標準格式(FHIR)</b>,並在送出前
+    <b>用健保自己公開的規則先檢查一遍</b> —— 該補的先補、會被退錢的先擋。</p>
+
+  <h2>它解決什麼問題?</h2>
+  <div class="panel">
+    <p style="margin:.1rem 0">申請填錯或漏填,健保<b>收件當下看起來沒事</b> ——
+      但問題不是當下爆,是<b class="mut" style="color:var(--bad)">幾週後審查才「核刪」(把已經給你的錢扣回去)</b>。</p>
+    <p style="margin:.6rem 0 .1rem" class="mut">「送出去沒事」是陷阱。這個工具在<b style="color:var(--fg)">送出前</b>,
+      用健保官方規則先跑一遍,把那些「事後才會爆」的問題提前抓出來,讓你先修再送。</p>
+  </div>
+
+  <h2>它做的五件事</h2>
+  <div class="panel steps">
+    <div class="step"><span class="n">① 產</span><span><b>組申請</b> — 把病人、醫師、診斷(ICD)、要申請的藥…組成一份標準 FHIR 文件(Bundle),保證通過官方驗證 0 錯誤。</span></div>
+    <div class="step"><span class="n">② 驗</span><span><b>基本檢查</b> — 藥和適應症是不是合法組合。</span></div>
+    <div class="step"><span class="n">③ 查</span><span><b>送前自查</b> — 用健保<b>官方 CQL 規則</b>對這份申請跑一遍,得出三態:
+      <span class="verdict"><span class="pill ok">通過</span><span class="pill bad">會被核刪</span><span class="pill warn">缺資料待補</span></span></span></div>
+    <div class="step"><span class="n">④ 送</span><span><b>提交</b> — 送到收件端。</span></div>
+    <div class="step"><span class="n">⑤ 回</span><span><b>核定回應</b> — 收到結果。注意:<b>「受理」不等於「核准」</b>,真正核定是事後才有。</span></div>
+  </div>
+
+  <h2>誰會用到 / 從哪開始</h2>
+  <p class="mut" style="margin-top:.2rem">給開發健保申報、醫療資訊系統的工程師,或想看台灣健保 FHIR 怎麼落地的人。</p>
   <div class="cards">
-    <a class="card" href="flow.html"><b>互動流程圖 →</b><p>產→驗→查→送→回,每站對應真實 class / 檔案</p></a>
-    <a class="card" href="https://github.com/tm731531/nhi-pas-fhir"><b>GitHub 原始碼 →</b><p>C# 主實作、Python 參考、CQL 引擎、demo</p></a>
-    <a class="card" href="https://github.com/tm731531/nhi-pas-fhir/blob/dev/spec/docs/cql-explained.md"><b>CQL 是什麼 →</b><p>16 個問答:從零搞懂 CQL / ELM / 引擎</p></a>
-    <a class="card" href="https://github.com/tm731531/nhi-pas-fhir/blob/dev/spec/docs/cql-wiring.md"><b>CQL 怎麼串 →</b><p>一張圖看它怎麼接進框架</p></a>
+    <a class="card" href="flow.html"><b>▶ 看互動流程圖</b><p>產→驗→查→送→回,每一站點開看對應的真實程式</p></a>
+    <a class="card" href="https://github.com/tm731531/nhi-pas-fhir"><b>▶ 看原始碼 (GitHub)</b><p>C# 主實作、Python 參考、CQL 引擎、可跑的 demo</p></a>
+    <a class="card" href="https://github.com/tm731531/nhi-pas-fhir/blob/dev/spec/docs/cql-explained.md"><b>▶ CQL 是什麼</b><p>16 個問答,從零把觀念講清楚(不需先懂 FHIR)</p></a>
+    <a class="card" href="https://github.com/tm731531/nhi-pas-fhir/blob/dev/spec/docs/cql-wiring.md"><b>▶ CQL 怎麼串</b><p>一張圖看它怎麼接進整個框架</p></a>
   </div>
 
   <p class="kw">Taiwan NHI · 健保 · 事前審查 · TWPAS · Prior Authorization · FHIR R4 · Da Vinci PAS ·
