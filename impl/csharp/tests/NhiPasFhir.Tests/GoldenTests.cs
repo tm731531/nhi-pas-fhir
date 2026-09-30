@@ -36,6 +36,9 @@ public class GoldenTests
     [Fact] public void EPrescription_reproduces_golden()         // 電子處方箋 (nhi.empd) — validated 0 errors
         => AssertReproducesGolden(Samples.EPrescriptionCase(), "e-prescription.golden.json");
 
+    [Fact] public void Ngs_reproduces_golden()                   // 次世代基因定序 (nhi.ngs) — validated 0 errors
+        => AssertReproducesGolden(Samples.NgsCase(), "ngs.golden.json");
+
     [Fact] public void UuidStyle_reproduces_golden()
     {
         var expected = File.ReadAllText(GoldenPath("uuid.golden.json"));

@@ -102,4 +102,16 @@ public static class Sys
     public const string ExtPersonAge = TwcoreSd + "/person-age";
     public const string MedicationNhiTw = "https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/medication-nhi-tw";
     public const string MedicationPathTw = "https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/medication-path-tw";
+
+    // --- 次世代基因定序 NGS (nhi.ngs 1.0.0) — transcribed from the official example Bundle-bun-nos-min. ---
+    public const string NgsBase = "https://nhicore.nhi.gov.tw/ngs";
+    public const string NgsSd = NgsBase + "/StructureDefinition";
+    public const string NgsApplyType = NgsBase + "/CodeSystem/nhi-apply-type";
+    public const string NgsCaseClassification = NgsBase + "/CodeSystem/nhi-case-classification";
+    public const string NgsOrgId = NgsBase + "/CodeSystem/organization-identifier-tw";
+    public const string NgsExtDiagReportCondition = NgsSd + "/extension-DiagnosticReport-condition";
+    public const string DepMohw = "https://dep.mohw.gov.tw";            // genetic-testing org identifier
+    public const string GeneNames = "http://www.genenames.org";        // HGNC gene ids
+    public const string Hgvs = "http://varnomen.hgvs.org";             // HGVS variant nomenclature
+    public const string MedicalServicePaymentTw = "https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/medical-service-payment-tw";
 }

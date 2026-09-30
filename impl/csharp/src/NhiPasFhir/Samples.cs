@@ -85,6 +85,16 @@ public static class Samples
         Created: "2024-02-19",
         Data: new Dictionary<string, object>());
 
+    /// <summary>次世代基因定序 NGS (nhi.ngs) — reproduces the official example Bundle-bun-nos-min. Fabricated.</summary>
+    public static PACase NgsCase() => new(
+        Ig: "tw.gov.mohw.nhi.ngs#1.0.0", CaseType: "ngs",
+        Patient: new Dictionary<string, string>
+        { ["id_card"] = "A123456789", ["name"] = "王大明", ["gender"] = "male", ["birth_date"] = "2001-01-01" },
+        Provider: new Dictionary<string, string>(),
+        Vitals: new Dictionary<string, double>(),
+        Created: "2024-07-25",
+        Data: new Dictionary<string, object>());
+
     /// <summary>NHI decision (核定回應) — fabricated. Claim-level 同意 (approve-comment "1"), with two
     /// medical orders as item.detail[] (exercises the item(1)+detail(N) cardinality of ClaimResponse-twpas).</summary>
     public static ResponseCase ResponseCase() => new(
