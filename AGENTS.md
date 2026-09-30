@@ -33,7 +33,7 @@ The layered test strategy (external validator + goldens + contract/integration +
 is in [`TESTING.md`](TESTING.md) — read it to understand what proves correctness before you change code.
 
 ```bash
-# 1) Build + test the library (only .NET 8 SDK needed). 60 test cases (58 CI + 2 live-integration) incl. byte-for-byte golden regression.
+# 1) Build + test the library (only .NET 8 SDK needed). 61 test cases (59 CI + 2 live-integration) incl. byte-for-byte golden regression.
 dotnet test impl/csharp/NhiPasFhir.sln
 
 # 2) Emit the sample bundles, then validate against the OFFICIAL HL7 validator (larger download).

@@ -42,6 +42,9 @@ public class GoldenTests
     [Fact] public void NotifiableDisease_reproduces_golden()     // 傳染病檢驗報告 (cdc.twidir) — validated 0 errors
         => AssertReproducesGolden(Samples.NotifiableDiseaseCase(), "notifiable-disease.golden.json");
 
+    [Fact] public void InspectionCheck_reproduces_golden()       // 電子病歷交換單張 EMR (emr) — validated 0 errors
+        => AssertReproducesGolden(Samples.InspectionCheckCase(), "inspection-check.golden.json");
+
     [Fact] public void UuidStyle_reproduces_golden()
     {
         var expected = File.ReadAllText(GoldenPath("uuid.golden.json"));

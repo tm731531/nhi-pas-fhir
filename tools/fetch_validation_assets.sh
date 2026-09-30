@@ -22,7 +22,7 @@ for ig in "ci:1.0.2" "empd:0.1.0" "ngs:1.0.0"; do
 done
 
 # IGs hosted on the FHIR registry (not nhicore). name:package-id:version
-for spec in "twidir:tw.gov.mohw.cdc.twidir:0.1.1"; do
+for spec in "twidir:tw.gov.mohw.cdc.twidir:0.1.1" "emr:tw.gov.mohw.emr:0.2.0"; do
   name="${spec%%:*}"; rest="${spec#*:}"; id="${rest%%:*}"; ver="${rest##*:}"
   echo "[1c] IG package ($id $ver, registry-hosted) ..."
   curl -fSL --retry 3 -o ".fhir/${name}-package.tgz" "https://packages.simplifier.net/${id}/${ver}"

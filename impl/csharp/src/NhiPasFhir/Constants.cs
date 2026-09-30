@@ -129,4 +129,12 @@ public static class Sys
     public const string TpechSlash = "https://tpech.gov.taipei/";     // 院內病歷號 (trailing slash)
     public const string TphMohw = "https://www.tph.mohw.gov.tw";      // 醫師證號
     public const string LimsCdc = "https://lims.cdc.gov.tw/";         // lab result id
+
+    // --- 電子病歷交換單張 EMR (tw.gov.mohw.emr 0.2.0) — transcribed from the official example Bundle-example-IC (檢驗檢查). ---
+    public const string EmrBase = "https://twcore.mohw.gov.tw/ig/emr";
+    public const string EmrSd = EmrBase + "/StructureDefinition";
+    public const string ExtIdentifierSuffix = TwcoreSd + "/identifier-suffix";
+    public const string Vghtpe = "https://www.vghtpe.gov.tw/Index.action";
+    public const string TwcoreIndex = "https://twcore.mohw.gov.tw/ig/index.html";
+    public const string Iso3166_1_3 = "http://hl7.org/fhir/ValueSet/iso3166-1-3";
 }

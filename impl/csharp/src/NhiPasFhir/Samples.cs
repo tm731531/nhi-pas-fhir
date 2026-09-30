@@ -105,6 +105,16 @@ public static class Samples
         Created: "2023-04-15",
         Data: new Dictionary<string, object>());
 
+    /// <summary>電子病歷交換單張 EMR (tw.gov.mohw.emr) — reproduces Bundle-example-IC (檢驗檢查). Fabricated.</summary>
+    public static PACase InspectionCheckCase() => new(
+        Ig: "tw.gov.mohw.emr#0.2.0", CaseType: "inspection-check",
+        Patient: new Dictionary<string, string>
+        { ["id_card"] = "A123456789", ["name"] = "黃睿駿", ["gender"] = "male", ["birth_date"] = "1999-01-01" },
+        Provider: new Dictionary<string, string>(),
+        Vitals: new Dictionary<string, double>(),
+        Created: "2023-01-04",
+        Data: new Dictionary<string, object>());
+
     /// <summary>NHI decision (核定回應) — fabricated. Claim-level 同意 (approve-comment "1"), with two
     /// medical orders as item.detail[] (exercises the item(1)+detail(N) cardinality of ClaimResponse-twpas).</summary>
     public static ResponseCase ResponseCase() => new(

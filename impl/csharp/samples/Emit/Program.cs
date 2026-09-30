@@ -20,6 +20,7 @@ Emit("ci-bundle.cs.json", Samples.CatastrophicIllnessCase());           // 重�
 Emit("empd-bundle.cs.json", Samples.EPrescriptionCase());               // 電子處方箋 (nhi.empd)
 Emit("ngs-bundle.cs.json", Samples.NgsCase());                          // 次世代基因定序 (nhi.ngs)
 Emit("twidir-bundle.cs.json", Samples.NotifiableDiseaseCase());          // 傳染病檢驗報告 (cdc.twidir)
+Emit("emr-bundle.cs.json", Samples.InspectionCheckCase());              // 電子病歷交換單張 (emr)
 // bun-uuid — self-assessment in urn:uuid referencing style
 EmitResource("pa-bundle-uuid.cs.json", NhiPas.ToUuidStyle(NhiPas.Build(Samples.SelfAssessmentCase())));
 
