@@ -50,7 +50,7 @@
 
 ## 6. 落地進度 — 選 C:CQF-Ruler 忠實引擎(2026-09-29)
 
-決策(decision-server):(1) 補 InCodeSystem 選 **B=接忠實引擎**;(2) 實現方式選 **C=CQF-Ruler / HAPI
+設計決策(design decision):(1) 補 InCodeSystem 選 **B=接忠實引擎**;(2) 實現方式選 **C=CQF-Ruler / HAPI
 clinical-reasoning 整台 FHIR server(docker),C# 打它 API**。理由:最乾淨分離、可獨立換。
 
 **Tom 的替換不變量:契約 = 「Bundle 進 → 三態出」。規則住在 server 不住在 C# code。** 故規則/IG 改版 =
