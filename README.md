@@ -39,15 +39,17 @@ patient's case; the library speaks FHIR.** It is a payload factory + validator g
 | 自主審查 (self-assessment) | 29 | Bundle-bun-self |
 | 核定回應 (NHI decision / ClaimResponse) | — | Bundle-bun-response |
 | OperationOutcome (error report) | — | error-example |
+| **重大傷病 (catastrophic illness, `nhi.ci`)** | 4 | Bundle-bun-min |
 
 Filing category (送核/補件/申復/爭議/申復補件) × application category (一般/自主/緊急) are parameterized,
 and the department field accepts any NHI department code. **40/40 profiles + 3/3 extensions** of the PAS
 IG are exercised (logical models are non-instantiable). See [spec/docs/COVERAGE.md](spec/docs/COVERAGE.md).
 
-> **Scope today:** this repo implements **one** IG — 事前審查 (`nhi.pas`) — with **two** case assemblers
-> (癌藥 · 免疫製劑). The other published Taiwan IGs (重大傷病, 電子處方箋, NGS, EMR, 傳染病…) are on the
-> roadmap, built the same way, one at a time. 長照 has **no published FHIR IG yet**. We never claim what
-> isn't built.
+> **Scope today:** this repo implements **two** IGs — 事前審查 (`nhi.pas`, assemblers 癌藥 · 免疫製劑) and
+> 重大傷病 (`nhi.ci`, validated 0 errors against the official example Bundle-bun-min). The other published
+> Taiwan IGs (電子處方箋, NGS, EMR, 傳染病…) are on the roadmap, built the same way, one at a time. It also
+> maps the mainstream 醫療費用申報 media/XML billing format to FHIR (see docs). 長照 has **no published FHIR
+> IG yet**. We never claim what isn't built.
 
 ## CQL pre-submit self-check (送前核刪自查)
 
@@ -139,7 +141,7 @@ This is AI-assisted code, so correctness is **machine-proven in layers**, not as
 is in **[TESTING.md](TESTING.md)**. In short:
 
 - **6 bundle types × `0 errors`** against the **official HL7 validator** (an authority outside the AI).
-- **14 byte-for-byte golden baselines** + **56 test cases** (54 CI-enforced + 2 live-integration) (`dotnet test`) — pipeline, CQL three-state,
+- **14 byte-for-byte golden baselines** + **57 test cases** (55 CI-enforced + 2 live-integration) (`dotnet test`) — pipeline, CQL three-state,
   transport adapters, fail-loud seams, live engine integration; mirrored by Python tests.
 - **3 independent adversarial review passes** (IG conformance, CQL conformance, architecture/security) —
   the layer that catches "plausible but wrong", which unit tests miss.

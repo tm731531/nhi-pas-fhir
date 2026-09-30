@@ -30,6 +30,9 @@ public class GoldenTests
     [Fact] public void SelfAssessment_reproduces_golden()
         => AssertReproducesGolden(Samples.SelfAssessmentCase(), "self-assessment.golden.json");
 
+    [Fact] public void CatastrophicIllness_reproduces_golden()   // 重大傷病 (nhi.ci) — validated 0 errors
+        => AssertReproducesGolden(Samples.CatastrophicIllnessCase(), "catastrophic-illness.golden.json");
+
     [Fact] public void UuidStyle_reproduces_golden()
     {
         var expected = File.ReadAllText(GoldenPath("uuid.golden.json"));

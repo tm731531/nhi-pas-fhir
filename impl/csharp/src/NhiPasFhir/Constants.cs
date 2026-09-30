@@ -65,4 +65,24 @@ public static class Sys
     public const string ExtClaimEncounter = Sd + "/extension-claim-encounter";
     public const string ExtRequestedService = Sd + "/extension-requestedService";
     public const string ExtDxRecordedDate = "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-diagnosisRecordedDate";
+
+    // --- 重大傷病 (nhi.ci 1.0.2) — systems transcribed from the official examples (Bundle-bun-min). ---
+    public const string CiBase = "https://nhicore.nhi.gov.tw/ci";
+    public const string CiSd = CiBase + "/StructureDefinition";
+    public const string CiApproveResult = CiBase + "/CodeSystem/nhi-approve-result";
+    public const string CiCategory = CiBase + "/CodeSystem/nhi-category";
+    public const string CiApplyMode = CiBase + "/CodeSystem/nhi-apply-mode";
+    public const string CiApplyType = CiBase + "/CodeSystem/nhi-apply-type";
+    public const string CiOrgId = CiBase + "/CodeSystem/organization-identifier-tw";
+    public const string CiCancerStage = CiBase + "/CodeSystem/cancer-stage";
+    public const string CiCancerStaging = CiBase + "/CodeSystem/nhi-cancerstaging";
+    public const string CiCancerStageStatus = CiBase + "/CodeSystem/nhi-cancerstage-status";
+    public const string CiCancerTreatment = CiBase + "/CodeSystem/nhi-cancer-treatment";
+    public const string CiCancerTreatmentPlan = CiBase + "/CodeSystem/nhi-cancer-treatment-plan";
+    public const string CiQuestionnaire = CiBase + "/Questionnaire/apply-catastrophic-illness";
+    public const string TwcorePostal3 = "https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/postal-code3-tw";
+    public const string ExtTwPostalCode = "https://twcore.mohw.gov.tw/ig/twcore/StructureDefinition/tw-postal-code";
+    public const string Tpech = "https://tpech.gov.taipei";           // 院內病歷號 assigning authority (example)
+    public const string BcpImg = "urn:ietf:bcp:13";                    // image media type
+    public const string RfcUri = "urn:ietf:rfc:3986";                  // DICOM SOP class as URI
 }

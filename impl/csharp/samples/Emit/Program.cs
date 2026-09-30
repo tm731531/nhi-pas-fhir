@@ -16,6 +16,7 @@ Emit("pa-bundle.cs.json", Samples.CancerDrugCase());
 Emit("pa-bundle-immunologic.cs.json", Samples.ImmunologicCase());
 Emit("pa-bundle-appeal.cs.json", Samples.AppealCase());                 // 申復
 Emit("pa-bundle-self.cs.json", Samples.SelfAssessmentCase());           // 自主審查
+Emit("ci-bundle.cs.json", Samples.CatastrophicIllnessCase());           // 重大傷病 (nhi.ci)
 // bun-uuid — self-assessment in urn:uuid referencing style
 EmitResource("pa-bundle-uuid.cs.json", NhiPas.ToUuidStyle(NhiPas.Build(Samples.SelfAssessmentCase())));
 

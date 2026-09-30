@@ -63,6 +63,18 @@ public static class Samples
         return c with { Data = new Dictionary<string, object>(c.Data) { ["priority_code"] = "3" } };  // 3 = 自主審查
     }
 
+    /// <summary>重大傷病 (nhi.ci) — reproduces the official example Bundle-bun-min. Fabricated data.
+    /// A different IG (Task-based); patient/doctor drive a few fields, the rest is example-fixed.</summary>
+    public static PACase CatastrophicIllnessCase() => new(
+        Ig: "tw.gov.mohw.nhi.ci#1.0.2", CaseType: "catastrophic-illness",
+        Patient: new Dictionary<string, string>
+        { ["id_card"] = "A123456789", ["name"] = "王大明", ["gender"] = "male", ["birth_date"] = "2001-01-01" },
+        Provider: new Dictionary<string, string>
+        { ["doctor_id_card"] = "A234649456", ["doctor_name"] = "王小明" },
+        Vitals: new Dictionary<string, double>(),
+        Created: "2024-01-01",
+        Data: new Dictionary<string, object>());
+
     /// <summary>NHI decision (核定回應) — fabricated. Claim-level 同意 (approve-comment "1"), with two
     /// medical orders as item.detail[] (exercises the item(1)+detail(N) cardinality of ClaimResponse-twpas).</summary>
     public static ResponseCase ResponseCase() => new(
