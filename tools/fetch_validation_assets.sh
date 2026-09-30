@@ -15,7 +15,7 @@ tar xzf .fhir/pas-package.tgz -C .fhir/pas-package
 echo "    package: $(python3 -c "import json;d=json.load(open('.fhir/pas-package/package/package.json'));print(d['name'],d['version'])")"
 
 # Additional published IGs implemented in this repo (same fetch shape). Add a line per IG as built.
-for ig in "ci:1.0.2" "empd:0.1.0" "ngs:1.0.0"; do
+for ig in "ci:1.0.2" "empd:0.1.0" "ngs:1.0.0" "base:1.0.0"; do
   name="${ig%%:*}"
   echo "[1b] IG package (nhi.$name) ..."
   curl -fSL --retry 3 -o ".fhir/${name}-package.tgz" "https://nhicore.nhi.gov.tw/${name}/package.tgz"

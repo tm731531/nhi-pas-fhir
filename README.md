@@ -51,8 +51,9 @@ IG are exercised (logical models are non-instantiable). See [spec/docs/COVERAGE.
 
 > **Scope today:** this repo implements **six** IGs — 事前審查 (`nhi.pas`, 癌藥 · 免疫製劑), 重大傷病
 > (`nhi.ci`), 電子處方箋 (`nhi.empd`), 次世代基因定序 (`nhi.ngs`), 傳染病檢驗報告 (`cdc.twidir`, a CDC IG),
-> and 電子病歷交換單張 (`emr`) — each validated 0 errors against its official example. `nhi.base` is the
-> shared foundation these inherit (no standalone bundle of its own). It also
+> and 電子病歷交換單張 (`emr`) — each validated 0 errors against its official example. `nhi.base` was
+> evaluated: it is a 健保 foundation **profile library** (Claim/Patient-twnhibase…) with no instantiable
+> bundle, so there is no case to build (see [spec/docs/validation/base-evaluation.md](spec/docs/validation/base-evaluation.md)). It also
 > maps the mainstream 醫療費用申報 media/XML billing format to FHIR (see docs). 長照 has **no published FHIR
 > IG yet**. We never claim what isn't built.
 
