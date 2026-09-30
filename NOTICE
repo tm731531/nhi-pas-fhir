@@ -1,0 +1,27 @@
+nhi-pas-fhir
+Copyright (c) Tom Ting
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+--------------------------------------------------------------------------------
+Third-party content (NOT covered by this repository's Apache-2.0 license)
+--------------------------------------------------------------------------------
+
+The following files are official artifacts of Taiwan's National Health Insurance
+FHIR Implementation Guides, published by 衛生福利部 / 中央健康保險署 (MOHW / NHIA),
+and are redistributed here for reference and testing only. They remain subject to
+the publishers' own terms, separate from this repository's Apache-2.0 grant:
+
+  * cql-engine/elm/*.json
+    cql-engine/rules/Library-*.json
+      — CQL / ELM rule libraries extracted from `tw.gov.mohw.nhi.cql` (v0.0.1, DRAFT),
+        https://build.fhir.org/ig/TWNHIFHIR/cql/
+
+  * Structure/profile/example content mirrored under spec/docs/ derives from
+    `tw.gov.mohw.nhi.pas` (v1.2.6) — https://nhicore.nhi.gov.tw/pas/ — which itself
+    builds on `tw.gov.mohw.twcore` and HL7 `hl7.fhir.us.davinci-pas`.
+
+These artifacts are authored by their respective publishers. Re-sync them from the
+official Implementation Guides; do not treat them as original work of this project.
+
+This project also builds on the Firely .NET SDK (Hl7.Fhir), Apache-2.0.

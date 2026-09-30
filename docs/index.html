@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>nhi-pas-fhir — Taiwan NHI Prior Authorization (事前審查) FHIR</title>
+<meta name="description" content="Open-source, validator-clean FHIR R4 reference implementation for Taiwan NHI Prior Authorization (健保事前審查 / TWPAS), with a faithful CQL pre-submit rule check. C# (Firely) + Python.">
+<style>
+  :root{ --bg:#0f1420; --card:#161c2b; --fg:#e6edf6; --mut:#9fb0c8; --acc:#4f8cff; --line:#26304a; }
+  @media (prefers-color-scheme: light){ :root{ --bg:#f6f8fc; --card:#fff; --fg:#182234; --mut:#5a6b85; --acc:#2f6bdb; --line:#e3e9f2; } }
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);
+    font:16px/1.65 system-ui,-apple-system,"Segoe UI","Noto Sans TC",sans-serif}
+  .wrap{max-width:860px;margin:0 auto;padding:3rem 1.25rem 4rem}
+  h1{font-size:1.9rem;margin:.2rem 0 .4rem;letter-spacing:-.01em}
+  .sub{color:var(--mut);font-size:1.05rem;margin:0 0 1.4rem}
+  .flow{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:1.2rem 0 1.6rem;font-size:.95rem}
+  .flow b{background:var(--acc);color:#fff;border-radius:999px;padding:.15rem .6rem;font-weight:600}
+  .flow span{color:var(--mut)}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.9rem;margin:1.4rem 0}
+  a.card{display:block;background:var(--card);border:1px solid var(--line);border-radius:.7rem;
+    padding:1rem 1.1rem;text-decoration:none;color:inherit;transition:border-color .15s}
+  a.card:hover{border-color:var(--acc)}
+  a.card b{color:var(--acc)} a.card p{margin:.3rem 0 0;color:var(--mut);font-size:.9rem}
+  .kw{color:var(--mut);font-size:.85rem;margin-top:1.6rem;border-top:1px solid var(--line);padding-top:1rem}
+  code{background:var(--line);padding:.1rem .35rem;border-radius:.25rem;font-size:.85em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>nhi-pas-fhir</h1>
+  <p class="sub">台灣健保 <b>事前審查(TWPAS)</b> 的 FHIR R4 參考實作 —— 把申請組成官方驗證 0-errors 的
+    Bundle,並用健保<b>官方 CQL 規則送前自查</b>,擋掉會被核刪 / 補件的。C# (Firely) + Python。</p>
+
+  <div class="flow">
+    <b>① 產</b><span>組 Bundle</span><span>→</span>
+    <b>② 驗</b><span>種子檢查</span><span>→</span>
+    <b>③ 查</b><span>CQL 自查</span><span>→</span>
+    <b>④ 送</b><span>提交</span><span>→</span>
+    <b>⑤ 回</b><span>核定回應</span>
+  </div>
+
+  <div class="cards">
+    <a class="card" href="flow.html"><b>互動流程圖 →</b><p>產→驗→查→送→回,每站對應真實 class / 檔案</p></a>
+    <a class="card" href="https://github.com/tm731531/nhi-pas-fhir"><b>GitHub 原始碼 →</b><p>C# 主實作、Python 參考、CQL 引擎、demo</p></a>
+    <a class="card" href="https://github.com/tm731531/nhi-pas-fhir/blob/dev/spec/docs/cql-explained.md"><b>CQL 是什麼 →</b><p>16 個問答:從零搞懂 CQL / ELM / 引擎</p></a>
+    <a class="card" href="https://github.com/tm731531/nhi-pas-fhir/blob/dev/spec/docs/cql-wiring.md"><b>CQL 怎麼串 →</b><p>一張圖看它怎麼接進框架</p></a>
+  </div>
+
+  <p class="kw">Taiwan NHI · 健保 · 事前審查 · TWPAS · Prior Authorization · FHIR R4 · Da Vinci PAS ·
+    TW Core · HL7 · CQL · ELM · CQF-Ruler · ClaimResponse · 核刪 · reference implementation ·
+    C# / Firely SDK · Python · healthcare interoperability. &nbsp;·&nbsp; Apache-2.0.</p>
+</div>
+</body>
+</html>

@@ -1,5 +1,10 @@
 # nhi-pas-fhir — Taiwan NHI Prior Authorization (事前審查) FHIR reference implementation
 
+[![CI](https://github.com/tm731531/nhi-pas-fhir/actions/workflows/ci.yml/badge.svg)](https://github.com/tm731531/nhi-pas-fhir/actions/workflows/ci.yml)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![FHIR R4](https://img.shields.io/badge/FHIR-R4%20(4.0.1)-e5462a.svg)](https://hl7.org/fhir/R4/)
+[![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4.svg)](https://dotnet.microsoft.com/)
+
 An open-source, spec-driven, multi-language framework that generates **officially-valid** Taiwan
 National Health Insurance (健保署) **FHIR** artifacts for **Prior Authorization / 事前審查 (TWPAS)**.
 Every output is gated by the **official HL7 FHIR validator at 0 errors** (structural + terminology).
