@@ -21,6 +21,13 @@ for ig in "ci:1.0.2" "empd:0.1.0" "ngs:1.0.0"; do
   curl -fSL --retry 3 -o ".fhir/${name}-package.tgz" "https://nhicore.nhi.gov.tw/${name}/package.tgz"
 done
 
+# IGs hosted on the FHIR registry (not nhicore). name:package-id:version
+for spec in "twidir:tw.gov.mohw.cdc.twidir:0.1.1"; do
+  name="${spec%%:*}"; rest="${spec#*:}"; id="${rest%%:*}"; ver="${rest##*:}"
+  echo "[1c] IG package ($id $ver, registry-hosted) ..."
+  curl -fSL --retry 3 -o ".fhir/${name}-package.tgz" "https://packages.simplifier.net/${id}/${ver}"
+done
+
 echo "[2/3] HL7 validator_cli.jar (~200MB) ..."
 if [ ! -s .fhir/validator_cli.jar ]; then
   curl -fSL --retry 3 -o .fhir/validator_cli.jar \

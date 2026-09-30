@@ -114,4 +114,19 @@ public static class Sys
     public const string GeneNames = "http://www.genenames.org";        // HGNC gene ids
     public const string Hgvs = "http://varnomen.hgvs.org";             // HGVS variant nomenclature
     public const string MedicalServicePaymentTw = "https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/medical-service-payment-tw";
+
+    // --- 傳染病檢驗報告 (cdc.twidir 0.1.1) — transcribed from the official example Bundle-bundle-request-ser-min. ---
+    public const string TwidirBase = "https://twidir.cdc.gov.tw/twidir";
+    public const string TwidirSd = TwidirBase + "/StructureDefinition";
+    public const string TwidirIdentifierType = TwidirBase + "/CodeSystem/twcdc-identifier-type-values";
+    public const string TwidirLoincPartSystem = TwidirBase + "/CodeSystem/loinc-part-system-values";
+    public const string TwidirOrgType = TwidirBase + "/CodeSystem/twcdc-organization-type-values";
+    public const string TwidirDeviceType = TwidirBase + "/CodeSystem/twcdc-device-type-values";
+    public const string Icd10cm2021Tw = "https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/icd-10-cm-2021-tw";
+    public const string TwcoreOrgId = "https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/organization-identifier-tw";
+    public const string PractitionerTwcore = TwcoreSd + "/Practitioner-twcore";
+    public const string Boca = "http://www.boca.gov.tw/";             // 護照號碼
+    public const string TpechSlash = "https://tpech.gov.taipei/";     // 院內病歷號 (trailing slash)
+    public const string TphMohw = "https://www.tph.mohw.gov.tw";      // 醫師證號
+    public const string LimsCdc = "https://lims.cdc.gov.tw/";         // lab result id
 }

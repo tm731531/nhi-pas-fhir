@@ -39,6 +39,9 @@ public class GoldenTests
     [Fact] public void Ngs_reproduces_golden()                   // 次世代基因定序 (nhi.ngs) — validated 0 errors
         => AssertReproducesGolden(Samples.NgsCase(), "ngs.golden.json");
 
+    [Fact] public void NotifiableDisease_reproduces_golden()     // 傳染病檢驗報告 (cdc.twidir) — validated 0 errors
+        => AssertReproducesGolden(Samples.NotifiableDiseaseCase(), "notifiable-disease.golden.json");
+
     [Fact] public void UuidStyle_reproduces_golden()
     {
         var expected = File.ReadAllText(GoldenPath("uuid.golden.json"));

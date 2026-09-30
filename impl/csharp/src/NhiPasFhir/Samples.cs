@@ -95,6 +95,16 @@ public static class Samples
         Created: "2024-07-25",
         Data: new Dictionary<string, object>());
 
+    /// <summary>傳染病檢驗報告 (cdc.twidir) — reproduces Bundle-bundle-request-ser-min. Fabricated.</summary>
+    public static PACase NotifiableDiseaseCase() => new(
+        Ig: "tw.gov.mohw.cdc.twidir#0.1.1", CaseType: "notifiable-disease-report",
+        Patient: new Dictionary<string, string>
+        { ["id_card"] = "888800371", ["name"] = "陳嘉明", ["gender"] = "male", ["birth_date"] = "1995-06-26" },
+        Provider: new Dictionary<string, string>(),
+        Vitals: new Dictionary<string, double>(),
+        Created: "2023-04-15",
+        Data: new Dictionary<string, object>());
+
     /// <summary>NHI decision (核定回應) — fabricated. Claim-level 同意 (approve-comment "1"), with two
     /// medical orders as item.detail[] (exercises the item(1)+detail(N) cardinality of ClaimResponse-twpas).</summary>
     public static ResponseCase ResponseCase() => new(
