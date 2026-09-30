@@ -4,6 +4,11 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <!-- CA2255: [ModuleInitializer] is used INTENTIONALLY so each ICaseAssembler self-registers with
+         AssemblerFactory on assembly load — this keeps case types decoupled (adding one = add a file,
+         no central list to edit). Converting to explicit registration would re-introduce that coupling,
+         so we accept the pattern here and silence the advisory. -->
+    <NoWarn>$(NoWarn);CA2255</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
