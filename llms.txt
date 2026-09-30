@@ -34,6 +34,12 @@
 - Toggle + socket design: ICqlPreCheck (off by default) → CqlPreCheck → ICqlEngine (CqfRulerCqlEngine);
   IPasSubmitter for 送. Rules live in the server; a rule/IG update = reload + re-run, no code change.
 
+## For AI agents
+
+- `AGENTS.md` — the agent onboarding guide: repo map, copy-paste build/test/run commands, how the
+  toggle/socket pieces fit, the non-negotiable rules (never fabricate FHIR; correctness = validator 0
+  errors), and the gotchas. Read it first if you are going to build or modify anything here.
+
 ## Map
 
 - `spec/` — language-agnostic single source of truth (specs, IG mirror, reference golden bundles).

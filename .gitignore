@@ -23,5 +23,5 @@ demo/**/obj/
 
 # internal AI-dev config (local only, not project source)
 CLAUDE.md
-AGENTS.md
+AGENTS.local.md
 spec/docs/strategy/
