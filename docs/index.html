@@ -3,35 +3,34 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>nhi-pas-fhir — 你的系統與健保之間的那一段:翻成 FHIR、送前自查、提交</title>
-<meta name="description" content="開源 framework:把你既有醫療系統裡的一筆健保『事前審查(TWPAS)』申請,翻成健保看得懂的 FHIR 格式,用官方 CQL 規則送出前自查(擋核刪/補件),再提交。定位、FHIR/CQL 是什麼、以及癌症/長照怎麼接。C#(Firely)+ Python。">
+<title>nhi-pas-fhir — 白話描述一筆申請 → 過官方驗證的健保 FHIR + 核刪預測</title>
+<meta name="description" content="開源:給一筆白話的健保事前審查(TWPAS)案子,產出過官方 HL7 validator 0-errors 的 FHIR Bundle,並用健保官方 CQL 規則預測會不會被核刪。省去自己啃 IG。C#(Firely)+ Python。">
 <style>
-  :root{ --bg:#0f1420; --card:#171e2e; --fg:#e8eef7; --mut:#9db0cb; --acc:#5b93ff; --ok:#3fb984; --warn:#e0b03a; --bad:#e0685f; --line:#28324c; --code:#0c1526; }
-  @media (prefers-color-scheme: light){ :root{ --bg:#f7f9fc; --card:#fff; --fg:#16233a; --mut:#5a6a85; --acc:#2f6bdb; --ok:#1e9e6a; --warn:#b9861a; --bad:#c9463c; --line:#e5ebf4; --code:#0d1526; } }
+  :root{ --bg:#0f1420; --card:#171e2e; --fg:#e8eef7; --mut:#9db0cb; --acc:#5b93ff; --ok:#3fb984; --warn:#e0b03a; --bad:#e0685f; --line:#28324c; --code:#0b1424; }
+  @media (prefers-color-scheme: light){ :root{ --bg:#f7f9fc; --card:#fff; --fg:#16233a; --mut:#5a6a85; --acc:#2f6bdb; --ok:#1e9e6a; --warn:#b9861a; --bad:#c9463c; --line:#e5ebf4; --code:#0b1424; } }
   *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);
     font:16px/1.7 system-ui,-apple-system,"Segoe UI","Noto Sans TC",sans-serif}
-  .wrap{max-width:840px;margin:0 auto;padding:2.4rem 1.25rem 4rem}
-  h1{font-size:1.7rem;line-height:1.38;margin:.4rem 0 .6rem;letter-spacing:-.01em}
-  h2{font-size:1.18rem;margin:2.3rem 0 .6rem;padding-top:.3rem}
+  .wrap{max-width:820px;margin:0 auto;padding:2.4rem 1.25rem 4rem}
+  h1{font-size:1.65rem;line-height:1.4;margin:.4rem 0 .55rem;letter-spacing:-.01em}
+  h2{font-size:1.15rem;margin:2.2rem 0 .6rem}
   .lead{font-size:1.05rem}
-  .mut{color:var(--mut)}
+  .mut{color:var(--mut)} b.ok{color:var(--ok)} b.bad{color:var(--bad)}
+  a{color:var(--acc)}
   .tag{display:inline-block;font-size:.78rem;color:var(--mut);border:1px solid var(--line);border-radius:999px;padding:.05rem .5rem;margin:0 .3rem .3rem 0}
   .panel{background:var(--card);border:1px solid var(--line);border-radius:.8rem;padding:1.05rem 1.15rem;margin:.9rem 0}
-  /* positioning diagram */
-  .pos{display:grid;grid-template-columns:1fr auto 1.25fr auto 1fr;gap:.5rem;align-items:stretch;text-align:center;margin:.4rem 0}
-  .pos .box{border:1px solid var(--line);border-radius:.6rem;padding:.7rem .5rem;font-size:.9rem}
-  .pos .me{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 12%,transparent)}
-  .pos .box b{display:block;margin-bottom:.15rem}
-  .pos .arrow{align-self:center;color:var(--mut)}
-  .pos small{color:var(--mut);font-size:.78rem}
-  @media(max-width:640px){ .pos{grid-template-columns:1fr;gap:.4rem} .pos .arrow{transform:rotate(90deg)} }
-  dl{margin:.4rem 0} dt{font-weight:600;margin-top:.7rem} dd{margin:.1rem 0 0;color:var(--mut)}
-  .steps{display:grid;gap:.5rem} .step{display:grid;grid-template-columns:auto 1fr;gap:.7rem;align-items:baseline}
-  .step .n{background:var(--acc);color:#fff;border-radius:999px;padding:.05rem .55rem;font-size:.8rem;font-weight:700;white-space:nowrap}
-  .pill{font-size:.82rem;border-radius:999px;padding:.1rem .55rem;border:1px solid var(--line)}
-  .pill.ok{color:var(--ok)} .pill.warn{color:var(--warn)} .pill.bad{color:var(--bad)}
-  pre{background:var(--code);color:#cdd9ee;border:1px solid var(--line);border-radius:.6rem;padding:.9rem 1rem;overflow:auto;font-size:.84rem;line-height:1.55}
-  pre .c{color:#7f93b3} pre .k{color:#6ab0ff} pre .s{color:#7fd6a0}
+  /* the example: input -> output */
+  .io{display:grid;grid-template-columns:1fr auto 1fr;gap:.7rem;align-items:stretch}
+  @media(max-width:640px){ .io{grid-template-columns:1fr} .io .mid{transform:rotate(90deg);justify-self:center} }
+  .io .col{border:1px solid var(--line);border-radius:.6rem;padding:.8rem .85rem;background:var(--bg)}
+  .io .lbl{font-size:.75rem;color:var(--mut);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.35rem}
+  .io .mid{align-self:center;color:var(--mut);font-size:1.3rem}
+  .io ul{margin:.2rem 0 0;padding-left:1.1rem} .io li{margin:.25rem 0;font-size:.93rem}
+  .verline{margin-top:.7rem;font-size:.9rem;color:var(--mut)}
+  pre{background:var(--code);color:#cdd9ee;border:1px solid var(--line);border-radius:.6rem;padding:.85rem 1rem;overflow:auto;font-size:.83rem;line-height:1.55}
+  pre .c{color:#7f93b3} pre .k{color:#6ab0ff} pre .s{color:#7fd6a0} pre .p{color:#e0b06a}
+  dl{margin:.2rem 0} dt{font-weight:600;margin-top:.6rem} dd{margin:.1rem 0 0;color:var(--mut)}
+  .steps{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;font-size:.92rem}
+  .steps b{background:var(--acc);color:#fff;border-radius:999px;padding:.1rem .5rem} .steps span{color:var(--mut)}
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.7rem;margin:.6rem 0}
   a.card{display:block;background:var(--card);border:1px solid var(--line);border-radius:.6rem;padding:.85rem 1rem;text-decoration:none;color:inherit;transition:border-color .15s}
   a.card:hover{border-color:var(--acc)} a.card b{color:var(--acc)} a.card p{margin:.25rem 0 0;color:var(--mut);font-size:.86rem}
@@ -47,76 +46,81 @@
     <span class="tag">開源 · Apache-2.0</span><span class="tag">C# (Firely) + Python</span><span class="tag">FHIR R4</span>
   </div>
 
-  <h1>你的醫療系統與健保之間的那一段。</h1>
-  <p class="lead">把你系統裡的一筆<b>健保「事前審查(TWPAS)」</b>申請,翻成健保看得懂的標準格式(<b>FHIR</b>),
-    在送出前用健保官方規則(<b>CQL</b>)先自查、擋掉會被退錢的,再提交。</p>
+  <h1>白話描述一筆申請 → 過官方驗證的健保 FHIR + 「會不會被核刪」的預測。</h1>
+  <p class="lead">要送健保<b>事前審查(TWPAS)</b>,你得產出符合官方 IG 的 FHIR。</p>
 
-  <h2>我們的定位:中間那一段,不是你的系統、也不是健保</h2>
   <div class="panel">
-    <div class="pos">
-      <div class="box"><b>你的既有系統</b><small>已有病人 / 診斷 / 藥的資料<br>(HIS / EMR / 自建)</small></div>
-      <div class="arrow">→</div>
-      <div class="box me"><b>本 framework</b><small>① 產 FHIR　② 驗　③ CQL 送前自查<br>④ 提交　⑤ 收核定</small></div>
-      <div class="arrow">→</div>
-      <div class="box"><b>健保</b><small>事前審查<br>收件 / 審查 / 核定</small></div>
+    <p style="margin:.1rem 0"><b>自己串 FHIR</b>:啃完整本健保 IG、填對 <b>40+ 個 profile</b> 與每個固定值、
+      跟 TW Core 術語坑纏鬥、自己除到官方 validator <b>0 錯</b> —— 做完<b>還是沒有</b>送前核刪自查。</p>
+    <p style="margin:.7rem 0 .1rem"><b style="color:var(--acc)">用這個 framework</b>:給一筆<b>白話案子</b>(不碰 FHIR),
+      直接拿到 <b class="ok">0-errors 的 Bundle</b> + <b>會不會被核刪的預測</b>。IG 的髒活我們替你做完、而且對得上官方。</p>
+  </div>
+
+  <h2>看一個實際例子</h2>
+  <div class="panel">
+    <div class="io">
+      <div class="col">
+        <div class="lbl">你給它(白話,不碰 FHIR)</div>
+        <ul>
+          <li>病人、醫師、醫院</li>
+          <li>診斷 ICD：<code>C90.00</code>(骨髓瘤)</li>
+          <li>想申請：乳癌藥 <b>Abemaciclib</b>(<code>BC27730100</code>)</li>
+        </ul>
+      </div>
+      <div class="mid">→</div>
+      <div class="col">
+        <div class="lbl">它給你</div>
+        <ul>
+          <li><b class="ok">✅ 一份 FHIR Bundle</b>,28 resources,<b>過官方 HL7 validator 0 errors</b></li>
+          <li><b class="bad">🔴 CQL 自查:會被核刪</b><br>理由(規則自己給的):<code>主要疾病之 ICD 代碼未使用 C50</code>(骨髓瘤≠乳癌)</li>
+        </ul>
+      </div>
     </div>
-    <p class="mut" style="margin:.6rem 0 0">你<b>只給一筆「案子的描述」</b>(病人、診斷、藥…,不碰 FHIR);
-      我們負責翻成 FHIR、送前自查、提交、收回應。<b>我們不取代你的系統,也不是健保的伺服器</b> —— 只做中間這段。</p>
+    <p class="verline">「這對不對?」全部可自己驗:產出的 Bundle 對照<b>官方範例 Bundle-bun-1</b>、能拿<b>官方 validator</b> 驗到 0 錯;
+      CQL 用的是<b>官方公開規則</b>。<br>
+      官方來源 → <a href="https://nhicore.nhi.gov.tw/pas/">健保事前審查 IG</a> ·
+      <a href="https://build.fhir.org/ig/TWNHIFHIR/cql/">官方 CQL 規則 IG</a></p>
   </div>
 
-  <h2>兩個名詞,先一句話講清楚</h2>
-  <div class="panel">
-    <dl>
-      <dt>FHIR 是什麼?</dt>
-      <dd>醫療資料交換的<b>國際標準格式</b>(像醫療界的 JSON/表單規格)。健保的事前審查規定用它來交換申請。你不用懂它 —— 我們把你的資料翻成它。</dd>
-      <dt>CQL 是什麼?</dt>
-      <dd>健保把「哪種藥、什麼條件才給付」的<b>審查規則寫成的公開格式</b>。我們拿<b>同一套官方規則</b>,在你送出前先對這筆申請跑一遍。</dd>
-    </dl>
+  <h2>自己試,clone 就能跑</h2>
+  <pre><span class="c"># 零設定(只需 .NET 8):48 綠 = 每個輸出 byte-for-byte 對得上</span>
+<span class="c">#   官方驗證過的 reference bundle</span>
+git clone https://github.com/tm731531/nhi-pas-fhir
+<span class="k">cd</span> nhi-pas-fhir
+dotnet test impl/csharp/NhiPasFhir.sln
+
+<span class="c"># 想親自過官方 HL7 validator?先抓驗證資產(較大),再驗:</span>
+tools/fetch_validation_assets.sh                        <span class="c"># validator + IG package</span>
+dotnet run --project impl/csharp/samples/Emit           <span class="c"># → build/*.json</span>
+tools/validate.sh impl/csharp/build/pa-bundle.cs.json   <span class="c"># Success: 0 errors</span></pre>
+  <p class="mut" style="margin:.4rem 0 0">或不裝任何東西,直接開 <a href="flow.html">互動流程圖</a> 看每一站對應的真實程式。</p>
+
+  <h2>你只需要懂這兩個名詞</h2>
+  <div class="panel"><dl>
+    <dt>FHIR</dt><dd>醫療資料交換的<b>國際標準格式</b>(健保規定用它交換申請)。你不用懂它 —— 我們把你的資料翻成它。</dd>
+    <dt>CQL</dt><dd>健保把「哪種藥、什麼條件才給付」寫成的<b>公開審查規則</b>。我們拿同一套,在你送出前先跑一遍。</dd>
+  </dl></div>
+
+  <h2>怎麼接進你既有的系統</h2>
+  <p class="mut" style="margin-top:.2rem">你系統已有這筆資料 → 填成中性的 <code>PACase</code>(不碰 FHIR)→ 呼叫一行。上面例子的程式就是:</p>
+  <pre><span class="k">var</span> c = <span class="k">new</span> PACase(CaseType:<span class="s">"cancer-drug"</span>, <span class="c">/* 病人/醫院/vitals */</span>
+    Data: <span class="k">new</span>(){ [<span class="s">"drug_code"</span>]=<span class="s">"BC27730100"</span>, [<span class="s">"diagnosis_icd"</span>]=<span class="s">"C90.00"</span> });
+
+<span class="k">var</span> r = <span class="k">await</span> Pipeline.RunAsync(c, cql: check);   <span class="c">// 產 FHIR + 送前 CQL 自查</span>
+<span class="k">if</span> (r.Blocked) show(r.Cql);   <span class="c">// 會被核刪/補件 → 先修</span>
+<span class="k">else</span> submit(r.Bundle);        <span class="c">// r.Bundle 可直接送</span></pre>
+  <div class="steps" style="margin:.7rem 0">
+    <b>① 產</b><span>組 FHIR</span><span>→</span><b>② 驗</b><span>→</span><b>③ 查</b><span>CQL</span><span>→</span><b>④ 送</b><span>→</span><b>⑤ 回</b>
   </div>
+  <p class="note"><b>長照怎麼用?</b> 長照是同一套 TW Core 地基上的另一本 IG,接法跟上面一樣、只換 <code>CaseType</code> ——
+    但誠實說:<b>長照組裝器在路線圖上,尚未實作</b>。目前實作的是健保事前審查。</p>
 
-  <h2>我們在流程裡做什麼(五步)</h2>
-  <div class="panel steps">
-    <div class="step"><span class="n">① 產</span><span><b>組申請</b> — 把你給的案子描述組成一份 FHIR 文件(Bundle),保證過官方驗證 0 錯誤。</span></div>
-    <div class="step"><span class="n">② 驗</span><span><b>基本檢查</b> — 藥 ↔ 適應症是不是合法組合。</span></div>
-    <div class="step"><span class="n">③ 查</span><span><b>CQL 送前自查</b> — 用健保官方規則跑一遍,三態:
-      <span class="pill ok">通過</span> <span class="pill bad">會被核刪</span> <span class="pill warn">缺資料待補</span></span></div>
-    <div class="step"><span class="n">④ 送</span><span><b>提交</b> 給收件端。</span></div>
-    <div class="step"><span class="n">⑤ 回</span><span><b>收核定回應</b>(注意:<b>受理 ≠ 核准</b>,核定是事後才有)。</span></div>
-  </div>
-
-  <h2>怎麼接進你既有的系統?</h2>
-  <p class="mut" style="margin-top:.2rem">核心概念:你的系統已經有這筆申請的資料 → 填成一個<b>中性的 <code>PACase</code></b>(完全不碰 FHIR)→ 呼叫我們一行。</p>
-
-  <p style="margin:.9rem 0 .3rem"><b>情境 A ── 癌症藥物要打健保</b></p>
-  <pre><span class="c">// 你的腫瘤科系統已有這筆資料，填成中性描述（不需懂 FHIR）：</span>
-<span class="k">var</span> c = <span class="k">new</span> PACase(
-    Ig: <span class="s">"...nhi.pas"</span>, CaseType: <span class="s">"cancer-drug"</span>,
-    Patient:  <span class="k">new</span>(){ [<span class="s">"id_card"</span>]=<span class="s">"…"</span>, [<span class="s">"birth_date"</span>]=<span class="s">"…"</span> },
-    Provider: <span class="k">new</span>(){ [<span class="s">"hospital_code"</span>]=<span class="s">"…"</span> },
-    Vitals:   <span class="k">new</span>(){ [<span class="s">"weight_kg"</span>]=60 }, Created: <span class="s">"2026-09-30"</span>,
-    Data:     <span class="k">new</span>(){ [<span class="s">"drug_code"</span>]=<span class="s">"BC27730100"</span>, [<span class="s">"diagnosis_icd"</span>]=<span class="s">"C50.9"</span>, <span class="c">/* 檢測、影像… */</span> });
-
-<span class="c">// 一行：組 FHIR + 種子檢查 + CQL 送前自查</span>
-<span class="k">var</span> r = <span class="k">await</span> Pipeline.RunAsync(c, cql: myCheck);
-
-<span class="k">if</span> (r.Blocked)  <span class="c">// 三態：會被核刪 / 缺資料待補 → 先修再送，別白白被扣錢</span>
-    ShowReasons(r.Cql);
-<span class="k">else</span>            <span class="c">// r.Bundle 就是可提交的 FHIR</span>
-    Submit(r.Bundle);</pre>
-
-  <p style="margin:1rem 0 .3rem"><b>情境 B ── 長照(long-term care)要怎麼用?</b></p>
-  <p class="mut" style="margin-top:.2rem">長照是<b>建在同一套 TW Core 地基</b>上的<b>另一本 IG</b>。本 framework 的介面是中性的
-    (你給 <code>PACase</code>、我們依 <code>CaseType</code> 挑對應的組裝器),設計上<b>「換一本 IG / profile 就能接」</b>,
-    你的接法跟情境 A 一模一樣,只是 <code>Ig</code>/<code>CaseType</code> 不同。</p>
-  <p class="note">誠實說:目前實作的是<b>健保事前審查</b>。<b>長照組裝器在路線圖上,尚未實作</b> ——
-    這裡講的是「設計上如何接」,不是「今天已經能跑」。</p>
-
-  <h2>從哪開始</h2>
+  <h2>更多</h2>
   <div class="cards">
-    <a class="card" href="flow.html"><b>▶ 看互動流程圖</b><p>產→驗→查→送→回,每站點開看對應的真實程式</p></a>
-    <a class="card" href="https://github.com/tm731531/nhi-pas-fhir"><b>▶ 看原始碼 (GitHub)</b><p>C# 主實作、Python 參考、CQL 引擎、可跑的 demo</p></a>
-    <a class="card" href="https://github.com/tm731531/nhi-pas-fhir/blob/dev/spec/docs/cql-explained.md"><b>▶ CQL 是什麼</b><p>16 個問答,從零講清楚(不需先懂 FHIR)</p></a>
+    <a class="card" href="https://github.com/tm731531/nhi-pas-fhir"><b>▶ 原始碼 (GitHub)</b><p>C# 主實作、Python 參考、CQL 引擎、demo</p></a>
+    <a class="card" href="https://github.com/tm731531/nhi-pas-fhir/blob/dev/spec/docs/cql-explained.md"><b>▶ CQL 是什麼</b><p>16 個問答,不需先懂 FHIR</p></a>
     <a class="card" href="https://github.com/tm731531/nhi-pas-fhir/blob/dev/spec/docs/cql-wiring.md"><b>▶ CQL 怎麼串</b><p>一張圖看它怎麼接進框架</p></a>
+    <a class="card" href="https://nhicore.nhi.gov.tw/pas/"><b>▶ 官方健保 IG</b><p>我們對齊的權威來源</p></a>
   </div>
 
   <p class="kw">Taiwan NHI · 健保 · 事前審查 · TWPAS · Prior Authorization · FHIR R4 · Da Vinci PAS ·
