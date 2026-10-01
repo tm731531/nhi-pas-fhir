@@ -1,9 +1,9 @@
-namespace NhiPasFhir.MediaDeclaration;
+namespace NhiPasFhir.Core;
 
-/// <summary>ROC (民國) date conversion for the NHI media-declaration format. Every date field
-/// (t3/t6, d9/d10/d11, p14/p15) is a zero-padded 民國 year per the spec (版更 112.08.25):
-/// 3-digit year + 2-digit month (+ 2-digit day). 西元 = 民國 + 1911.
-/// See spec/docs/media-declaration-to-fhir.md §6.</summary>
+/// <summary>ROC (民國) date conversion — a generic util (西元 = 民國 + 1911), shared by the
+/// media-declaration ingest and the 健保卡 card reader. Zero-padded 民國: 3-digit year + 2-digit month
+/// (+ 2-digit day) per the media-declaration spec (版更 112.08.25); the 健保卡 basic segment uses the same
+/// YYYMMDD form. See spec/docs/media-declaration-to-fhir.md §6.</summary>
 public static class RocDate
 {
     /// <summary>ROC "YYYMMDD" or "YYYMM" -> ISO ("2010-05-01" / "2010-05"). null if not parseable.</summary>

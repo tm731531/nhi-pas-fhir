@@ -1,4 +1,5 @@
 using Hl7.Fhir.Model;
+using NhiPasFhir.Core;
 
 namespace NhiPasFhir.MediaDeclaration;
 

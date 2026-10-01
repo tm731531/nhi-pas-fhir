@@ -24,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\NhiPasFhir\NhiPasFhir.csproj" />
     <ProjectReference Include="..\..\src\NhiPasFhir.Ingest\NhiPasFhir.Ingest.csproj" />
+    <ProjectReference Include="..\..\src\NhiPasFhir.CardReader\NhiPasFhir.CardReader.csproj" />
   </ItemGroup>
 
   <ItemGroup>
