@@ -2,7 +2,7 @@
 
 **Feature Branch**: `002-his-ingest-feed`
 **Created**: 2026-10-01
-**Status**: Draft — design approved in brainstorming 2026-10-01; pending spec review
+**Status**: Implemented 2026-10-01 — 每日上傳 XML ingest done (84 tests green, base-R4 gate + golden); 費用申報 CSV + vendor exports deferred; 讀卡/送件 are separate features
 **Input**: Replace the teaching-only `t|d|p` stand-in parser with a C# parser that reads a **real NHI
 format** — the 健保署 **每日上傳 XML** (`RECS>REC>MSH/MB1/MB2`, Big5) — normalizes it, and feeds the
 **existing FHIR converter** so a **fabricated sample file produces a FHIR Bundle that validates with 0
