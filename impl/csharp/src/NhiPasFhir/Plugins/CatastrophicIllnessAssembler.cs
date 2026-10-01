@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using Hl7.Fhir.Model;
 using NhiPasFhir.Core;
+using static NhiPasFhir.Core.FhirBuild;   // Cc / Cd / R — shared FHIR datatype builders
 using Task = Hl7.Fhir.Model.Task;   // disambiguate from System.Threading.Tasks.Task
 
 namespace NhiPasFhir.Plugins;
@@ -23,8 +24,7 @@ public sealed class CatastrophicIllnessAssembler : IgAssemblerBase
     [ModuleInitializer]
     internal static void Register() => AssemblerFactory.Register(IgId, Case, () => new CatastrophicIllnessAssembler());
 
-    // P / R come from IgAssemblerBase. Cd returns a Coding (for QR answer valueCoding) — distinct from Cc.
-    private static Coding Cd(string sys, string code, string? display = null) => new(sys, code) { Display = display };
+    // P from IgAssemblerBase; Cc / Cd / R from Fhir (using static). Cd = Coding, for QR answer valueCoding.
 
     // --- QuestionnaireResponse item helpers (keep the linkId 1-7 tree readable) ---
     private static QuestionnaireResponse.ItemComponent Grp(string linkId, string text, params QuestionnaireResponse.ItemComponent[] kids)
@@ -46,8 +46,8 @@ public sealed class CatastrophicIllnessAssembler : IgAssemblerBase
             Id = "pat-1", Meta = P("Patient-twci"),
             Identifier =
             {
-                new Identifier { Use = Identifier.IdentifierUse.Official, Type = new CodeableConcept(Sys.V2_0203, "NNxxx"), System = Sys.IdCard, Value = idCard },
-                new Identifier { Use = Identifier.IdentifierUse.Official, Type = new CodeableConcept(Sys.V2_0203, "MR"), System = Sys.Tpech, Value = "123456" },
+                new Identifier { Use = Identifier.IdentifierUse.Official, Type = Cc(Sys.V2_0203, "NNxxx"), System = Sys.IdCard, Value = idCard },
+                new Identifier { Use = Identifier.IdentifierUse.Official, Type = Cc(Sys.V2_0203, "MR"), System = Sys.Tpech, Value = "123456" },
             },
             Name = { new HumanName { Use = HumanName.NameUse.Usual, Text = name } },
             Telecom =
@@ -63,7 +63,7 @@ public sealed class CatastrophicIllnessAssembler : IgAssemblerBase
                 new Address
                 {
                     Text = "台北市大安區信義路三段140號",
-                    PostalCodeElement = new FhirString { Extension = { new Extension(Sys.ExtTwPostalCode, new CodeableConcept(Sys.TwcorePostal3, "106")) } },
+                    PostalCodeElement = new FhirString { Extension = { new Extension(Sys.ExtTwPostalCode, Cc(Sys.TwcorePostal3, "106")) } },
                 },
             },
         };
@@ -71,8 +71,8 @@ public sealed class CatastrophicIllnessAssembler : IgAssemblerBase
         var condition = new Condition
         {
             Id = "con-1", Meta = P("Condition-twci"),
-            ClinicalStatus = new CodeableConcept(Sys.ConditionClinical, "active"),
-            Category = { new CodeableConcept(Sys.CiCategory, "01") },
+            ClinicalStatus = Cc(Sys.ConditionClinical, "active"),
+            Category = { Cc(Sys.CiCategory, "01") },
             Subject = R("Patient/pat-1"),
         };
 
@@ -151,7 +151,7 @@ public sealed class CatastrophicIllnessAssembler : IgAssemblerBase
             Id = "task-1", Meta = P("Task-twci"),
             BasedOn = { R("Condition/con-1") },
             Status = Task.TaskStatus.Requested,
-            BusinessStatus = new CodeableConcept(Sys.CiApproveResult, "5"),   // 核定結果: 同意42天
+            BusinessStatus = Cc(Sys.CiApproveResult, "5"),   // 核定結果: 同意42天
             Intent = Task.TaskIntent.Order,
             Focus = R("QuestionnaireResponse/qr-1"),
             For = R("Patient/pat-1"),

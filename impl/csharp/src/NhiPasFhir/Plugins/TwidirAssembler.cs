@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using Hl7.Fhir.Model;
 using NhiPasFhir.Core;
+using static NhiPasFhir.Core.FhirBuild;
 
 namespace NhiPasFhir.Plugins;
 
@@ -38,7 +39,7 @@ public sealed class TwidirAssembler : IgAssemblerBase
             Name = { new HumanName { Use = HumanName.NameUse.Usual, Text = c.Patient.GetValueOrDefault("name", "陳嘉明") } },
             Gender = AdministrativeGender.Male,
             BirthDate = c.Patient.GetValueOrDefault("birth_date", "1995-06-26"),
-            Address = { new Address { PostalCodeElement = new FhirString { Extension = { new Extension(Sys.ExtTwPostalCode, new CodeableConcept(Sys.TwcorePostal3, "106")) } } } },
+            Address = { new Address { PostalCodeElement = new FhirString { Extension = { new Extension(Sys.ExtTwPostalCode, Cc(Sys.TwcorePostal3, "106")) } } } },
         };
 
         var orgSend = new Organization

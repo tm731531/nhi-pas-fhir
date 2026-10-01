@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using Hl7.Fhir.Model;
 using NhiPasFhir.Core;
+using static NhiPasFhir.Core.FhirBuild;
 
 namespace NhiPasFhir.Plugins;
 
@@ -22,9 +23,9 @@ public sealed class EmrAssembler : IgAssemblerBase
     [ModuleInitializer]
     internal static void Register() => AssemblerFactory.Register(IgId, Case, () => new EmrAssembler());
 
-    // P / R (relative) / Cc come from IgAssemblerBase. Abs = an ABSOLUTE reference — the IC example mixes
-    // absolute (here) and relative (base R) references per field, so both are needed; reproduced exactly.
-    private static ResourceReference Abs(string typeSlashId) => new($"{Sys.EmrBase}/{typeSlashId}");
+    // P from IgAssemblerBase; Cc / R (relative) from Fhir (using static). The IC example mixes absolute
+    // and relative references per field, so Abs (absolute) is also used — a thin alias over Fhir.AbsRef.
+    private static ResourceReference Abs(string typeSlashId) => AbsRef(Sys.EmrBase, typeSlashId);
 
     public override Bundle Assemble(PACase c)
     {
