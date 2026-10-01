@@ -29,8 +29,12 @@ public sealed class NoSubmitter : IPasSubmitter
 }
 
 /// <summary>Real transport: POST the claim Bundle to a PAS receiver endpoint and read back its response
-/// Bundle. Demo points <c>endpoint</c> at the demo's fake receiver; production points it at the real
-/// 健保 endpoint. Only the URL (and, in production, the auth/cert) changes — the flow is identical.</summary>
+/// Bundle. Demo points <c>endpoint</c> at the demo's fake receiver. Production: configure the injected
+/// <c>HttpClient</c> with the HCA 醫事憑證 client cert and route it over the 健保 VPN, then point
+/// <c>endpoint</c> at the real NHI endpoint — code unchanged. NOTE: the real 健保 transport may instead be
+/// the installed 醫療資料傳輸共通介面 (not plain REST); if so, write one more IPasSubmitter wrapping that
+/// local API — same socket. Exact binding is in the login-walled 介面規格. See
+/// spec/docs/real-submission-adapter.md for the full readiness picture + the production-wiring snippet.</summary>
 public sealed class HttpPasSubmitter : IPasSubmitter
 {
     private readonly HttpClient _http;

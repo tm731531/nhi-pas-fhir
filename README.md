@@ -139,6 +139,7 @@ maps to the real class/file/numbers. Open it locally, or serve it from GitHub Pa
 - [NHI↔FHIR MIGRATION](spec/docs/nhi-fhir-migration.md) — how 健保 data maps to/from FHIR (媒體申報 · FHIR IG · 長照 三個世界), and how an existing HIS/EMR migrates in stages
 - [MEDIA-DECLARATION↔FHIR](spec/docs/media-declaration-to-fhir.md) — the mainstream 醫療費用申報 media/XML format (總表段/點數清單段/醫令清單段, real field IDs) mapped to a FHIR Claim graph, with a reference converter
 - [LTC MODEL](spec/docs/ltc-model.md) — 長照 (non-FHIR): Barthel ADL + Lawton IADL scales + the published 給付 table, and why 失能等級 is not computed from ADL
+- [REAL-SUBMISSION ADAPTER](spec/docs/real-submission-adapter.md) — the real 送 to 健保 (VPN + 醫療資料傳輸共通介面 + HCA cert): what remains, why it's a credentials gate not a code gate, and the production wiring ready to flip on
 - [EXPLAINER](spec/docs/EXPLAINER.md) — what FHIR is, for a systems owner (not a FHIR expert)
 - [ARCHITECTURE](spec/docs/ARCHITECTURE.md) — interface → abstract → implementation + factory
 - [CASE-CATALOG](spec/docs/CASE-CATALOG.md) — every case type, lifecycle, class hierarchy

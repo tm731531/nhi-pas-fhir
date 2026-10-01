@@ -96,13 +96,14 @@ FHIR 把一筆申請拆成「一份文件（Bundle）裝很多資源（Resource�
 
 ---
 
-## 五、另一個方向:媒體申報 XML ↔ FHIR（研究中）
+## 五、另一個方向:媒體申報 XML ↔ FHIR（✅ 已建)
 
-日常健保核銷走的是**媒體申報**(不是 FHIR)。要做完整工具箱,得能雙向轉:
-- **媒體申報 → FHIR**:把申報總表/點數清單/醫令清單的欄位,對映成 FHIR 的 Claim/Encounter/資源。
-- **FHIR → 媒體申報**:反過來,讓 FHIR 產出的資料能落回健保申報。
-- **規範來源**:健保署「醫療費用 XML 申報格式」有公開規格 + 歷次修改版(nhi.gov.tw）。
-- **現況**:這是本專案的獨立工單（逐案型:門診/住院/事前審查各有格式),**尚未實作**,誠實標明。
+日常健保核銷走的是**媒體申報**(不是 FHIR)。工具箱已能**雙向轉**:
+- **媒體申報 → FHIR**:總表段/點數清單段/醫令清單段的欄位 → FHIR `Claim`+`Patient`/`Encounter`/`Condition`/`MedicationRequest`。
+- **FHIR → 媒體申報**:反過來,並**重算 t 段彙總**(件數/點數)不信 inbound。
+- **規範來源**:健保署「醫療費用 XML 申報格式」公開規格(門診格式 版更 112.08.25),欄位逐字轉錄。
+- **實作**:C# `media-tool`(`to-fhir` / `to-media`,主)+ Python 鏡像;逐欄位映射 + 四個真實踩坑見
+  [`media-declaration-to-fhir.md`](media-declaration-to-fhir.md)。**剩**:住院/交付機構格式、代碼表逐個查證(標 TODO)。
 
 ---
 
@@ -130,10 +131,12 @@ FHIR 把一筆申請拆成「一份文件（Bundle）裝很多資源（Resource�
 
 | 領域 | 世界 | 狀態 |
 |---|---|---|
-| 事前審查 (pas) | FHIR | ✅ 已做（本 repo 的活教材） |
-| 重大傷病 / 電子處方箋 / NGS / EMR / 傳染病 / 健保基礎 | FHIR | ⬜ 已發布可做,路線圖上,一本一本建 |
-| 媒體申報（費用申報） | 舊 XML | ⬜ 有規格,研究中,尚未實作 |
-| 長照 | 非 FHIR（量表/給付） | ⬜ **無 FHIR IG**;走量表/給付規範建模,尚未實作 |
+| 事前審查 (pas) | FHIR | ✅ 已做（癌藥·免疫製劑,0 errors） |
+| 重大傷病 / 電子處方箋 / NGS / 傳染病 / 電子病歷 | FHIR | ✅ **全部已做**,各自過官方 validator 0 errors |
+| 健保基礎 (nhi.base) | FHIR | ✅ 已評估=基礎 profile 層,無獨立 bundle([base-evaluation](validation/base-evaluation.md)) |
+| 媒體申報（費用申報） | 舊 XML | ✅ **已做**:C# `media-tool` 雙向 + Python 鏡像([mapping](media-declaration-to-fhir.md));剩住院格式/代碼表 TODO |
+| 長照 | 非 FHIR（量表/給付） | ✅ **已做**:Barthel ADL + Lawton IADL + 給付表([ltc-model](ltc-model.md));失能等級屬 CMS 官方工具不自推 |
+| 真實送件 adapter | — | 🔒 卡資格:需醫事憑證(HCA)+ 健保 VPN;shell 已備(`HttpPasSubmitter`),等憑證即真打 |
 
 **原則貫穿全篇:做多少、說多少;沒做好的,絕不宣稱做好了。**
 
