@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using Hl7.Fhir.Model;
 using NhiPasFhir.Core;
+using static NhiPasFhir.Core.FhirBuild;   // Cc — the single shared CodeableConcept builder
 
 namespace NhiPasFhir.Plugins;
 
@@ -24,7 +25,6 @@ public sealed class CancerDrugAssembler : AbstractCaseAssembler
     protected override CaseParts BuildCase(PACase c, Patient patient, Practitioner doctor, Organization hospital)
         => throw new NotSupportedException("cancer-drug overrides Assemble; BuildCase is not used.");
 
-    private static CodeableConcept Cc(string sys, string code, string? display = null) => new(sys, code, display);
     private static CodeableConcept Text(string text) => new() { Text = text };
     private static Attachment Pdf(string url, string title) => new() { ContentType = "application/pdf", Url = url, Title = title };
     private static string S(PACase c, string k, string dflt) => c.Data.TryGetValue(k, out var v) ? (string)v : dflt;
@@ -227,7 +227,7 @@ public sealed class CancerDrugAssembler : AbstractCaseAssembler
         var obsTx = new Observation
         {
             Id = "obs-tx-min", Meta = Profile("Observation-tx-assessment-twpas"), Status = ObservationStatus.Final,
-            Code = Cc(Sys.CsTxAst, "IWGC", "International Working Group(IWG) Consensus Criteria"),
+            Code = Cc(Sys.CsTxAst, "IWGC", text: "International Working Group(IWG) Consensus Criteria"),
             Subject = Ref(patient), Effective = new FhirDateTime("2024-05-07"), Performer = { Ref(doctor) },
             Value = new FhirString("Partial remission (PR)"),
         };
@@ -287,16 +287,16 @@ public sealed class CancerDrugAssembler : AbstractCaseAssembler
 
         var item1 = new Claim.ItemComponent
         {
-            Sequence = 1, ProductOrService = Cc(Sys.CsOrderType, "1", "藥品"),
-            Modifier = { Cc(Sys.CsContinuation, "1", "初次使用"), Cc(Sys.CsLineOfTherapy, "1", "第一線治療") },
+            Sequence = 1, ProductOrService = Cc(Sys.CsOrderType, "1", text: "藥品"),
+            Modifier = { Cc(Sys.CsContinuation, "1", text: "初次使用"), Cc(Sys.CsLineOfTherapy, "1", text: "第一線治療") },
             ProgramCode = { Text(S(c, "program_text", "ALK陽性的晚期非小細胞肺癌第一線治療")) },
             Quantity = new Quantity { Value = I(c, "drug_qty", 52), System = Sys.Ucum, Code = "{tbl}" },
         };
         item1.Extension.Add(new Extension(Sys.ExtRequestedService, Ref(medApply1)));
         var item2 = new Claim.ItemComponent
         {
-            Sequence = 2, ProductOrService = Cc(Sys.CsOrderType, "1", "藥品"),
-            Modifier = { Cc(Sys.CsContinuation, "1", "初次使用"), Cc(Sys.CsLineOfTherapy, "1", "第一線治療") },
+            Sequence = 2, ProductOrService = Cc(Sys.CsOrderType, "1", text: "藥品"),
+            Modifier = { Cc(Sys.CsContinuation, "1", text: "初次使用"), Cc(Sys.CsLineOfTherapy, "1", text: "第一線治療") },
             ProgramCode = { new CodeableConcept(Sys.CsApplyReason, S(c, "apply_reason", "C50P1")) },
             Quantity = new Quantity { Value = I(c, "drug_qty_2", 70), System = Sys.Ucum, Code = "{tbl}" },
         };

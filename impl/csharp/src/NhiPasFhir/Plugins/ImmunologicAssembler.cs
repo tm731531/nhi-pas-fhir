@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using Hl7.Fhir.Model;
 using NhiPasFhir.Core;
+using static NhiPasFhir.Core.FhirBuild;   // Cc — the single shared CodeableConcept builder
 
 namespace NhiPasFhir.Plugins;
 
@@ -25,7 +26,6 @@ public sealed class ImmunologicAssembler : AbstractCaseAssembler
     protected override CaseParts BuildCase(PACase c, Patient patient, Practitioner doctor, Organization hospital)
         => throw new NotSupportedException("immunologic-agent overrides Assemble; BuildCase is not used.");
 
-    private static CodeableConcept Cc(string sys, string code, string? display = null) => new(sys, code, display);
     private static CodeableConcept Text(string text) => new() { Text = text };
     // Case-payload readers: a caller may override via PACase.Data; absent → the example default (keeps the golden stable).
     private static string S(PACase c, string k, string dflt) => c.Data.TryGetValue(k, out var v) ? (string)v : dflt;
@@ -332,7 +332,7 @@ public sealed class ImmunologicAssembler : AbstractCaseAssembler
         {
             Id = "pro-phototherapy", Meta = Profile("Procedure-phototherapy-twpas"),
             Status = EventStatus.Completed,
-            Code = Cc(Sys.CsPhototherapy, "nb-UVB", "窄頻UVB(nb-UVB)"),
+            Code = Cc(Sys.CsPhototherapy, "nb-UVB", text: "窄頻UVB(nb-UVB)"),
             Subject = Ref(patient),
             Performed = new Period { Start = "2024-01-01", End = "2024-03-31" },
             UsedReference = { Ref(subPhoto) },
@@ -342,7 +342,7 @@ public sealed class ImmunologicAssembler : AbstractCaseAssembler
         {
             Id = "obs-tx-min", Meta = Profile("Observation-tx-assessment-twpas"),
             Status = ObservationStatus.Final,
-            Code = Cc(Sys.CsTxAst, "IWGC", "International Working Group(IWG) Consensus Criteria"),
+            Code = Cc(Sys.CsTxAst, "IWGC", text: "International Working Group(IWG) Consensus Criteria"),
             Subject = Ref(patient),
             Effective = new FhirDateTime("2024-05-07"),
             Performer = { Ref(doctor) },
@@ -411,8 +411,8 @@ public sealed class ImmunologicAssembler : AbstractCaseAssembler
         var item1 = new Claim.ItemComponent
         {
             Sequence = 1,
-            ProductOrService = Cc(Sys.CsOrderType, "1", "藥品"),
-            Modifier = { Cc(Sys.CsContinuation, "1", "初次使用"), Cc(Sys.CsLineOfTherapy, "1", "第一線治療") },
+            ProductOrService = Cc(Sys.CsOrderType, "1", text: "藥品"),
+            Modifier = { Cc(Sys.CsContinuation, "1", text: "初次使用"), Cc(Sys.CsLineOfTherapy, "1", text: "第一線治療") },
             ProgramCode = { Text(S(c, "program_text", "ALK陽性的晚期非小細胞肺癌第一線治療")) },
             Quantity = new Quantity { Value = I(c, "drug_qty", 52), System = Sys.Ucum, Code = "{tbl}" },
         };
@@ -420,8 +420,8 @@ public sealed class ImmunologicAssembler : AbstractCaseAssembler
         var item2 = new Claim.ItemComponent
         {
             Sequence = 2,
-            ProductOrService = Cc(Sys.CsOrderType, "1", "藥品"),
-            Modifier = { Cc(Sys.CsContinuation, "1", "初次使用"), Cc(Sys.CsLineOfTherapy, "1", "第一線治療") },
+            ProductOrService = Cc(Sys.CsOrderType, "1", text: "藥品"),
+            Modifier = { Cc(Sys.CsContinuation, "1", text: "初次使用"), Cc(Sys.CsLineOfTherapy, "1", text: "第一線治療") },
             ProgramCode = { new CodeableConcept(Sys.CsApplyReason, S(c, "apply_reason", "C50P1")) },
             Quantity = new Quantity { Value = I(c, "drug_qty_2", 70), System = Sys.Ucum, Code = "{tbl}" },
         };
