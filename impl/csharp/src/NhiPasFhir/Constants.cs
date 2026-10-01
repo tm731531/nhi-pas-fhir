@@ -68,7 +68,6 @@ public static class Sys
 
     // --- 重大傷病 (nhi.ci 1.0.2) — systems transcribed from the official examples (Bundle-bun-min). ---
     public const string CiBase = "https://nhicore.nhi.gov.tw/ci";
-    public const string CiSd = CiBase + "/StructureDefinition";
     public const string CiApproveResult = CiBase + "/CodeSystem/nhi-approve-result";
     public const string CiCategory = CiBase + "/CodeSystem/nhi-category";
     public const string CiApplyMode = CiBase + "/CodeSystem/nhi-apply-mode";
@@ -89,13 +88,12 @@ public static class Sys
 
     // --- 電子處方箋與調劑 (nhi.empd 0.1.0) — transcribed from the official example Bundle-bun-ep. ---
     public const string EmpdBase = "https://nhicore.nhi.gov.tw/empd";
-    public const string EmpdSd = EmpdBase + "/StructureDefinition";
     public const string EmpdCaseType = EmpdBase + "/CodeSystem/CaseType-cs";
     public const string EmpdPaymentCategory = EmpdBase + "/CodeSystem/PaymentCategory-cs";
     public const string EmpdTypeOfPrescription = EmpdBase + "/CodeSystem/TypeOfPrescription-cs";
     public const string EmpdOrderType = EmpdBase + "/CodeSystem/OrderType-cs";
     public const string EmpdSelfpayStatus = EmpdBase + "/CodeSystem/SelfpayStatus-cs";
-    public const string EmpdExtTotalDuration = EmpdSd + "/Extension-TotalDuration";
+    public const string EmpdExtTotalDuration = EmpdBase + "/StructureDefinition/Extension-TotalDuration";
     public const string MoiSlash = "http://www.moi.gov.tw/";           // note: empd uses a trailing slash
     public const string Hpio = "http://ns.electronichealth.net.au/id/hi/hpio/1.0";  // Org identifier (example)
     public const string MohwSlash = "https://www.mohw.gov.tw/";        // practitioner qualification id
@@ -105,11 +103,10 @@ public static class Sys
 
     // --- 次世代基因定序 NGS (nhi.ngs 1.0.0) — transcribed from the official example Bundle-bun-nos-min. ---
     public const string NgsBase = "https://nhicore.nhi.gov.tw/ngs";
-    public const string NgsSd = NgsBase + "/StructureDefinition";
     public const string NgsApplyType = NgsBase + "/CodeSystem/nhi-apply-type";
     public const string NgsCaseClassification = NgsBase + "/CodeSystem/nhi-case-classification";
     public const string NgsOrgId = NgsBase + "/CodeSystem/organization-identifier-tw";
-    public const string NgsExtDiagReportCondition = NgsSd + "/extension-DiagnosticReport-condition";
+    public const string NgsExtDiagReportCondition = NgsBase + "/StructureDefinition/extension-DiagnosticReport-condition";
     public const string DepMohw = "https://dep.mohw.gov.tw";            // genetic-testing org identifier
     public const string GeneNames = "http://www.genenames.org";        // HGNC gene ids
     public const string Hgvs = "http://varnomen.hgvs.org";             // HGVS variant nomenclature
@@ -117,7 +114,6 @@ public static class Sys
 
     // --- 傳染病檢驗報告 (cdc.twidir 0.1.1) — transcribed from the official example Bundle-bundle-request-ser-min. ---
     public const string TwidirBase = "https://twidir.cdc.gov.tw/twidir";
-    public const string TwidirSd = TwidirBase + "/StructureDefinition";
     public const string TwidirIdentifierType = TwidirBase + "/CodeSystem/twcdc-identifier-type-values";
     public const string TwidirLoincPartSystem = TwidirBase + "/CodeSystem/loinc-part-system-values";
     public const string TwidirOrgType = TwidirBase + "/CodeSystem/twcdc-organization-type-values";
@@ -132,7 +128,6 @@ public static class Sys
 
     // --- 電子病歷交換單張 EMR (tw.gov.mohw.emr 0.2.0) — transcribed from the official example Bundle-example-IC (檢驗檢查). ---
     public const string EmrBase = "https://twcore.mohw.gov.tw/ig/emr";
-    public const string EmrSd = EmrBase + "/StructureDefinition";
     public const string ExtIdentifierSuffix = TwcoreSd + "/identifier-suffix";
     public const string Vghtpe = "https://www.vghtpe.gov.tw/Index.action";
     public const string TwcoreIndex = "https://twcore.mohw.gov.tw/ig/index.html";
