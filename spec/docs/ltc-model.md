@@ -26,10 +26,13 @@
 
 ## 四包錢 (the four packages) — published amounts + copay
 
-Modelled in `LtcBenefit`. Primary source: the official **長照給付支付基準** (衛福部長照專區, `1966.gov.tw`
-→ 長照給付支付基準). The 照顧及專業服務 ceilings are **confirmed against it** (e.g. L6 28,070 / L7 32,090);
-the other three packages' amounts + copay shares are widely-cited but **still secondary-sourced — reconfirm
-each against the official 給付支付基準 before production**. All figures are public, non-PHI reference.
+Modelled in `LtcBenefit`. **All 2.0 amounts + copay below are CONFIRMED against the official primary
+source** — 「長期照顧(照顧服務/專業服務/交通接送服務/輔具服務及居家無障礙環境改善服務)**給付及支付基準**」
+**附表1** (衛福部; 四包錢 + 部分負擔 columns 低收/中低收/一般). Service codes in that schedule: **B/C** 碼
+照顧及專業服務, **D** 碼 交通接送, **E/F** 碼 輔具/居家無障礙, **G** 碼 喘息. Every value here matches the
+附表1 (照顧 L2 10,020 … L8 36,180 · 交通 1,680/1,840/2,000/2,400 · 輔具 40,000 · 喘息 32,340/48,510 ·
+copay 照顧&喘息 0/5/16%, 交通&輔具 0/10/30%). The 3.0 additions (§below) are newer than this schedule and
+remain secondary-sourced. All figures public, non-PHI.
 
 | 包 | 額度 | 部分負擔 一般 / 中低收 / 低收 |
 |---|---|---|
