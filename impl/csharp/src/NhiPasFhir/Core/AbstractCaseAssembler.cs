@@ -4,15 +4,16 @@ namespace NhiPasFhir.Core;
 
 // IG 對照 (spec/docs/IG-TRACEABILITY.md): 共用臨床層 Profiles(Patient/Practitioner/Organization/Coverage/Encounter-twpas)+ ClaimResponse-self-assessment-twpas(自主審查)
 
-/// <summary>Shared assembly behaviour (TW Core clinical layer + Bundle). Case types override BuildCase.</summary>
-public abstract class AbstractCaseAssembler : ICaseAssembler
+/// <summary>pas-family specialisation of the single <see cref="IgAssemblerBase"/>: it adds the TW Core
+/// clinical layer + a Claim-twpas Template Method (case types override BuildCase, or Assemble for
+/// divergent shapes). It is not a parallel base — pas IS a FHIR IG assembler; it inherits the one
+/// canonical/profile/bundle standard and only adds pas-specific assembly.</summary>
+public abstract class AbstractCaseAssembler : IgAssemblerBase
 {
-    public abstract string Ig { get; }
-    public abstract string CaseType { get; }
+    protected override string CanonicalBase => Sys.PasBase;
 
-    protected static Meta Profile(string name) => new() { Profile = new[] { $"{Sys.Sd}/{name}" } };
+    protected Meta Profile(string name) => P(name);   // pas-local alias for the inherited profile Meta
     protected static ResourceReference Ref(Resource r) => new($"{r.TypeName}/{r.Id}");
-    protected static string FullUrl(Resource r) => $"{Sys.PasBase}/{r.TypeName}/{r.Id}";
 
     protected record CaseParts(
         List<Resource> Extras,
@@ -110,17 +111,13 @@ public abstract class AbstractCaseAssembler : ICaseAssembler
     protected static CodeableConcept ServiceDeptOf(PACase c)
         => new(Sys.ServiceDept, c.Data.TryGetValue("department_code", out var v) ? (string)v : "AJ");
 
+    // pas convenience overload of the inherited WrapBundle: fixed id "bun-demo" + collection type.
     protected Bundle WrapBundle(string profile, IEnumerable<Resource> ordered)
-    {
-        var bundle = new Bundle { Id = "bun-demo", Meta = Profile(profile), Type = Bundle.BundleType.Collection };
-        foreach (var r in ordered)
-            bundle.Entry.Add(new Bundle.EntryComponent { FullUrl = FullUrl(r), Resource = r });
-        return bundle;
-    }
+        => WrapBundle("bun-demo", profile, Bundle.BundleType.Collection, ordered);
 
     /// <summary>Default assembly = the cancer-drug-shaped Claim-twpas template. Divergent case types
     /// (e.g. immunologic, which needs a different Claim profile + Composition + many resources) override this.</summary>
-    public virtual Bundle Assemble(PACase c)
+    public override Bundle Assemble(PACase c)
     {
         var patient = BuildPatient(c);
         var doctor = BuildDoctor(c);

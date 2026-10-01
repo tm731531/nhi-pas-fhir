@@ -1,17 +1,17 @@
 using Hl7.Fhir.Model;
 using NhiPasFhir.Core;
 
-namespace NhiPasFhir.Plugins;
+namespace NhiPasFhir.Core;
 
-/// <summary>Shared base for the sibling-IG assemblers (重大傷病 / 電子處方箋 / NGS / 傳染病 / EMR). These
-/// IGs are each their own document/message/collection Bundle under their own canonical, so — unlike the
-/// pas-shaped <see cref="AbstractCaseAssembler"/> (Claim-centric) — this base factors out ONLY what is
-/// genuinely per-IG common: the canonical, the profile Meta, and the entry-wrapping loop
-/// (fullUrl = {canonical}/{Type}/{id}). Generic FHIR datatype construction (CodeableConcept / Coding /
-/// reference) is NOT here — that is universal to every assembler, so it lives in <see cref="FhirBuild"/> and is
-/// composed via <c>using static NhiPasFhir.Core.FhirBuild;</c>. A subclass supplies its <see cref="CanonicalBase"/>
-/// and builds its own resources; behaviour is byte-identical to the hand-rolled versions (golden tests + a
-/// WrapBundle unit test are the safety net).</summary>
+/// <summary>THE single base for every FHIR IG assembler — because there is one standard: a set of
+/// resources, each conforming to a profile under the IG's canonical, wrapped in a Bundle whose entries
+/// are fullUrl'd by that canonical. It factors out exactly that: the canonical (<see cref="CanonicalBase"/>),
+/// the profile Meta (<see cref="P"/>), and the entry-wrapping loop (<see cref="WrapBundle"/>). Every
+/// assembler extends it — the sibling IGs (重大傷病/電子處方箋/NGS/傳染病/EMR) directly, and the pas family
+/// via <see cref="AbstractCaseAssembler"/>, which specialises this with a Claim-centric Template Method.
+/// Generic FHIR datatype construction (CodeableConcept / Coding / reference) is NOT here — that is universal
+/// and composed from <see cref="FhirBuild"/> (<c>using static NhiPasFhir.Core.FhirBuild;</c>), so a change
+/// to it never ripples through this hierarchy. Covered directly by FhirBuildTests (WrapBundle) + the goldens.</summary>
 public abstract class IgAssemblerBase : ICaseAssembler
 {
     public abstract string Ig { get; }
