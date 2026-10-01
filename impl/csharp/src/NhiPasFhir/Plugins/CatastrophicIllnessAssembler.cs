@@ -12,18 +12,18 @@ namespace NhiPasFhir.Plugins;
 /// Task-twci (申請) → focus QuestionnaireResponse-twci (申請書, linkIds 1-7) → Patient-twci + Condition-twci.
 /// A different IG from pas (nhi.ci): Task-based, not Claim-based — so it implements ICaseAssembler directly
 /// with its own CI canonical, rather than the pas-shaped AbstractCaseAssembler.</summary>
-public sealed class CatastrophicIllnessAssembler : ICaseAssembler
+public sealed class CatastrophicIllnessAssembler : IgAssemblerBase
 {
     public const string IgId = "tw.gov.mohw.nhi.ci#1.0.2";
     public const string Case = "catastrophic-illness";
-    public string Ig => IgId;
-    public string CaseType => Case;
+    public override string Ig => IgId;
+    public override string CaseType => Case;
+    protected override string CanonicalBase => Sys.CiBase;
 
     [ModuleInitializer]
     internal static void Register() => AssemblerFactory.Register(IgId, Case, () => new CatastrophicIllnessAssembler());
 
-    private static Meta P(string name) => new() { Profile = new[] { $"{Sys.CiSd}/{name}" } };
-    private static ResourceReference R(string typeSlashId) => new(typeSlashId);
+    // P / R come from IgAssemblerBase. Cd returns a Coding (for QR answer valueCoding) — distinct from Cc.
     private static Coding Cd(string sys, string code, string? display = null) => new(sys, code) { Display = display };
 
     // --- QuestionnaireResponse item helpers (keep the linkId 1-7 tree readable) ---
@@ -32,7 +32,7 @@ public sealed class CatastrophicIllnessAssembler : ICaseAssembler
     private static QuestionnaireResponse.ItemComponent A(string linkId, string text, DataType value)
         => new() { LinkId = linkId, Text = text, Answer = { new QuestionnaireResponse.AnswerComponent { Value = value } } };
 
-    public Bundle Assemble(PACase c)
+    public override Bundle Assemble(PACase c)
     {
         var idCard = c.Patient.GetValueOrDefault("id_card", "A123456789");
         var name = c.Patient.GetValueOrDefault("name", "王大明");
@@ -158,9 +158,6 @@ public sealed class CatastrophicIllnessAssembler : ICaseAssembler
         };
 
         var ordered = new List<Resource> { task, qr, patient, condition };
-        var bundle = new Bundle { Id = "bun-1", Meta = P("Bundle-twci"), Type = Bundle.BundleType.Collection };
-        foreach (var r in ordered)
-            bundle.Entry.Add(new Bundle.EntryComponent { FullUrl = $"{Sys.CiBase}/{r.TypeName}/{r.Id}", Resource = r });
-        return bundle;
+        return WrapBundle("bun-1", "Bundle-twci", Bundle.BundleType.Collection, ordered);
     }
 }

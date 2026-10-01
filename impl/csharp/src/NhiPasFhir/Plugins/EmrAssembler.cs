@@ -11,23 +11,22 @@ namespace NhiPasFhir.Plugins;
 /// <summary>電子病歷交換單張 (EMR exchange sheet) — reproduces the official example Bundle-example-IC
 /// (檢驗檢查 / InspectionCheck): a FHIR *document* Bundle spined by InspectionCheckComposition, referencing
 /// Organization + Patient + Observation(CBC) + Specimen + two Practitioners + Encounter. A twcore/emr IG.</summary>
-public sealed class EmrAssembler : ICaseAssembler
+public sealed class EmrAssembler : IgAssemblerBase
 {
     public const string IgId = "tw.gov.mohw.emr#0.2.0";
     public const string Case = "inspection-check";
-    public string Ig => IgId;
-    public string CaseType => Case;
+    public override string Ig => IgId;
+    public override string CaseType => Case;
+    protected override string CanonicalBase => Sys.EmrBase;
 
     [ModuleInitializer]
     internal static void Register() => AssemblerFactory.Register(IgId, Case, () => new EmrAssembler());
 
-    private static Meta P(string name) => new() { Profile = new[] { $"{Sys.EmrSd}/{name}" } };
-    private static ResourceReference Rel(string typeSlashId) => new(typeSlashId);
+    // P / R (relative) / Cc come from IgAssemblerBase. Abs = an ABSOLUTE reference — the IC example mixes
+    // absolute (here) and relative (base R) references per field, so both are needed; reproduced exactly.
     private static ResourceReference Abs(string typeSlashId) => new($"{Sys.EmrBase}/{typeSlashId}");
-    private static CodeableConcept Cc(string sys, string code, string? display = null, string? text = null)
-        => new() { Coding = { new Coding(sys, code) { Display = display } }, Text = text };
 
-    public Bundle Assemble(PACase c)
+    public override Bundle Assemble(PACase c)
     {
         var org = new Organization
         {
@@ -83,13 +82,13 @@ public sealed class EmrAssembler : ICaseAssembler
             Status = ObservationStatus.Final,
             Category = { Cc(Sys.ObsCategory, "laboratory", "Laboratory", "Laboratory") },
             Code = Cc(Sys.Loinc, "6690-2", "Leukocytes [#/volume] in Blood by Automated count", "全套血液檢查 CBC-Ｉ"),
-            Subject = Rel("Patient/IC-Pat2"),
+            Subject = R("Patient/IC-Pat2"),
             Effective = new Period { Start = "2022-03-30", End = "2022-04-06" },
-            Performer = { Rel("Practitioner/IC-Pra7") },
+            Performer = { R("Practitioner/IC-Pra7") },
             Interpretation = { Cc(Sys.V3InterpObs, "RR", text: "正常") },
             Note = { new Annotation { Text = "無" } },
             BodySite = Cc(Sys.Snomed, "420135007", "Whole blood", "血液"),
-            Specimen = Rel("Specimen/IC-Spe4"),
+            Specimen = R("Specimen/IC-Spe4"),
             Component =
             {
                 new Observation.ComponentComponent
@@ -136,14 +135,8 @@ public sealed class EmrAssembler : ICaseAssembler
         };
 
         var ordered = new List<Resource> { comp, org, patient, obs, specimen, pra5, enc, pra7 };
-        var bundle = new Bundle
-        {
-            Id = "example-IC", Meta = P("InspectionCheckBundle"), Type = Bundle.BundleType.Document,
-            Identifier = new Identifier { System = Sys.TwcoreIndex, Value = "Bundle-EMR" },
-            Timestamp = new DateTimeOffset(2023, 1, 4, 13, 1, 56, TimeSpan.FromHours(8)),
-        };
-        foreach (var r in ordered)
-            bundle.Entry.Add(new Bundle.EntryComponent { FullUrl = $"{Sys.EmrBase}/{r.TypeName}/{r.Id}", Resource = r });
-        return bundle;
+        return WrapBundle("example-IC", "InspectionCheckBundle", Bundle.BundleType.Document, ordered,
+            identifier: new Identifier { System = Sys.TwcoreIndex, Value = "Bundle-EMR" },
+            timestamp: new DateTimeOffset(2023, 1, 4, 13, 1, 56, TimeSpan.FromHours(8)));
     }
 }

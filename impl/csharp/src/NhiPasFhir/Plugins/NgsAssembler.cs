@@ -11,22 +11,20 @@ namespace NhiPasFhir.Plugins;
 /// *document* Bundle spined by Composition-twngs, referencing DiagnosticReport (genetic analysis) +
 /// Condition + Patient + Organization (hospital + genetic-testing lab) + Specimen + Device (sequencer)
 /// + DocumentReference + Observation (the genomic panel: 20 gene-studied + 6 HGVS variants) + ServiceRequest.</summary>
-public sealed class NgsAssembler : ICaseAssembler
+public sealed class NgsAssembler : IgAssemblerBase
 {
     public const string IgId = "tw.gov.mohw.nhi.ngs#1.0.0";
     public const string Case = "ngs";
-    public string Ig => IgId;
-    public string CaseType => Case;
+    public override string Ig => IgId;
+    public override string CaseType => Case;
+    protected override string CanonicalBase => Sys.NgsBase;
 
     [ModuleInitializer]
     internal static void Register() => AssemblerFactory.Register(IgId, Case, () => new NgsAssembler());
 
-    private static Meta P(string name) => new() { Profile = new[] { $"{Sys.NgsSd}/{name}" } };
-    private static ResourceReference R(string typeSlashId) => new(typeSlashId);
-    private static CodeableConcept Cc(string sys, string code, string? display = null, string? text = null)
-        => new() { Coding = { new Coding(sys, code) { Display = display } }, Text = text };
+    // P / R / Cc come from IgAssemblerBase.
 
-    public Bundle Assemble(PACase c)
+    public override Bundle Assemble(PACase c)
     {
         var patient = new Patient
         {
@@ -169,15 +167,9 @@ public sealed class NgsAssembler : ICaseAssembler
         };
 
         var ordered = new List<Resource> { comp, diaRep, cond, patient, orgHosp, orgGene, specimen, device, doc, obs, serReq };
-        var bundle = new Bundle
-        {
-            Id = "bun-nos-min", Meta = P("Bundle-twngs"), Type = Bundle.BundleType.Document,
-            Identifier = new Identifier { System = "https://www.nhi.gov.tw", Value = "789123" },
-            Timestamp = new DateTimeOffset(2024, 7, 25, 13, 50, 58, TimeSpan.FromHours(8)),
-        };
-        foreach (var r in ordered)
-            bundle.Entry.Add(new Bundle.EntryComponent { FullUrl = $"{Sys.NgsBase}/{r.TypeName}/{r.Id}", Resource = r });
-        return bundle;
+        return WrapBundle("bun-nos-min", "Bundle-twngs", Bundle.BundleType.Document, ordered,
+            identifier: new Identifier { System = "https://www.nhi.gov.tw", Value = "789123" },
+            timestamp: new DateTimeOffset(2024, 7, 25, 13, 50, 58, TimeSpan.FromHours(8)));
     }
 
     private static Observation.ComponentComponent Comp(CodeableConcept code, CodeableConcept value, string? interpLoinc = null)

@@ -11,22 +11,20 @@ namespace NhiPasFhir.Plugins;
 /// *document* Bundle spined by Composition-EMPD with 4 sections (Coverage / vital-signs / diagnosis /
 /// medication), referencing Patient/Practitioner/Organization/Encounter/Observation/Condition/Coverage
 /// /Medication/MedicationRequest. A different IG from pas (nhi.empd) → implements ICaseAssembler directly.</summary>
-public sealed class EmpdAssembler : ICaseAssembler
+public sealed class EmpdAssembler : IgAssemblerBase
 {
     public const string IgId = "tw.gov.mohw.nhi.empd#0.1.0";
     public const string Case = "e-prescription";
-    public string Ig => IgId;
-    public string CaseType => Case;
+    public override string Ig => IgId;
+    public override string CaseType => Case;
+    protected override string CanonicalBase => Sys.EmpdBase;
 
     [ModuleInitializer]
     internal static void Register() => AssemblerFactory.Register(IgId, Case, () => new EmpdAssembler());
 
-    private static Meta P(string name) => new() { Profile = new[] { $"{Sys.EmpdSd}/{name}" } };
-    private static ResourceReference R(string typeSlashId) => new(typeSlashId);
-    private static CodeableConcept Cc(string sys, string code, string? display = null, string? text = null)
-        => new() { Coding = { new Coding(sys, code) { Display = display } }, Text = text };
+    // P / R / Cc come from IgAssemblerBase.
 
-    public Bundle Assemble(PACase c)
+    public override Bundle Assemble(PACase c)
     {
         var patient = new Patient
         {
@@ -192,15 +190,9 @@ public sealed class EmpdAssembler : ICaseAssembler
         };
 
         var ordered = new List<Resource> { comp, patient, org, doctor, enc, obs, cond, cov, med, medReq };
-        var bundle = new Bundle
-        {
-            Id = "bun-ep", Meta = P("Bundle-EMPD"), Type = Bundle.BundleType.Document,
-            Identifier = new Identifier { System = Sys.MoiSlash, Value = "bun-10" },
-            Timestamp = new DateTimeOffset(2024, 2, 19, 14, 30, 0, TimeSpan.FromHours(1)),
-        };
-        foreach (var r in ordered)
-            bundle.Entry.Add(new Bundle.EntryComponent { FullUrl = $"{Sys.EmpdBase}/{r.TypeName}/{r.Id}", Resource = r });
-        return bundle;
+        return WrapBundle("bun-ep", "Bundle-EMPD", Bundle.BundleType.Document, ordered,
+            identifier: new Identifier { System = Sys.MoiSlash, Value = "bun-10" },
+            timestamp: new DateTimeOffset(2024, 2, 19, 14, 30, 0, TimeSpan.FromHours(1)));
     }
 
     private static Composition.SectionComponent Section(string loinc, string text, params string[] entryRefs)

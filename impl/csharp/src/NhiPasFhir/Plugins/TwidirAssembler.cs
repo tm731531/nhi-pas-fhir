@@ -11,23 +11,21 @@ namespace NhiPasFhir.Plugins;
 /// Bundle-bundle-request-ser-min: a FHIR *message* Bundle headed by a MessageHeader (event = Laboratory
 /// report) whose focus is DiagnosticReport + Patient + Observation + Condition + Device, plus Specimen +
 /// two Organizations (reporting / sending hospital) + Practitioner. A CDC IG (twidir), not an NHI IG.</summary>
-public sealed class TwidirAssembler : ICaseAssembler
+public sealed class TwidirAssembler : IgAssemblerBase
 {
     public const string IgId = "tw.gov.mohw.cdc.twidir#0.1.1";
     public const string Case = "notifiable-disease-report";
-    public string Ig => IgId;
-    public string CaseType => Case;
+    public override string Ig => IgId;
+    public override string CaseType => Case;
+    protected override string CanonicalBase => Sys.TwidirBase;
 
     [ModuleInitializer]
     internal static void Register() => AssemblerFactory.Register(IgId, Case, () => new TwidirAssembler());
 
-    private static Meta P(string name) => new() { Profile = new[] { $"{Sys.TwidirSd}/{name}" } };
+    // P / R / Cc come from IgAssemblerBase. Pt = a foreign (TW Core) profile canonical, twidir-specific.
     private static Meta Pt(string canonical) => new() { Profile = new[] { canonical } };
-    private static ResourceReference R(string typeSlashId) => new(typeSlashId);
-    private static CodeableConcept Cc(string sys, string code, string? display = null, string? text = null)
-        => new() { Coding = { new Coding(sys, code) { Display = display } }, Text = text };
 
-    public Bundle Assemble(PACase c)
+    public override Bundle Assemble(PACase c)
     {
         var patient = new Patient
         {
@@ -128,14 +126,8 @@ public sealed class TwidirAssembler : ICaseAssembler
         };
 
         var ordered = new List<Resource> { header, cond, diaRep, obs, specimen, patient, orgSend, orgHosp, doctor, device };
-        var bundle = new Bundle
-        {
-            Id = "bundle-request-ser-min", Meta = P("bundle-request-reporting"), Type = Bundle.BundleType.Message,
-            Identifier = new Identifier { System = "https://www.cdc.gov.tw/", Value = "01010905170415100000000" },
-            Timestamp = new DateTimeOffset(2023, 4, 15, 10, 0, 0, TimeSpan.Zero),
-        };
-        foreach (var r in ordered)
-            bundle.Entry.Add(new Bundle.EntryComponent { FullUrl = $"{Sys.TwidirBase}/{r.TypeName}/{r.Id}", Resource = r });
-        return bundle;
+        return WrapBundle("bundle-request-ser-min", "bundle-request-reporting", Bundle.BundleType.Message, ordered,
+            identifier: new Identifier { System = "https://www.cdc.gov.tw/", Value = "01010905170415100000000" },
+            timestamp: new DateTimeOffset(2023, 4, 15, 10, 0, 0, TimeSpan.Zero));
     }
 }
