@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>健保卡 → FHIR 一條龍 (demo)</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#fff; --ink:#1b1f24; --muted:#5c6773; --line:#e3e7ec;
+    --accent:#0f766e; --accent-ink:#fff; --ok:#15803d; --warn:#b45309; --lock:#7c5cff; --code:#0b1020;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --bg:#0e1116; --card:#161b22; --ink:#e6edf3; --muted:#9aa7b4; --line:#2a313a;
+           --accent:#2dd4bf; --accent-ink:#06211d; --ok:#4ade80; --warn:#fbbf24; --lock:#a78bfa; --code:#0b1020; }
+  }
+  *{box-sizing:border-box} html,body{margin:0}
+  body{background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,"Noto Sans TC",sans-serif;padding:24px}
+  .wrap{max-width:860px;margin:0 auto}
+  h1{font-size:22px;margin:.2em 0;letter-spacing:.2px}
+  .sub{color:var(--muted);margin:.2em 0 1.2em}
+  .notice{background:color-mix(in srgb,var(--lock) 12%,var(--card));border:1px solid color-mix(in srgb,var(--lock) 35%,var(--line));
+          border-radius:10px;padding:10px 14px;font-size:13px;color:var(--ink);margin-bottom:18px}
+  .notice b{color:var(--lock)}
+  .btns{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+  button{font:inherit;font-weight:600;border:1px solid var(--line);border-radius:10px;padding:11px 18px;cursor:pointer;background:var(--card);color:var(--ink)}
+  button.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+  button:disabled{opacity:.5;cursor:progress}
+  .flow{display:flex;flex-direction:column;gap:12px}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .step h3{margin:0 0 6px;font-size:14px;letter-spacing:.3px;display:flex;align-items:center;gap:8px}
+  .pill{font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px}
+  .pill.ok{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+  .pill.lock{background:color-mix(in srgb,var(--lock) 18%,transparent);color:var(--lock)}
+  .pill.warn{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;font-size:14px}
+  .kv .k{color:var(--muted)}
+  .msg{color:var(--muted);font-size:13.5px;margin-top:4px}
+  .err{color:var(--warn);background:color-mix(in srgb,var(--warn) 12%,var(--card));border:1px solid color-mix(in srgb,var(--warn) 35%,var(--line));border-radius:10px;padding:12px 14px}
+  details{margin-top:4px} summary{cursor:pointer;color:var(--muted);font-size:13px}
+  pre{background:var(--code);color:#cdd6e4;border-radius:10px;padding:12px;overflow:auto;font-size:12px;max-height:340px;margin:8px 0 0}
+  .muted{color:var(--muted)}
+  .dragon{font-size:13px;color:var(--muted);margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🐉 健保卡 → FHIR 一條龍 <span class="muted" style="font-size:14px">(demo)</span></h1>
+  <div class="sub">插卡 → 讀卡(小工具) → 進料/組 FHIR → 驗證 → 送件(dry-run)</div>
+
+  <div class="notice">
+    🔒 <b>真實資料聲明</b>:「真卡」模式會讀你健保卡的<b>基本資料段</b>(姓名/身分證/生日/性別),
+    僅在此頁<b>記憶體顯示</b>、<b>不儲存、不上傳、不進 repo</b>。病情/醫令為<b>示範假資料</b>;
+    送件為 <b>dry-run,不實送</b>(真送需 HCA 醫事憑證 + 健保 VPN)。
+  </div>
+
+  <div class="btns">
+    <button class="primary" id="live">插卡讀取(真卡,需小工具 :8531)</button>
+    <button id="demo">示範模式(假卡,免讀卡機)</button>
+  </div>
+
+  <div class="flow" id="flow" hidden>
+    <div class="step" id="s1"><h3>① 讀卡 <span class="pill ok" id="s1pill">—</span></h3><div class="kv" id="s1body"></div></div>
+    <div class="step" id="s2"><h3>② 進料 / 組 FHIR <span class="pill ok" id="s2pill">—</span></h3><div class="kv" id="s2body"></div></div>
+    <div class="step" id="s3"><h3>③ 驗證 <span class="pill ok" id="s3pill">—</span></h3><div class="msg" id="s3body"></div></div>
+    <div class="step" id="s4"><h3>④ 送件 <span class="pill lock" id="s4pill">DRY-RUN</span></h3><div class="msg" id="s4body"></div>
+      <details><summary>看組好的 FHIR Bundle（would-send payload）</summary><pre id="bundle"></pre></details>
+    </div>
+    <div class="dragon" id="dragon"></div>
+  </div>
+
+  <div class="err" id="err" hidden></div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+function esc(s){ return String(s??"").replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+async function run(mode){
+  $("err").hidden = true; $("flow").hidden = true;
+  const btns = document.querySelectorAll("button"); btns.forEach(b=>b.disabled=true);
+  try{
+    const r = await fetch(`/api/run?mode=${mode}`);
+    const d = await r.json();
+    if(!d.ok){
+      $("err").hidden = false;
+      $("err").innerHTML = `<b>✗ ${esc(d.stage||"錯誤")}</b><br>${esc(d.error||"unknown")}`;
+      return;
+    }
+    $("flow").hidden = false;
+    $("s1pill").textContent = d.mode;
+    $("s1pill").className = "pill " + (d.mode==="真卡" ? "ok" : "warn");
+    $("s1body").innerHTML =
+      `<span class="k">姓名</span><span>${esc(d.card.fullName)}</span>`+
+      `<span class="k">身分證</span><span>${esc(d.card.idNo)}</span>`+
+      `<span class="k">生日</span><span>${esc(d.card.birthDateIso)}</span>`+
+      `<span class="k">性別</span><span>${esc(d.card.sex)}</span>`;
+    $("s2body").innerHTML =
+      `<span class="k">FHIR 資源數</span><span>${d.fhir.resources}</span>`+
+      `<span class="k">Claim 醫令</span><span>${d.fhir.claimItems}（示範假資料)</span>`;
+    $("s3pill").textContent = d.valid ? "PASS" : "FAIL";
+    $("s3pill").className = "pill " + (d.valid ? "ok":"warn");
+    $("s3body").textContent = d.validateMsg;
+    $("s4body").textContent = d.submit.message;
+    $("bundle").textContent = d.bundleJson;
+    $("dragon").textContent = `🐉 讀卡 ✅ → 進料 ✅ → FHIR ${d.valid?"✅":"✗"} → 送件 🔒(dry-run,未實送)`;
+  }catch(e){
+    $("err").hidden = false; $("err").textContent = "呼叫 /api/run 失敗:" + e;
+  }finally{ btns.forEach(b=>b.disabled=false); }
+}
+$("live").onclick = ()=>run("live");
+$("demo").onclick = ()=>run("demo");
+</script>
+</body>
+</html>

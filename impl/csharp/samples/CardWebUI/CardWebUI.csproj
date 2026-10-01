@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>card-web-ui</AssemblyName>
+  </PropertyGroup>
+
+  <!-- 網頁 app (:8530): serves the UI + runs the FHIR chain. It does NOT touch the reader — it calls the
+       小工具 (:8531) for card data over HTTP. Composition root: refs core + ingest (converter). -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\NhiPasFhir\NhiPasFhir.csproj" />
+    <ProjectReference Include="..\..\src\NhiPasFhir.Ingest\NhiPasFhir.Ingest.csproj" />
+  </ItemGroup>
+
+</Project>
