@@ -7,9 +7,10 @@ namespace NhiPasFhir.Ltc;
 /// / 照顧者負荷 / 居家環境) — NOT ADL alone. So this library does NOT compute the level; passing it a level,
 /// it returns the published amounts. Level 1 (無失能/僅衰弱) is not eligible.
 ///
-/// AMOUNTS are the published 長照 給付額度 as widely cited (≈2026). They are public, non-PHI reference data,
-/// but sourced from secondary summaries — **reconfirm against the official 1966 / 衛福部 給付額度表 before
-/// production use**. Encoded here so the toolbox models the real benefit structure, honestly flagged.</summary>
+/// AMOUNTS (public, non-PHI reference): the 照顧及專業服務 monthly ceilings are CONFIRMED against the
+/// official 長照給付支付基準 (1966.gov.tw, 長照專區 — e.g. L6 28,070 / L7 32,090 match). The other three
+/// packages' amounts + the copay shares are widely-cited but still secondary-sourced — **reconfirm each
+/// against the official 給付支付基準 before production use** (the toolbox models the structure, honestly flagged).</summary>
 public static class LtcBenefit
 {
     /// <summary>四包錢 — the four LTC 2.0 benefit packages.</summary>

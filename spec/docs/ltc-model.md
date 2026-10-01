@@ -26,8 +26,10 @@
 
 ## 四包錢 (the four packages) — published amounts + copay
 
-Modelled in `LtcBenefit`. Amounts are the widely-cited published 給付額度 (≈2026); **non-PHI public
-reference, but reconfirm against the official 1966 / 衛福部 給付額度表 before production** (secondary-sourced).
+Modelled in `LtcBenefit`. Primary source: the official **長照給付支付基準** (衛福部長照專區, `1966.gov.tw`
+→ 長照給付支付基準). The 照顧及專業服務 ceilings are **confirmed against it** (e.g. L6 28,070 / L7 32,090);
+the other three packages' amounts + copay shares are widely-cited but **still secondary-sourced — reconfirm
+each against the official 給付支付基準 before production**. All figures are public, non-PHI reference.
 
 | 包 | 額度 | 部分負擔 一般 / 中低收 / 低收 |
 |---|---|---|
@@ -37,6 +39,9 @@ reference, but reconfirm against the official 1966 / 衛福部 給付額度表 b
 | 喘息服務 | 年額度:2–6級 32,340 · 7–8級 48,510 | 16% / 5% / 0% |
 
 `CopayRate(package, payer)` + `SelfPay(amount, package, payer)` compute out-of-pocket; 等級 1 (僅衰弱) 不符資格。
+
+> **資格範圍 (per 1966, 2025-01-01 起擴大)**: 原四類對象 + **全年齡失智且無法自理者** + 符合健保署公告條件者
+> 亦納入長照服務對象。(眉角:資格 ≠ 給付額度;額度仍由失能等級決定。)
 
 ## What is deliberately NOT computed (and why)
 
