@@ -28,6 +28,27 @@ public sealed class NoSubmitter : IPasSubmitter
         => Task.FromResult(new SubmitResult(false, "not-submitted", null, "送件未啟用(未接收件端)。"));
 }
 
+/// <summary>「演練模式」dry-run — assemble + validate the submission payload and report what WOULD be sent,
+/// but transmit nothing. Distinct from NoSubmitter (which does not even build a payload): this proves the
+/// Bundle is wire-ready (serializes + strict-reparses) and reports its byte size, so a UI can show「組好了、
+/// 驗過了、按真送就會送這包」without needing HCA/VPN. Real transmission is HttpPasSubmitter (gated, #13).</summary>
+public sealed class DryRunPasSubmitter : IPasSubmitter
+{
+    public static readonly DryRunPasSubmitter Instance = new();
+    public bool Enabled => true;
+
+    public Task<SubmitResult> SubmitAsync(Bundle claimBundle)
+    {
+        var payload = FhirJson.Serialize(claimBundle);
+        // Prove it is wire-ready: strict reparse throws if the payload is structurally invalid.
+        _ = FhirJson.Parse<Bundle>(payload);
+        var bytes = Encoding.UTF8.GetByteCount(payload);
+        return Task.FromResult(new SubmitResult(
+            false, "dry-run", null,
+            $"DRY-RUN:payload 已組好並通過結構驗證({bytes} bytes),但未實送。真送需 HCA 醫事憑證 + 健保 VPN(#13)。"));
+    }
+}
+
 /// <summary>Real transport: POST the claim Bundle to a PAS receiver endpoint and read back its response
 /// Bundle. Demo points <c>endpoint</c> at the demo's fake receiver. Production: configure the injected
 /// <c>HttpClient</c> with the HCA 醫事憑證 client cert and route it over the 健保 VPN, then point
