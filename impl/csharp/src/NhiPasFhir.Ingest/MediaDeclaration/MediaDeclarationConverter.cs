@@ -40,11 +40,9 @@ public static class MediaDeclarationConverter
             Identifier = { new Identifier($"{NhiId}/national-id", rec.D("d3") ?? "") },     // d3 身分證統一編號
             BirthDate = RocDate.ToIso(rec.D("d11")),                                        // d11 出生年月日 (ROC)
         };
-        var doctor = new Practitioner
-        {
-            Id = "pra-1",
-            Identifier = { new Identifier($"{NhiId}/practitioner-id", rec.D("d30") ?? "") }, // d30 診治醫事人員代號
-        };
+        var doctor = new Practitioner { Id = "pra-1" };
+        if (!string.IsNullOrEmpty(rec.D("d30")))                                             // d30 診治醫事人員代號
+            doctor.Identifier.Add(new Identifier($"{NhiId}/practitioner-id", rec.D("d30"))); // omit if absent — never emit an empty-valued identifier (invalid FHIR; never fabricate)
         // 健保 is the payer — base R4 Claim requires insurance[1..*] + a Coverage. (d14 給付類別 -> Coverage.type: TODO.)
         var nhi = new Organization
         {
@@ -148,10 +146,12 @@ public static class MediaDeclarationConverter
             Priority = new CodeableConcept(ProcessPriorityCs, "normal"),
             Created = RocDate.ToIso(rec.T("t6")) ?? RocDate.ToIso(rec.D("d9")),              // t6 申報日期
             CareTeam = { new Claim.CareTeamComponent { Sequence = 1, Provider = Rf(doctor) } },
-            SubType = new CodeableConcept($"{NhiId}/case-category", rec.D("d1") ?? ""),       // d1 案件分類 (TODO code table)
-            Identifier = { new Identifier($"{NhiId}/claim-seq", rec.D("d2") ?? "") },         // d2 流水編號
             Insurance = { new Claim.InsuranceComponent { Sequence = 1, Focal = true, Coverage = Rf(coverage) } },
         };
+        if (!string.IsNullOrEmpty(rec.D("d1")))                                               // d1 案件分類 (TODO code table)
+            claim.SubType = new CodeableConcept($"{NhiId}/case-category", rec.D("d1"));        // omit if absent — never an empty-valued coding
+        if (!string.IsNullOrEmpty(rec.D("d2")))                                               // d2 流水編號
+            claim.Identifier.Add(new Identifier($"{NhiId}/claim-seq", rec.D("d2")));          // omit if absent — never an empty-valued identifier
         claim.Diagnosis.AddRange(diagnoses);
         claim.Item.AddRange(items);
         bundleEntries.Add(claim);
