@@ -22,14 +22,32 @@
   輕度 <100 / 完全獨立 =100).
 - **`Iadl`** — the 8 Lawton items (使用電話 / 購物 / 備餐 / 家務 / 洗衣 / 交通 / 服藥 / 理財), able=1/unable=0,
   `Total` 0-8.
-- **`LtcBenefit`** — the **照顧及專業服務** monthly ceiling per 失能等級 (2→10,020 … 8→36,180 NT$),
-  the `IsEligible` check (等級 1 = 僅輕微衰弱, not eligible), and the `四包錢` package enum.
+- **`LtcBenefit`** — the full **四包錢** benefit schedule + **部分負擔 (copay)**, by 失能等級 and 身分別.
+
+## 四包錢 (the four packages) — published amounts + copay
+
+Modelled in `LtcBenefit`. Amounts are the widely-cited published 給付額度 (≈2026); **non-PHI public
+reference, but reconfirm against the official 1966 / 衛福部 給付額度表 before production** (secondary-sourced).
+
+| 包 | 額度 | 部分負擔 一般 / 中低收 / 低收 |
+|---|---|---|
+| 照顧及專業服務 | 月上限 by 等級:2→10,020 · 3→15,460 · 4→18,580 · 5→24,100 · 6→28,070 · 7→32,090 · 8→36,180 | 16% / 5% / 0% |
+| 交通接送 (第4級以上) | 月額度 by 地區類別:1→1,680 · 2→1,840 · 3→2,000 · 4→2,400 | 30% / 10% / 0% |
+| 輔具及居家無障礙 | 每 3 年上限 40,000 | 30% / 10% / 0% |
+| 喘息服務 | 年額度:2–6級 32,340 · 7–8級 48,510 | 16% / 5% / 0% |
+
+`CopayRate(package, payer)` + `SelfPay(amount, package, payer)` compute out-of-pocket; 等級 1 (僅衰弱) 不符資格。
 
 ## What is deliberately NOT computed (and why)
 
 **失能等級 (1-8) is NOT derived from ADL here.** The level comes from the official **CMS 照顧管理評估量表**,
-which weighs far more than ADL — IADL, cognition, communication, behaviour, special needs, caregiver
-load. There is no public formula "Barthel total → 等級", so computing it from ADL alone would be
+which scores **eight dimensions**, not just ADL:
+
+> ① ADL (日常生活) · ② IADL (工具性日常生活) · ③ 認知功能 · ④ 行為/精神症狀 · ⑤ 特殊複雜照護需求 ·
+> ⑥ 社會支持 · ⑦ 主要照顧者負荷 · ⑧ 居家環境
+
+An A-level 照管專員 weighs all eight **holistically** (any one dimension needing significant help can move
+the level). There is no public formula "Barthel total → 等級", so computing it from ADL alone would be
 **fabrication** — forbidden by the repo's #1 rule. The ADL/IADL totals here are *inputs a care manager
 uses*, not a shortcut to the level. When/if the official scoring algorithm (or a 長照 FHIR IG) is
 published, wire it in and map it to `LtcBenefit`.

@@ -41,4 +41,27 @@ public class LtcTests
         Assert.Null(LtcBenefit.CareCeiling(1));
         Assert.Null(LtcBenefit.CareCeiling(9));   // out of range
     }
+
+    [Fact] public void LtcBenefit_four_packages_published_amounts()
+    {
+        Assert.Equal(1_680, LtcBenefit.TransportMonthlyByRegionTier[1]);   // 交通接送 by region tier
+        Assert.Equal(2_400, LtcBenefit.TransportMonthlyByRegionTier[4]);
+        Assert.Equal(40_000, LtcBenefit.AssistiveDeviceCeilingPer3Years);  // 輔具/居家無障礙 per 3 yrs
+        Assert.Equal(32_340, LtcBenefit.RespiteYearlyCeiling(6));          // 喘息 2-6 級
+        Assert.Equal(48_510, LtcBenefit.RespiteYearlyCeiling(8));          // 喘息 7-8 級
+        Assert.Null(LtcBenefit.RespiteYearlyCeiling(1));                   // level 1 not eligible
+    }
+
+    [Fact] public void LtcBenefit_copay_by_payer_and_package()
+    {
+        // 低收入戶 = 0 across the board
+        Assert.Equal(0m, LtcBenefit.CopayRate(LtcBenefit.Package.Transport, LtcBenefit.Payer.LowIncome));
+        // 一般戶: 照顧/喘息 16%, 交通/輔具 30%
+        Assert.Equal(0.16m, LtcBenefit.CopayRate(LtcBenefit.Package.CareAndProfessional, LtcBenefit.Payer.General));
+        Assert.Equal(0.30m, LtcBenefit.CopayRate(LtcBenefit.Package.AssistiveDeviceAndHomeMods, LtcBenefit.Payer.General));
+        // 中低收: 照顧 5%
+        Assert.Equal(0.05m, LtcBenefit.CopayRate(LtcBenefit.Package.CareAndProfessional, LtcBenefit.Payer.MidLowIncome));
+        // self-pay = amount × share
+        Assert.Equal(1_603m, LtcBenefit.SelfPay(10_020m, LtcBenefit.Package.CareAndProfessional, LtcBenefit.Payer.General));
+    }
 }
