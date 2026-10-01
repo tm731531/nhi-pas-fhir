@@ -54,8 +54,9 @@ public class LtcTests
 
     [Fact] public void LtcBenefit_30_additions()
     {
-        Assert.Equal(60_000, LtcBenefit.SmartDeviceRentalCeilingPer3Years);   // 3.0 智慧科技輔具租賃 (3yr)
-        Assert.Equal(180_000, LtcBenefit.ResidentialInstitutionYearly);        // 3.0 住宿式 12萬→18萬/年
+        Assert.Equal(60_000, LtcBenefit.SmartDeviceRentalCeilingPer3Years);   // 3.0 智慧科技輔具租賃 (3yr, amount secondary)
+        Assert.Equal(180_000, LtcBenefit.ResidentialInstitutionYearly);        // 3.0 住宿式 18萬/年 (primary-confirmed, 1966)
+        Assert.Equal(15_000, LtcBenefit.ResidentialInstitutionMonthlyMax);     // 月上限 15,000
     }
 
     [Fact] public void LtcBenefit_copay_by_payer_and_package()
