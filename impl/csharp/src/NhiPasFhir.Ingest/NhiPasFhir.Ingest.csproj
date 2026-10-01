@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Big5 / cp950 decoding for 每日上傳 XML. Lives HERE, never in the pure FHIR core. -->
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Hexagonal: ingest depends on core. Core must NEVER reference ingest. -->
+    <ProjectReference Include="..\NhiPasFhir\NhiPasFhir.csproj" />
+  </ItemGroup>
+
+</Project>

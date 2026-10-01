@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\NhiPasFhir\NhiPasFhir.csproj" />
+    <ProjectReference Include="..\..\src\NhiPasFhir.Ingest\NhiPasFhir.Ingest.csproj" />
   </ItemGroup>
 
   <ItemGroup>
