@@ -61,7 +61,7 @@ The 媒體申報 record is **three segment types**, nested one-to-many:
 
 | 欄位 | 資料名稱 | 長度/屬性 | → FHIR |
 |---|---|---|---|
-| d1 | 案件分類 | 2 X | `Claim.subType` / `Claim.type` — **code table TODO (註11/註19)** |
+| d1 | 案件分類 | 2 X | `Claim.subType` / `Claim.type` — **code table in §8** (01 西醫一般 … A1 居家照護 …) |
 | d2 | 流水編號 | 6 9 | `Claim.identifier` (per 案件分類 sequence) |
 | **d3** | **身分證統一編號** | 10 X | **`Patient.identifier`** (國民身分證; 外籍→居留證/護照; 檢核原則 in spec) |
 | **d11** | **出生年月日** | 7 X (ROC) | **`Patient.birthDate`** (ROC→西元, see §6) |
@@ -172,11 +172,50 @@ maps survive the round-trip; unmapped code-table/dosage fields (§8) are lossy b
 
 ---
 
-## 8. What is NOT covered (honest TODO)
+## 8. Code tables (transcribed from the official 門診 spec, 版更 112.08.25)
 
-- **Code tables** behind d1 案件分類, d8 科別, d14/d15 給付/部分負擔, p3 醫令類別 detail, and the
-  補報/轉出 codes — each cites a 註 in the source; transcribe on demand, never guess.
-- **住院 / 交付機構** formats (sibling specs, same 3-segment shape).
+Authoritative code→meaning, so the raw codes in d1/p3 are no longer opaque. (Verbatim from the spec's
+own field notes; not guessed.)
+
+**d1 案件分類 (case category)** — drives `Claim.subType`:
+
+| code | 意義 | code | 意義 |
+|---|---|---|---|
+| `01` | 西醫一般案件 | `A1` | 居家照護 |
+| `05` | 洗腎 | `A2` | 精神疾病社區復健 |
+| `06` | 結核病 | `A3` | 預防保健 |
+| `08` | 慢性病連續處方調劑 | `D1` | 行政協助愛滋病案件 |
+| `11` | 牙醫一般案件 | `21` | 中醫一般案件 |
+| `30` | 中醫特定疾病門診加強照護 | | *(其餘專案代碼見源 PDF 註11/註19)* |
+
+**p3 醫令類別 (order class)** — switches the FHIR resource type:
+
+| code | 意義 | → FHIR |
+|---|---|---|
+| `0` | 診察費 | `Claim.item` only |
+| `1` | 用藥明細 | `MedicationRequest` |
+| `2` | 診療明細 | `Procedure` |
+| `3` | 特殊材料 | `Device` / `SupplyRequest` |
+| `4` | 不得另計價之藥品/檢驗(查)/診療項目 | `Claim.item` only |
+| `9` | 藥事服務費 | `Claim.item` only |
+
+Still opaque (not yet transcribed — each cites a 註, transcribe on demand, never guess): d8 就醫科別
+(註13), d14 給付類別, d15 部分負擔 (註10), d12 補報原因, p2 醫令調劑方式.
+
+## 9. 住院 (inpatient) + other sibling formats
+
+The **住院醫療費用點數申報格式** is a sibling spec (NHI → 醫療費用XML申報格式 → 住院申報, `cp-11354`).
+It uses the **same 3-segment t/d/p shape** as 門診, so the converter's structure carries over; what
+differs is inpatient-specific detail — 住院天數, 病房(費), 論病例計酬/DRG, 轉歸(discharge status),
+手術/處置 richer — which map to `Encounter.hospitalization` + additional `Claim.item`/`Procedure`.
+**The exact 住院 field IDs are TODO**: the 住院 spec page is login/Cloudflare-gated, so transcribing its
+field layout verbatim needs access — we do not guess inpatient field IDs. 交付機構 (dispensing) is a
+third sibling, same pattern.
+
+## 10. What is NOT covered (honest TODO)
+
+- **Remaining code tables**: d8 科別, d14/d15 給付/部分負擔, 補報/轉出 codes (see §8 "still opaque").
+- **住院 / 交付機構** exact field layouts (§9) — same 3-segment shape, field IDs TODO (gated spec).
 - **申復格式** (醫療費用XML申復格式, `np-2753-1.html`) — the appeal channel, a separate spec.
 - A conformance **profile**: there is no published 健保費用申報 FHIR IG, so we bind to base R4 + TW Core
   and validate structurally. If/when the NHI publishes one, swap it in the way pas uses `Claim-twpas`.
