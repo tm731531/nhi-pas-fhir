@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>dragon-demo</AssemblyName>
+  </PropertyGroup>
+
+  <!-- Composition root: the ONLY place that knows all adapters. The adapters themselves stay independent
+       (each depends on core only). Wiring them together here does not couple them to each other. -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\NhiPasFhir\NhiPasFhir.csproj" />
+    <ProjectReference Include="..\..\src\NhiPasFhir.Ingest\NhiPasFhir.Ingest.csproj" />
+    <ProjectReference Include="..\..\src\NhiPasFhir.CardReader\NhiPasFhir.CardReader.csproj" />
+  </ItemGroup>
+
+</Project>
