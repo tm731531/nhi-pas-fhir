@@ -63,6 +63,17 @@ public static class LtcBenefit
         _ => 0m,
     };
 
+    // --- 長照 3.0 additions (phased from 2026; builds ON 2.0 — the four packages above are unchanged). ---
+    // Source: 衛福部「長照十年計畫3.0」(1966.gov.tw cp-6572) + 行政院. Secondary figures — reconfirm officially.
+
+    /// <summary>3.0 階段三 (2026-07-01): 智慧科技輔具租賃 — 每 3 年上限 (移位/移動/沐浴排泄/居家照顧床/安全看視).
+    /// This is IN ADDITION to the 2.0 輔具及居家無障礙 package (40,000/3yr), not a replacement.</summary>
+    public const int SmartDeviceRentalCeilingPer3Years = 60_000;
+
+    /// <summary>3.0: 住宿式服務機構使用者補助, 失能等級 4+ — raised from 120,000 to this (per year, accrued
+    /// monthly, paid half-yearly). Separate from the home/community 四包錢.</summary>
+    public const int ResidentialInstitutionYearly = 180_000;
+
     /// <summary>Is a 失能等級 eligible for LTC 2.0 benefits? (Level 1 is not.)</summary>
     public static bool IsEligible(int disabilityLevel) => CareAndProfessionalMonthlyCeiling.ContainsKey(disabilityLevel);
 
