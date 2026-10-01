@@ -9,21 +9,34 @@ Two decoupled pieces, each on its own port (mirrors the tw-nhi-icc service + app
 
 The browser only opens `:8530`; it never touches the reader. `:8530` calls `:8531` for card data.
 
+## Package it (once) — self-contained binaries, no .NET SDK on the target
+
+```bash
+tools/publish-card-demo.sh linux-x64 dist      # or: win-x64 | osx-arm64 | osx-x64
+```
+
+This produces two **standalone single-file executables** (the target machine needs **no .NET SDK, no
+source**) under `dist/`:
+- `dist/card-helper/card-helper`      (小工具, :8531)
+- `dist/card-web-ui/card-web-ui` + `wwwroot/`  (網頁, :8530)
+
 ## Run it (on the machine that has the 健保卡 reader)
 
 Prereqs: a PC/SC reader + its driver + the PC/SC daemon running (Linux: `pcscd`; Windows/macOS: the
-built-in Smart Card service), and a 健保卡 inserted.
+built-in Smart Card service), and a 健保卡 inserted. **Just run the two binaries** — no `dotnet`:
 
 ```bash
-cd impl/csharp
-export PATH=$HOME/.dotnet:$PATH
-
 # terminal 1 — the card bridge (keep it running, card inserted)
-dotnet run --project samples/CardHelper        # → http://localhost:8531/card
+./dist/card-helper/card-helper        # → http://localhost:8531/card
 
 # terminal 2 — the web UI
-dotnet run --project samples/CardWebUI         # → http://localhost:8530
+./dist/card-web-ui/card-web-ui        # → http://localhost:8530
 ```
+
+(On Windows: `card-helper.exe` / `card-web-ui.exe`, double-click or run from a terminal.)
+
+> Dev-only shortcut (needs the SDK): `dotnet run --project samples/CardHelper` /
+> `dotnet run --project samples/CardWebUI`.
 
 Open <http://localhost:8530> →
 - **插卡讀取(真卡)** — reads YOUR card via the 小工具 and runs the chain with your real demographics.

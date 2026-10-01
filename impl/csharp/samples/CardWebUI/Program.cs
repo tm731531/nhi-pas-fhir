@@ -13,7 +13,13 @@ using NhiPasFhir.MediaDeclaration;
 // 送件 is DRY-RUN (not transmitted).
 // ───────────────────────────────────────────────────────────────────────────────────────────────
 
-var builder = WebApplication.CreateBuilder(args);
+// ContentRootPath = the binary's own directory so wwwroot is found no matter the current directory
+// (a published self-contained binary is run from anywhere, not the project folder).
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+    Args = args,
+    ContentRootPath = AppContext.BaseDirectory,
+});
 builder.Services.AddHttpClient();
 var app = builder.Build();
 app.UseDefaultFiles();
