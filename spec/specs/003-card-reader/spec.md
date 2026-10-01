@@ -2,7 +2,7 @@
 
 **Feature Branch**: `003-card-reader`
 **Created**: 2026-10-01
-**Status**: Draft — design approved in brainstorming 2026-10-01
+**Status**: Implemented 2026-10-01 — basic-segment read (pure byte→Patient path tested; live read SkippableFact); 就醫序號/寫卡/送件 credential-gated (#13)
 **Input**: Read a 健保卡's **基本資料段** (basic-data segment) over PC/SC and turn it into a **base-R4 FHIR
 Patient**. This is sub-project 2 of the "一條龍" (讀卡 → 進料 → FHIR → 送件). Scope = reading the basic
 segment (readable **without** a 醫事人員卡) and producing Patient demographics. Governed by
