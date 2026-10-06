@@ -44,9 +44,14 @@ public class CqfRulerIntegrationTests
         var engine = new CqfRulerCqlEngine(Http, BaseUrl);
         var cql = new CqlPreCheck(engine, DrugRuleMap.Default);   // the committed 藥碼→規則 map
 
-        var r = await Pipeline.RunAsync(Samples.CancerDrugCase(), cql: cql);
+        // Use a real IG L01EF03 (Abemaciclib) code so DrugRuleMap selects BCAbemaciclibRule1. The sample's
+        // default drug_code (BC27730100) is not an IG-listed NHI code, so it would be NotEvaluated — see
+        // the DrugRuleMap correction. Override just the code; the case stays a myeloma (C90.00) case.
+        var myeloma = Samples.CancerDrugCase();
+        var data = new Dictionary<string, object>(myeloma.Data) { ["drug_code"] = "BC27640100" };
+        var r = await Pipeline.RunAsync(myeloma with { Data = data }, cql: cql);
 
-        // Our sample is a myeloma case; the breast-cancer Abemaciclib rule must not pass it.
+        // The bundle is a myeloma case; the breast-cancer Abemaciclib rule must not pass it.
         Assert.NotNull(r.Cql);
         Assert.NotEqual(CqlOutcome.Pass, r.Cql!.Outcome);
         Assert.True(r.Blocked);

@@ -19,6 +19,8 @@ public class CqlTests
             => Task.FromResult<IReadOnlyDictionary<string, object?>>(_named);
     }
 
+    // Drug key matches Samples.CancerDrugCase()'s drug_code so the fake precheck selects the fake rule.
+    // (This is a FakeEngine map, independent of the real DrugRuleMap — the key is just the lookup token.)
     private static ICqlPreCheck Enabled(Dictionary<string, object?> named, string drug = "BC27730100", string rule = "BCAbemaciclibRule1")
         => new CqlPreCheck(new FakeEngine(named),
             new Dictionary<string, IReadOnlyList<string>> { [drug] = new[] { rule } });
@@ -32,8 +34,11 @@ public class CqlTests
 
     [Fact] public void DrugRuleMap_has_the_verified_rule()
     {
-        Assert.Equal(new[] { "BCAbemaciclibRule1" }, DrugRuleMap.Default["BC27730100"]);
-        Assert.Contains("BC27730100", DrugRuleMap.CoveredDrugs);
+        // BC27640100 is one of the IG's L01EF03 (Abemaciclib) codes in Library-BCCodeConcept.
+        // (The prior seed used BC27730100, which is NOT in the IG's L01EF03 define — corrected.)
+        Assert.Equal(new[] { "BCAbemaciclibRule1" }, DrugRuleMap.Default["BC27640100"]);
+        Assert.Contains("BC27640100", DrugRuleMap.CoveredDrugs);
+        Assert.DoesNotContain("BC27730100", DrugRuleMap.CoveredDrugs); // fabricated code removed
     }
 
     [Fact] public async Task Uncovered_drug_is_NotEvaluated_never_fabricated()
