@@ -56,4 +56,25 @@ public class CqfRulerIntegrationTests
         Assert.NotEqual(CqlOutcome.Pass, r.Cql!.Outcome);
         Assert.True(r.Blocked);
     }
+
+    // Newly-vendored CRC*/HCC* rules must actually EVALUATE on the faithful engine: each runs to its
+    // verdict 布林 define with no OperationOutcome (EvaluateAsync throws on an evaluation error, so a
+    // returned verdict key is proof the whole rule + its CodeConcept/Reusable deps translated and ran).
+    [SkippableTheory]
+    [InlineData("CRCRegorafenibRule1", "大腸直腸癌Regorafenib申請結果_布林")]
+    [InlineData("CRCBevacizumabRule1", "大腸直腸癌Bevacizumab第一線治療申請結果_布林")]
+    [InlineData("HCCSorafenibRule1", "肝癌Sorafenib申請結果_布林")]
+    [InlineData("HCCAtezoDurvaRule1", "肝癌AtezoDurva申請結果_布林")]
+    public async System.Threading.Tasks.Task CRC_HCC_rules_evaluate_to_their_verdict(string ruleId, string verdictKey)
+    {
+        Skip.IfNot(ServerUp(), "CQF-Ruler not reachable on :8095 — start it to run the live CQL test");
+
+        var engine = new CqfRulerCqlEngine(Http, BaseUrl);
+        var bundle = NhiPas.Build(Samples.CancerDrugCase());
+
+        var results = await engine.EvaluateAsync(ruleId, bundle);
+
+        Assert.True(results.Count > 10, $"{ruleId} evaluated too few defines ({results.Count})");
+        Assert.True(results.ContainsKey(verdictKey), $"{ruleId} missing verdict define '{verdictKey}'");
+    }
 }

@@ -41,6 +41,25 @@ public class CqlTests
         Assert.DoesNotContain("BC27730100", DrugRuleMap.CoveredDrugs); // fabricated code removed
     }
 
+    [Fact] public void DrugRuleMap_covers_CRC_and_HCC_rules()
+    {
+        // CRC Regorafenib — ATC L01EX05, CRCCodeConcept."L01EX05" = { BC26168100 }. Same single code is
+        // HCCCodeConcept."L01EX05" too (tumor-shared) → both cancers' Regorafenib rules.
+        Assert.Equal(new[] { "CRCRegorafenibRule1", "HCCRegorafenibRule1" }, DrugRuleMap.Default["BC26168100"]);
+        // CRC Bevacizumab — KC01146219 is in L01FG01 (Rule1) but excluded from Rule2's define → Rule1 only.
+        Assert.Equal(new[] { "CRCBevacizumabRule1" }, DrugRuleMap.Default["KC01146219"]);
+        Assert.Equal(new[] { "CRCBevacizumabRule1", "CRCBevacizumabRule2" }, DrugRuleMap.Default["K000807219"]);
+        // HCC Sorafenib — ATC L01EX02, HCCCodeConcept."L01EX02".
+        Assert.Equal(new[] { "HCCSorafenibRule1" }, DrugRuleMap.Default["B024727100"]);
+        // HCC Atezo/Durva — L01FF03 durvalumab code gated by the shared rule.
+        Assert.Equal(new[] { "HCCAtezoDurvaRule1" }, DrugRuleMap.Default["KC01088229"]);
+        // Tumor-agnostic Larotrectinib (L01EX12): one NHI code, gated by all three cancers' rules.
+        Assert.Equal(new[] { "BCLarotrectinibRule1", "CRCLarotrectinibRule1", "HCCLarotrectinibRule1" },
+            DrugRuleMap.Default["BC27747100"]);
+        // Shared Pembrolizumab (L01FF02): BC + CRC.
+        Assert.Equal(new[] { "BCPembrolizumabRule", "CRCPembrolizumabRule1" }, DrugRuleMap.Default["KC01025219"]);
+    }
+
     [Fact] public async Task Uncovered_drug_is_NotEvaluated_never_fabricated()
     {
         // A drug with no loaded rule must fail loud (NotEvaluated), not guess a verdict.
