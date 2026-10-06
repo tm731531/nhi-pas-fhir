@@ -29,8 +29,20 @@ The three keys — the real endpoint, an **HCA cert**, and **NHI-VPN access** �
 ## How the adapter is wired to flip on
 
 The library already isolates transmission behind one seam — `IPasSubmitter` (the "送" socket). The lib
-PRODUCES the Bundle; the submitter is a thin, swappable transport hop. Two production shapes, both just
-an adapter behind the same interface:
+PRODUCES the Bundle; the submitter is a thin, swappable transport hop. Four implementations behind the
+one interface — pick by configuration, no rebuild:
+
+| impl | transmits? | use |
+|---|---|---|
+| `NoSubmitter` (default) | no | 送件未啟用 — assemble/check only |
+| `DryRunPasSubmitter` | no | **演練**: serialize + strict-reparse the payload, report its byte size — proves it is wire-ready without HCA/VPN (what the 插卡 demo UI uses) |
+| `HttpPasSubmitter` | yes | real transport — shape (a) below |
+| *(共通介面 adapter)* | yes | real transport — shape (b) below, ~1 class pending the gated spec |
+
+Selection is one config knob: `Submitters.Select(SubmitterMode.None | DryRun | Http, http, endpoint)`
+returns the right `IPasSubmitter` — so flipping on when the cert + VPN arrive is a config change, not code.
+
+The two real-transport shapes:
 
 **(a) If the real binding is REST-over-VPN** — `HttpPasSubmitter` is ready as-is; only configuration
 changes (no code). HCA is a client certificate on the `HttpClient`, routed over the VPN:
@@ -53,6 +65,7 @@ unchanged (this repo already produces it).
 |---|---|---|
 | Produce correct Bundle | ✅ done, validated 0 errors | — |
 | `IPasSubmitter` seam + `HttpPasSubmitter` shell | ✅ done, tested (TransportTests, stub handler) | — |
+| `DryRunPasSubmitter` (演練: validate + report, no transmit) | ✅ done, tested (DryRunSubmitterTests); used by the 插卡 demo UI | — |
 | Exact endpoint / transport binding | ⛔ unknown | login-walled 介面規格 (醫事機構專區) |
 | HCA 醫事憑證 | ⛔ not held | 醫事機構 identity |
 | 健保 VPN + 共通介面 install | ⛔ not available | 醫事機構 identity |

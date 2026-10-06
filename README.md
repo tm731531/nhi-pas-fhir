@@ -153,7 +153,7 @@ This is AI-assisted code, so correctness is **machine-proven in layers**, not as
 is in **[TESTING.md](TESTING.md)**. In short:
 
 - **6 bundle types × `0 errors`** against the **official HL7 validator** (an authority outside the AI).
-- **15 byte-for-byte golden baselines** + **92 test cases** (89 CI-enforced + 3 live-integration) (`dotnet test`) — pipeline, CQL three-state,
+- **15 byte-for-byte golden baselines** + **94 test cases** (91 CI-enforced + 3 live-integration) (`dotnet test`) — pipeline, CQL three-state,
   transport adapters, fail-loud seams, live engine integration; mirrored by Python tests.
 - **3 independent adversarial review passes** (IG conformance, CQL conformance, architecture/security) —
   the layer that catches "plausible but wrong", which unit tests miss.

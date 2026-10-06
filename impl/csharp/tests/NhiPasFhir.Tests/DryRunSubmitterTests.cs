@@ -1,3 +1,5 @@
+using System;
+using System.Net.Http;
 using Hl7.Fhir.Model;
 using NhiPasFhir.Core;
 using Xunit;
@@ -23,5 +25,20 @@ public class DryRunSubmitterTests
         Assert.Null(result.Response);           // no receiver response
         Assert.Contains("DRY-RUN", result.Message);
         Assert.Contains("bytes", result.Message);
+    }
+
+    [Fact]
+    public void Select_picks_the_submitter_by_mode()
+    {
+        Assert.IsType<NoSubmitter>(Submitters.Select(SubmitterMode.None));
+        Assert.IsType<DryRunPasSubmitter>(Submitters.Select(SubmitterMode.DryRun));
+        Assert.IsType<HttpPasSubmitter>(Submitters.Select(SubmitterMode.Http, new HttpClient(), "https://example.test/pas"));
+    }
+
+    [Fact]
+    public void Select_http_without_client_or_endpoint_fails_loud()
+    {
+        Assert.Throws<ArgumentNullException>(() => Submitters.Select(SubmitterMode.Http));
+        Assert.Throws<ArgumentNullException>(() => Submitters.Select(SubmitterMode.Http, new HttpClient()));
     }
 }

@@ -5,6 +5,26 @@ using Task = System.Threading.Tasks.Task;
 
 namespace NhiPasFhir.Core;
 
+/// <summary>Which "送" transport an app wants — the config knob that flips the submitter on.
+/// None (default, nothing transmitted) → DryRun (validate + report, nothing transmitted) → Http (real).</summary>
+public enum SubmitterMode { None, DryRun, Http }
+
+/// <summary>Chooses the `IPasSubmitter` by config, so "flip on when the HCA cert + 健保 VPN arrive" is a
+/// one-line configuration change, not a code change (see spec/docs/real-submission-adapter.md). The
+/// Bundle the lib produces is identical across all modes.</summary>
+public static class Submitters
+{
+    public static IPasSubmitter Select(SubmitterMode mode, HttpClient? http = null, string? endpoint = null) => mode switch
+    {
+        SubmitterMode.None => NoSubmitter.Instance,
+        SubmitterMode.DryRun => DryRunPasSubmitter.Instance,
+        SubmitterMode.Http => new HttpPasSubmitter(
+            http ?? throw new ArgumentNullException(nameof(http), "Http mode needs an HttpClient (with the HCA client cert, routed over the 健保 VPN)"),
+            endpoint ?? throw new ArgumentNullException(nameof(endpoint), "Http mode needs the real NHI PAS endpoint from the gated 介面規格")),
+        _ => NoSubmitter.Instance,
+    };
+}
+
 /// <summary>維度 = 送/回. Result of submitting a claim Bundle to an NHI PAS receiver.
 /// IMPORTANT: Accepted means the receiver TOOK the submission (收件) — it is NOT approval. The real
 /// decision is carried by the returned ClaimResponse.Outcome (queued 審核中 / complete …).</summary>
