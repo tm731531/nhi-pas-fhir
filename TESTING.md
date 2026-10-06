@@ -5,7 +5,7 @@ FHIR — is output that is **plausible but wrong**: it compiles, it looks right,
 a bundle the NHI will 核刪 (claw back payment for). So correctness here is never asserted; it is
 **machine-proven, in layers**, against an authority outside the AI. This page is that story.
 
-Run everything with: `dotnet test impl/csharp/NhiPasFhir.sln` (94 test cases: 91 CI-enforced + 3 live-integration). See also the detailed
+Run everything with: `dotnet test impl/csharp/NhiPasFhir.sln` (99 test cases: 92 CI-enforced + 7 live-integration). See also the detailed
 plan in [`spec/docs/CONTRACTS-and-TESTS.md`](spec/docs/CONTRACTS-and-TESTS.md).
 
 ## The layers (weakest guarantee at the bottom, strongest at the top)
@@ -55,8 +55,8 @@ language-agnostic `spec/` is proven by more than one implementation. **Both run 
 (`dotnet test`) and a `python` job (`pytest`) — so neither language's contract can regress unnoticed.
 
 ## What is deliberately NOT claimed
-- The **CQL rules IG is v0.0.1 DRAFT**; the vendored rules are a snapshot. CQL coverage is **all 20 乳癌
-  (BC) rules** (50 健保碼 in the drug→rule map, every code from the IG's BCCodeConcept) — **大腸直腸癌 (CRC)
-  + 肝癌 (HCC) are not yet vendored**.
+- The **CQL rules IG is v0.0.1 DRAFT**; the vendored rules are a snapshot. CQL coverage is **all 36 rules
+  across the IG's three cancers** (乳癌 20 · 大腸直腸癌 9 · 肝癌 7; 84 健保碼 in the drug→rule map, every
+  code from the respective CodeConcept). The IG is draft — it may add cancers/rules later.
 - **長照** is designed-for but not implemented, so it has no tests.
 Honest test coverage means saying where the proof stops.

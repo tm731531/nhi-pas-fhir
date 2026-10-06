@@ -61,18 +61,17 @@ IG are exercised (logical models are non-instantiable). See [spec/docs/COVERAGE.
 ## CQL pre-submit self-check (送前核刪自查)
 
 The NHI publishes its reimbursement rules as **CQL** (Clinical Quality Language, IG
-`tw.gov.mohw.nhi.cql`, ~66 drug rules compiled to **ELM**). Before you POST, this framework runs the NHI's
+`tw.gov.mohw.nhi.cql`, 36 drug rules across 3 cancers). Before you POST, this framework runs the NHI's
 **own official rules** — faithfully, on a real engine — against your Bundle and predicts the outcome, so
 you send only what will pass and hold back what would be **核刪 (post-payment clawback)** or needs **補件
 (missing data)**. Three-state output: **Pass / WouldBeRejected / DataMissing** (not a naive pass/fail).
 
-> **Scope today:** all **20 乳癌 (breast-cancer) rules** of the CQL IG are vendored and proven to
-> evaluate on the live engine; `Core/DrugRuleMap` (the single source of truth the 查 step reads) maps
-> **50 健保碼 across 15 drugs → rules**, every code traced to the IG's official `BCCodeConcept`
-> ATC→NHI defines (0 fabricated). **大腸直腸癌 (CRC) + 肝癌 (HCC) rules are not yet vendored.** Adding
-> them is the same data task: drop the official `Library-*.json` into `cql-engine/rules/`, verify it
-> runs, add its rows to `DrugRuleMap`. An uncovered drug returns **NotEvaluated** (fail-loud), never a
-> guessed verdict.
+> **Scope today:** the CQL IG's drug rules are **fully vendored — all 36 rules across its three cancers**
+> (乳癌 BC 20 · 大腸直腸癌 CRC 9 · 肝癌 HCC 7) — and proven to evaluate on the live engine. `Core/DrugRuleMap`
+> (the single source of truth the 查 step reads) maps **84 健保碼 → rules**, every code traced to its
+> cancer's official `CodeConcept` ATC→NHI defines (cross-checked: 0 fabricated, strict per-cancer
+> provenance; tumor-agnostic drugs fan one code to several rules). An uncovered drug returns
+> **NotEvaluated** (fail-loud), never a guessed verdict.
 
 - Faithful engine: a **CQF-Ruler / HAPI clinical-reasoning** server runs the ELM (it implements
   `InCodeSystem`, which lightweight engines do not) — `cql-engine/` (docker + loader + official rules).
@@ -154,7 +153,7 @@ This is AI-assisted code, so correctness is **machine-proven in layers**, not as
 is in **[TESTING.md](TESTING.md)**. In short:
 
 - **6 bundle types × `0 errors`** against the **official HL7 validator** (an authority outside the AI).
-- **15 byte-for-byte golden baselines** + **94 test cases** (91 CI-enforced + 3 live-integration) (`dotnet test`) — pipeline, CQL three-state,
+- **15 byte-for-byte golden baselines** + **99 test cases** (92 CI-enforced + 7 live-integration) (`dotnet test`) — pipeline, CQL three-state,
   transport adapters, fail-loud seams, live engine integration; mirrored by Python tests.
 - **3 independent adversarial review passes** (IG conformance, CQL conformance, architecture/security) —
   the layer that catches "plausible but wrong", which unit tests miss.
