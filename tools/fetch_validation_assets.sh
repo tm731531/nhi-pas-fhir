@@ -6,7 +6,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 mkdir -p .fhir
 IG_CANONICAL="https://nhicore.nhi.gov.tw/pas"
-PKG_VER="1.2.6"
+PKG_VER="1.2.7"
 
 echo "[1/2] IG package ($IG_CANONICAL/package.tgz) ..."
 curl -fSL --retry 3 -o .fhir/pas-package.tgz "$IG_CANONICAL/package.tgz"
@@ -15,7 +15,7 @@ tar xzf .fhir/pas-package.tgz -C .fhir/pas-package
 echo "    package: $(python3 -c "import json;d=json.load(open('.fhir/pas-package/package/package.json'));print(d['name'],d['version'])")"
 
 # Additional published IGs implemented in this repo (same fetch shape). Add a line per IG as built.
-for ig in "ci:1.0.2" "empd:0.1.0" "ngs:1.0.0" "base:1.0.0"; do
+for ig in "ci:1.0.2" "empd:0.2.1" "ngs:1.0.0" "base:1.0.0"; do
   name="${ig%%:*}"
   echo "[1b] IG package (nhi.$name) ..."
   curl -fSL --retry 3 -o ".fhir/${name}-package.tgz" "https://nhicore.nhi.gov.tw/${name}/package.tgz"
@@ -40,6 +40,11 @@ java -version 2>/dev/null || { echo "WARNING: Java not found — validator needs
 # include → Condition/Procedure/Substance CLOSED slicing hard-fails (the official pas example trips on
 # this too). The codes ARE present (complete content). We rewrite the url to the correct /CodeSystem/
 # canonical and load it via -ig, so memberOf resolves locally and bundles validate at 0.
+# NOTE (2026-10): TW Core 1.0.0 exists and FIXES this url, but EVERY implemented IG still declares a
+# dependency on tw.gov.mohw.twcore 0.3.2 (pas 1.2.7 / ci 1.0.2 / empd 0.2.1 / ngs / base / emr all pin
+# 0.3.2; twidir pins 0.1.1). The validator resolves twcore from that declared dependency, so the patch
+# MUST be built from the SAME 0.3.2 the IGs use — bumping to 1.0.0 would mismatch the concept set.
+# Follow twcore 1.0.0 only when the IGs bump their own dependency.
 TWCORE_VER="0.3.2"
 echo "[3/3] terminology patch (corrected TW Core ICD CodeSystems) ..."
 TWDIR="$HOME/.fhir/packages/tw.gov.mohw.twcore#${TWCORE_VER}/package"

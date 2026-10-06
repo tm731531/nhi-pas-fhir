@@ -15,8 +15,8 @@ TW Core · HL7 · CQL · Clinical Quality Language · ELM · CQF-Ruler · cqfram
 pre-submit rule check · ClaimResponse · reference implementation · C# / Firely SDK · Python ·
 healthcare interoperability · clinical decision support.
 
-> Domain source of truth: <https://nhicore.nhi.gov.tw/pas/> · IG `tw.gov.mohw.nhi.pas#1.2.6` · FHIR R4
-> (inherits `tw.gov.mohw.twcore` + `hl7.fhir.us.davinci-pas`). Last IG sync: 2026-09-28.
+> Domain source of truth: <https://nhicore.nhi.gov.tw/pas/> · IG `tw.gov.mohw.nhi.pas#1.2.7` · FHIR R4
+> (inherits `tw.gov.mohw.twcore` + `hl7.fhir.us.davinci-pas`). Last IG sync: 2026-10-06.
 
 > 🤖 **Reading this with an AI agent?** Start with **[`AGENTS.md`](AGENTS.md)** — repo map, copy-paste
 > build/test/run commands, how the pieces fit, the hard rules, and the gotchas — or **[`llms.txt`](llms.txt)**
@@ -40,7 +40,7 @@ patient's case; the library speaks FHIR.** It is a payload factory + validator g
 | 核定回應 (NHI decision / ClaimResponse) | — | Bundle-bun-response |
 | OperationOutcome (error report) | — | error-example |
 | **重大傷病 (catastrophic illness, `nhi.ci`)** | 4 | Bundle-bun-min |
-| **電子處方箋 (e-prescription, `nhi.empd`)** | 10 | Bundle-bun-ep |
+| **電子處方箋 (e-prescription, `nhi.empd` 0.2.1)** | 13 | Bundle-bun-01-ep |
 | **次世代基因定序 (NGS, `nhi.ngs`)** | 11 | Bundle-bun-nos-min |
 | **傳染病檢驗報告 (notifiable disease, `cdc.twidir`)** | 10 | Bundle-bundle-request-ser-min |
 | **電子病歷交換單張 (EMR, `emr`)** | 8 | Bundle-example-IC |
@@ -153,7 +153,7 @@ This is AI-assisted code, so correctness is **machine-proven in layers**, not as
 is in **[TESTING.md](TESTING.md)**. In short:
 
 - **6 bundle types × `0 errors`** against the **official HL7 validator** (an authority outside the AI).
-- **15 byte-for-byte golden baselines** + **91 test cases** (88 CI-enforced + 3 live-integration) (`dotnet test`) — pipeline, CQL three-state,
+- **15 byte-for-byte golden baselines** + **92 test cases** (89 CI-enforced + 3 live-integration) (`dotnet test`) — pipeline, CQL three-state,
   transport adapters, fail-loud seams, live engine integration; mirrored by Python tests.
 - **3 independent adversarial review passes** (IG conformance, CQL conformance, architecture/security) —
   the layer that catches "plausible but wrong", which unit tests miss.

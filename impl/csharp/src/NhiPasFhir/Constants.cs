@@ -86,19 +86,29 @@ public static class Sys
     public const string RfcUri = "urn:ietf:rfc:3986";                  // DICOM SOP class as URI
     public const string CondCategory = "http://terminology.hl7.org/CodeSystem/condition-category";
 
-    // --- 電子處方箋與調劑 (nhi.empd 0.1.0) — transcribed from the official example Bundle-bun-ep. ---
+    // --- 電子處方箋與調劑 (nhi.empd 0.2.1) — transcribed from the official example Bundle-bun-01-ep. ---
     public const string EmpdBase = "https://nhicore.nhi.gov.tw/empd";
-    public const string EmpdCaseType = EmpdBase + "/CodeSystem/CaseType-cs";
-    public const string EmpdPaymentCategory = EmpdBase + "/CodeSystem/PaymentCategory-cs";
+    public const string EmpdPrescriptionId = EmpdBase + "/identifier/prescription";           // Bundle.identifier + MedicationRequest PrescriptionNo slice
+    public const string EmpdMedicalEncounterId = EmpdBase + "/medical-encounter-identifier";   // Encounter.identifier slice medical-encounter-identifier
+    public const string EmpdFuncSequenceNumber = EmpdBase + "/func-sequence-number";           // Encounter.identifier slice func-sequence-number
+    public const string EmpdOutpatientCaseType = EmpdBase + "/CodeSystem/nhi-outpatient-case-type";  // Encounter.class (was CaseType-cs in 0.1.0)
+    public const string EmpdPartCode = EmpdBase + "/CodeSystem/PartCode-cs";                   // Encounter.type
+    public const string EmpdNhiIdentityType = EmpdBase + "/CodeSystem/nhi-identity-type";      // Coverage.type
+    public const string EmpdPaymentCategory = EmpdBase + "/CodeSystem/PaymentCategory-cs";     // Coverage Extension-PaymentCategory value
+    public const string EmpdExtPaymentCategory = EmpdBase + "/StructureDefinition/Extension-PaymentCategory";
+    public const string EmpdExtCombinedPrescriptionNote = EmpdBase + "/StructureDefinition/Extension-CombinedPrescriptionNote";
+    public const string EmpdOrgIdTw = EmpdBase + "/CodeSystem/organization-identifier-tw";     // Organization.identifier:nhi-organization system
+    public const string EmpdNhiMedicationCs = EmpdBase + "/CodeSystem/NHIMedication-cs";       // Medication.code nhi-medication slice (was twcore medication-nhi-tw in 0.1.0)
     public const string EmpdTypeOfPrescription = EmpdBase + "/CodeSystem/TypeOfPrescription-cs";
     public const string EmpdOrderType = EmpdBase + "/CodeSystem/OrderType-cs";
     public const string EmpdSelfpayStatus = EmpdBase + "/CodeSystem/SelfpayStatus-cs";
     public const string EmpdExtTotalDuration = EmpdBase + "/StructureDefinition/Extension-TotalDuration";
-    public const string MoiSlash = "http://www.moi.gov.tw/";           // note: empd uses a trailing slash
-    public const string Hpio = "http://ns.electronichealth.net.au/id/hi/hpio/1.0";  // Org identifier (example)
-    public const string MohwSlash = "https://www.mohw.gov.tw/";        // practitioner qualification id
+    public const string Moi = "http://www.moi.gov.tw";                 // Patient 國民身分證統一編號 (no trailing slash in empd 0.2.1)
+    public const string Tmip = "https://www.tmip.com.tw/";             // Patient 病歷號 (medical-record) assigning authority (example)
+    public const string DepMohwDoma = "https://dep.mohw.gov.tw/DOMA";  // Practitioner medical-license identifier (example)
+    public const string CdmisFda = "https://cdmis.fda.gov.tw";         // Practitioner qualification identifier system (was mohw.gov.tw in 0.1.0)
+    public const string ServiceDeptTreatmentNhiTw = "https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/medical-treatment-department-nhi-tw";  // Encounter.serviceType
     public const string ExtPersonAge = TwcoreSd + "/person-age";
-    public const string MedicationNhiTw = "https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/medication-nhi-tw";
     public const string MedicationPathTw = "https://twcore.mohw.gov.tw/ig/twcore/CodeSystem/medication-path-tw";
 
     // --- 次世代基因定序 NGS (nhi.ngs 1.0.0) — transcribed from the official example Bundle-bun-nos-min. ---

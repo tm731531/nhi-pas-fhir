@@ -5,7 +5,7 @@ FHIR — is output that is **plausible but wrong**: it compiles, it looks right,
 a bundle the NHI will 核刪 (claw back payment for). So correctness here is never asserted; it is
 **machine-proven, in layers**, against an authority outside the AI. This page is that story.
 
-Run everything with: `dotnet test impl/csharp/NhiPasFhir.sln` (91 test cases: 88 CI-enforced + 3 live-integration). See also the detailed
+Run everything with: `dotnet test impl/csharp/NhiPasFhir.sln` (92 test cases: 89 CI-enforced + 3 live-integration). See also the detailed
 plan in [`spec/docs/CONTRACTS-and-TESTS.md`](spec/docs/CONTRACTS-and-TESTS.md).
 
 ## The layers (weakest guarantee at the bottom, strongest at the top)
@@ -24,7 +24,7 @@ This layer is why that class of bug was found and fixed.
 
 ### 4. External ground truth — the official HL7 FHIR validator (0 errors)
 Every emitted bundle is validated against the **official HL7 validator** with the pinned IG
-(`tw.gov.mohw.nhi.pas#1.2.6` + TW Core + Da Vinci PAS). **6 bundle types, all `Success: 0 errors`.**
+(`tw.gov.mohw.nhi.pas#1.2.7` + TW Core + Da Vinci PAS). **7 bundle types, all `Success: 0 errors`.**
 This is an authority *outside* this codebase and outside the AI — it cannot be talked into passing.
 Evidence: [`spec/docs/validation/`](spec/docs/validation/). Reproduce: `tools/validate.sh <bundle>`.
 
