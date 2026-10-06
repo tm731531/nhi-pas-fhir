@@ -66,12 +66,13 @@ The NHI publishes its reimbursement rules as **CQL** (Clinical Quality Language,
 you send only what will pass and hold back what would be **核刪 (post-payment clawback)** or needs **補件
 (missing data)**. Three-state output: **Pass / WouldBeRejected / DataMissing** (not a naive pass/fail).
 
-> **Scope today:** proven **end-to-end on one rule** (乳癌 Abemaciclib), indexed in the committed
-> 藥碼→規則 map (`Core/DrugRuleMap`, the single source of truth the 查 step reads). "~66" is the size of
-> the NHI catalogue, **not** what this repo has vendored — the draft CQL IG (`nhi.cql` v0.0.1) is not yet
-> distributed as a fetchable package, so loading more is a data task, not fabrication: drop the official
-> `Library-*.json` into `cql-engine/rules/`, verify it runs, add its row to `DrugRuleMap`. An uncovered
-> drug returns **NotEvaluated** (fail-loud), never a guessed verdict.
+> **Scope today:** all **20 乳癌 (breast-cancer) rules** of the CQL IG are vendored and proven to
+> evaluate on the live engine; `Core/DrugRuleMap` (the single source of truth the 查 step reads) maps
+> **50 健保碼 across 15 drugs → rules**, every code traced to the IG's official `BCCodeConcept`
+> ATC→NHI defines (0 fabricated). **大腸直腸癌 (CRC) + 肝癌 (HCC) rules are not yet vendored.** Adding
+> them is the same data task: drop the official `Library-*.json` into `cql-engine/rules/`, verify it
+> runs, add its rows to `DrugRuleMap`. An uncovered drug returns **NotEvaluated** (fail-loud), never a
+> guessed verdict.
 
 - Faithful engine: a **CQF-Ruler / HAPI clinical-reasoning** server runs the ELM (it implements
   `InCodeSystem`, which lightweight engines do not) — `cql-engine/` (docker + loader + official rules).

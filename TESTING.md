@@ -55,7 +55,8 @@ language-agnostic `spec/` is proven by more than one implementation. **Both run 
 (`dotnet test`) and a `python` job (`pytest`) — so neither language's contract can regress unnoticed.
 
 ## What is deliberately NOT claimed
-- The **CQL rules IG is v0.0.1 DRAFT**; the vendored rules are a snapshot and the drug→rule map currently
-  covers the worked sample rule — so CQL coverage is one rule end-to-end, not all ~66 yet.
+- The **CQL rules IG is v0.0.1 DRAFT**; the vendored rules are a snapshot. CQL coverage is **all 20 乳癌
+  (BC) rules** (50 健保碼 in the drug→rule map, every code from the IG's BCCodeConcept) — **大腸直腸癌 (CRC)
+  + 肝癌 (HCC) are not yet vendored**.
 - **長照** is designed-for but not implemented, so it has no tests.
 Honest test coverage means saying where the proof stops.
